@@ -13,7 +13,6 @@ goog.provide('glift.api.IconFn');
  *  !glift.displays.icons.IconBar)
  * }
  */
-glift.api.IconFn;
 
 /**
  * An icon definition.
@@ -22,13 +21,11 @@ glift.api.IconFn;
  *  tooltip: (string|undefined)
  * }}
  */
-glift.api.IconDef;
 
 /**
  * A collection of Icon Actions.
  * @typedef {!Object<string, glift.api.IconDef>}
  */
-glift.api.IconActions;
 
 /**
  * The actions for the icons (see glift.displays.svg.icons).
@@ -210,9 +207,9 @@ glift.api.iconActionDefaults = {
     tooltip: 'Shows if the problem is solved',
   },
 
-  //////////////////////
-  // Status Bar Icons //
-  //////////////////////
+  //
+  // Status Bar Icons
+  //
 
   'game-info': {
     click: function (event, widget, icon, iconBar) {

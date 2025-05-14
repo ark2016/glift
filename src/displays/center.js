@@ -150,6 +150,8 @@ glift.displays.linearCentering_ = function (
     innerHeight = outerHeight - 2 * vertMargin,
     transforms = [],
     newBboxes = [];
+  var scale, partialTransform, newBbox, extraSpace;
+
   // TODO(kashomon): Min spacing is totally broken and has no tests.
   // Probably should just remove it.
   minSpacing = minSpacing || 0;
@@ -168,12 +170,12 @@ glift.displays.linearCentering_ = function (
   var totalElemLength = 0;
   for (var i = 0; i < inBboxes.length; i++) {
     if (innerHeight > innerWidth) {
-      var scale = innerWidth / inBboxes[i].width();
+      scale = innerWidth / inBboxes[i].width();
     } else {
-      var scale = innerHeight / inBboxes[i].height();
+      scale = innerHeight / inBboxes[i].height();
     }
-    var partialTransform = new glift.displays.Transform(scale);
-    var newBbox = inBboxes[i].scale(scale);
+    partialTransform = new glift.displays.Transform(scale);
+    newBbox = inBboxes[i].scale(scale);
     transforms.push(partialTransform);
     newBboxes.push(newBbox);
     totalElemLength += getLongSide(newBbox, dir);
@@ -185,18 +187,18 @@ glift.displays.linearCentering_ = function (
   // Pop off elements that don't fit.
   var unfitBoxes = [];
   while (outsideLongSide < totalElemLength) {
-    var outOfBoundsBox = newBboxes.pop();
+    newBbox = newBboxes.pop();
     transforms.pop();
-    totalElemLength -= getLongSide(outOfBoundsBox, dir);
+    totalElemLength -= getLongSide(newBbox, dir);
     totalElemLength -= minSpacing;
-    unfitBoxes.push(outOfBoundsBox);
+    unfitBoxes.push(newBbox);
   }
 
   // Find how much space to use for the parts
   if (dir === 'h') {
-    var extraSpace = innerWidth - totalElemLength;
+    extraSpace = innerWidth - totalElemLength;
   } else {
-    var extraSpace = innerHeight - totalElemLength;
+    extraSpace = innerHeight - totalElemLength;
   }
   var extraSpacing = extraSpace / (transforms.length + 1);
   var elemSpacing = extraSpacing;
@@ -217,9 +219,9 @@ glift.displays.linearCentering_ = function (
 
   // Find the x and y translates.
   var finishedBoxes = [];
-  for (var i = 0; i < newBboxes.length; i++) {
-    var newBbox = newBboxes[i];
-    var partialTransform = transforms[i];
+  for (var j = 0; j < newBboxes.length; j++) {
+    newBbox = newBboxes[j];
+    partialTransform = transforms[j];
     var yTranslate = top - newBbox.top();
     var xTranslate = left - newBbox.left();
     partialTransform.xMove = xTranslate;
@@ -255,10 +257,7 @@ glift.displays.centerWithin = function (
   var outerWidth = outerBbox.width(),
     innerWidth = outerWidth - 2 * horzMargin,
     outerHeight = outerBbox.height(),
-    innerHeight = outerHeight - 2 * vertMargin,
-    transforms = undefined,
-    newBboxes = undefined,
-    elemWidth = 0;
+    innerHeight = outerHeight - 2 * vertMargin;
 
   var scale = 1; // i.e., no scaling;
   if (innerHeight / innerWidth > bbox.height() / bbox.width()) {

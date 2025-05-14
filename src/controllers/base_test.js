@@ -2,7 +2,6 @@
   module('glift.controllers.baseTest');
   var capturetest = testdata.sgfs.capturetest;
   var complexProblem = testdata.sgfs.complexproblem;
-  var ptlistToMap = testUtil.ptlistToMap;
   var conv = glift.util.pointFromSgfCoord;
 
   test('Successful build a Base Controller', function () {
@@ -42,7 +41,6 @@
     });
 
     for (var i = 0; i < wstones.length; i++) {
-      var stonePtStr = wstones[i].point.toString();
       ok(
         stoneMap[wstones[i].point.toString()] === undefined,
         "Must be *not* be defined since they've been captured"
@@ -51,9 +49,9 @@
 
     flattened = base.prevMove();
     stoneMap = flattened.stoneMap();
-    for (var i = 0; i < wstones.length; i++) {
+    for (var j = 0; j < wstones.length; j++) {
       ok(
-        stoneMap[wstones[i].point.toString()] !== undefined,
+        stoneMap[wstones[j].point.toString()] !== undefined,
         'Must be defined'
       );
     }

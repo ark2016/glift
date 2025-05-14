@@ -6,7 +6,6 @@ var gulp = require('gulp'),
   concat = require('gulp-concat'),
   chmod = require('gulp-chmod'),
   through = require('through2'),
-  jsSource = './src/**/*.js',
   closureCompiler = require('./deps/glift-core/dev/closure-compiler.js'),
   updateHtmlFiles = require('./deps/glift-core/dev/updatehtml.js'),
   jsSrcGlobGen = require('./deps/glift-core/dev/srcgen.js');

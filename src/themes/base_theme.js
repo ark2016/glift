@@ -4,7 +4,7 @@ goog.provide('glift.themes.base');
  * @typedef {!Object}
  */
 // TODO(kashomon): Provide real type
-glift.themes.base;
+// glift.themes.base; // Удалено
 
 /**
  * Base theme from which all others extend. All possible options should be
@@ -153,13 +153,13 @@ glift.themes.baseTemplate = {
     DEFAULT: {
       fill: '#000',
       stroke: 'black',
-      //fill: "90-#337-#55B"
+      // fill: "90-#337-#55B"
     },
 
     DEFAULT_HOVER: {
       fill: '#AAA',
       stroke: '#AAA',
-      //fill: "90-#337-#55D"
+      // fill: "90-#337-#55D"
     },
 
     tooltips: {

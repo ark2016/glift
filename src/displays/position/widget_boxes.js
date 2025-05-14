@@ -71,7 +71,7 @@ glift.displays.position.WidgetBoxes.prototype = {
    *
    * fn(<component-name>, bbox>);
    */
-  map: function (fn) {
+  forEach: function (fn) {
     if (glift.util.typeOf(fn) !== 'function') {
       return;
     }
@@ -81,9 +81,10 @@ glift.displays.position.WidgetBoxes.prototype = {
         var key = ordering[j];
         inFn(key, col.mapping[key]);
       }
-    }.bind(this);
+    };
     this._first && applyOrdering(this._first, fn.bind(this));
     this._second && applyOrdering(this._second, fn.bind(this));
+    return undefined;
   },
 
   /**
@@ -96,7 +97,7 @@ glift.displays.position.WidgetBoxes.prototype = {
     var left = null;
     var bottom = null;
     var right = null;
-    this.map(function (compName, bbox) {
+    this.forEach(function (compName, bbox) {
       if (top === null) {
         top = bbox.top();
         left = bbox.left();

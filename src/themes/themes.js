@@ -109,7 +109,7 @@ glift.themes = {
       theme.board.imagefill = value;
       // "url('" + value  + "')";
     } else {
-      throw 'Yikes! Not a theme: cannot set background image.';
+      throw new Error('Yikes! Not a theme: cannot set background image.');
     }
   },
 };

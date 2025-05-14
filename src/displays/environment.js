@@ -94,12 +94,9 @@ glift.displays.GuiEnvironment.prototype = {
    * broard.
    */
   init: function () {
-    var displays = glift.displays,
-      env = displays.environment,
-      divHeight = this.divHeight,
+    var divHeight = this.divHeight,
       divWidth = this.divWidth,
       cropbox = this.cropbox,
-      dirs = glift.enums.directions,
       // The box for the entire div.
       divBox = glift.orientation.bbox.fromPts(
         glift.util.point(0, 0), // top left point

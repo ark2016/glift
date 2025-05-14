@@ -2,7 +2,6 @@
   module('glift.controllers.gameViewerTest');
   var problem = testdata.sgfs.complexproblem;
   var states = glift.enums.states;
-  var ptlistToMap = testUtil.ptlistToMap;
 
   test('Test Create', function () {
     var gameViewer = glift.controllers.gameViewer({ sgfString: problem });
@@ -21,9 +20,10 @@
   });
 
   test('Test NextMove / PrevMove', function () {
+    var flattened, move;
     var gameViewer = glift.controllers.gameViewer({ sgfString: problem });
-    var flattened = gameViewer.nextMove();
-    var move = gameViewer.movetree.getLastMove();
+    flattened = gameViewer.nextMove();
+    move = gameViewer.movetree.getLastMove();
     ok(move !== undefined);
     ok(flattened !== undefined);
 
@@ -42,7 +42,7 @@
     flattened = gameViewer.nextMove();
     deepEqual(gameViewer.currentMoveNumber(), 2);
     deepEqual(gameViewer.treepath, [0, 0]);
-    var move = gameViewer.movetree.getLastMove();
+    move = gameViewer.movetree.getLastMove();
     ok(move, 'Must exist');
     deepEqual(move.color, states.WHITE);
     deepEqual(move.point.toString(), '13,2'); // n = 13, c = 2;
@@ -58,9 +58,10 @@
   });
 
   test('Test Simple Change Variations', function () {
+    var flattened, move;
     var gameViewer = glift.controllers.gameViewer({ sgfString: problem });
-    var flattened = gameViewer.setNextVariation(1).nextMove();
-    var move = gameViewer.movetree.getLastMove();
+    flattened = gameViewer.setNextVariation(1).nextMove();
+    move = gameViewer.movetree.getLastMove();
     deepEqual(gameViewer.currentMoveNumber(), 1);
     deepEqual(gameViewer.treepath, [1]);
     deepEqual(move.color, states.BLACK);
@@ -72,12 +73,13 @@
   });
 
   test('AddStone', function () {
+    var flattened, move;
     var gameViewer = glift.controllers.gameViewer({ sgfString: problem });
-    var flattened = gameViewer.addStone(glift.util.point(18, 0), states.BLACK);
+    flattened = gameViewer.addStone(glift.util.point(18, 0), states.BLACK);
     deepEqual(flattened, null, 'invalid move means null flattened');
 
-    var flattened = gameViewer.addStone(glift.util.point(12, 0), states.BLACK);
-    var move = gameViewer.movetree.getLastMove();
+    flattened = gameViewer.addStone(glift.util.point(12, 0), states.BLACK);
+    move = gameViewer.movetree.getLastMove();
     ok(
       flattened.stoneMap()[move.point.toString()] !== undefined,
       'Must be defined'

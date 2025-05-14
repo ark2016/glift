@@ -22,7 +22,6 @@ goog.provide('glift.displays.icons.IconBarOptions');
  *  allPositioning: !glift.displays.position.WidgetBoxes
  * }}
  */
-glift.displays.icons.IconBarOptions;
 
 /**
  * @param {!glift.displays.icons.IconBarOptions} options
@@ -110,9 +109,7 @@ glift.displays.icons.IconBar.prototype = {
   /** Draws the icon bar. */
   draw: function () {
     this.destroy();
-    var divBbox = this.divBbox,
-      svgData = glift.displays.icons.svg,
-      point = glift.util.point;
+    var divBbox = this.divBbox;
     this.bbox = divBbox;
     this.svg = glift.svg
       .svg()
@@ -258,8 +255,6 @@ glift.displays.icons.IconBar.prototype = {
     // with something more sensible.
     var textMultiplier = textMod || 0.5;
     var fontSize = bbox.width() * textMultiplier;
-    var id = this.idGen.tempIconText(iconName);
-    var boxStrokeWidth = 7;
     this.clearTempText(iconName);
     var textObj = glift.svg
       .text()
@@ -269,7 +264,7 @@ glift.displays.icons.IconBar.prototype = {
       .setAttr('font-family', 'sans-serif') // TODO(kashomon): Put in themes.
       .setAttr('font-size', fontSize + 'px')
       .setAttr('x', bbox.center().x()) // + boxStrokeWidth + 'px')
-      .setAttr('y', bbox.center().y()) //+ fontSize)
+      .setAttr('y', bbox.center().y()) // + fontSize)
       .setAttr('dy', '.33em') // Move down, for centering purposes
       .setAttr('style', 'text-anchor: middle; vertical-align: middle;')
       .setAttr('lengthAdjust', 'spacing'); // also an opt: spacingAndGlyphs
@@ -313,11 +308,10 @@ glift.displays.icons.IconBar.prototype = {
    * time.
    */
   initIconActions: function (parentWidget, iconActions) {
-    var hoverColors = { BLACK: 'BLACK_HOVER', WHITE: 'WHITE_HOVER' };
     this.forEachIcon(
       function (icon) {
         var iconName = icon.iconName;
-        if (!iconActions.hasOwnProperty(icon.iconName)) {
+        if (!Object.prototype.hasOwnProperty.call(iconActions, icon.iconName)) {
           // Make sure that there exists an action specified in the
           // displayOptions, before we add any options.
           return;

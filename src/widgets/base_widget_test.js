@@ -1,6 +1,5 @@
 (function () {
   module('glift.widgets.baseWidgetTests');
-  var divId = 'zed';
   var defaultSgfOptions = new glift.api.SgfOptions();
   var manager = glift.api.createNoDraw(defaultSgfOptions);
 
@@ -17,21 +16,21 @@
       uic.ICONBAR,
     ]);
 
-    var comp = baseWidget.getUiComponents_(
+    comp = baseWidget.getUiComponents_(
       new glift.api.SgfOptions({
         disableCommentBox: true,
       })
     );
     deepEqual([uic.BOARD, uic.STATUS_BAR, uic.ICONBAR], comp);
 
-    var comp = baseWidget.getUiComponents_(
+    comp = baseWidget.getUiComponents_(
       new glift.api.SgfOptions({
         disableIconBar: true,
       })
     );
     deepEqual([uic.BOARD, uic.COMMENT_BOX, uic.STATUS_BAR], comp);
 
-    var comp = baseWidget.getUiComponents_(
+    comp = baseWidget.getUiComponents_(
       new glift.api.SgfOptions({
         disableStatusBar: true,
       })

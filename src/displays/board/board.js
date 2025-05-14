@@ -192,7 +192,6 @@ glift.displays.board.Display.prototype = {
       .board()
       .differ(flattened.board(), glift.flattener.board.displayDiff);
 
-    var symb = glift.flattener.symbols;
     var marks = glift.enums.marks;
     var symbolStoneToState = glift.flattener.symbolStoneToState;
     var symbolMarkToMark = glift.flattener.symbolMarkToMark;

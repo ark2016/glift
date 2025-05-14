@@ -24,8 +24,8 @@
 
   // Helper constructor function that has a bunch of defaults.
   var construct = function (options) {
-    var options = options || {};
-    return new glift.displays.position.positioner(
+    options = options || {};
+    return new glift.displays.position.Positioner(
       options.divBox || squareBbox,
       options.boardRegion || glift.enums.boardRegions.ALL,
       options.intersections || 19,
@@ -208,10 +208,11 @@
   test('Position widget vertically, map', function () {
     var boxes = construct().calcVertPositioning();
     var boxList = [];
-    boxes.map(function (key, bbox) {
+    boxes.forEach(function (key, bbox) {
       ok(glift.BoardComponent[key] !== undefined, key);
       ok(bbox.width() > 0, bbox);
       boxList.push(key);
+      return undefined;
     });
     deepEqual(boxList, ['STATUS_BAR', 'BOARD', 'COMMENT_BOX', 'ICONBAR']);
   });
@@ -241,10 +242,11 @@
     ok(boxes._first, 'first');
     ok(boxes._second, 'second');
     var boxList = [];
-    boxes.map(function (key, bbox) {
+    boxes.forEach(function (key, bbox) {
       ok(glift.BoardComponent[key] !== undefined, key);
       ok(bbox.width() > 0, bbox);
       boxList.push(key);
+      return undefined;
     });
     deepEqual(boxList, ['BOARD', 'STATUS_BAR', 'COMMENT_BOX', 'ICONBAR']);
   });

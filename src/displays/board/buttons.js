@@ -16,7 +16,7 @@ glift.displays.board.buttons = function (svg, idGen, boardPoints) {
   var tl = data[0];
   var br = data[len - 1];
 
-  data = { tl: tl, br: br, spacing: boardPoints.spacing };
+  data = { tl, br, spacing: boardPoints.spacing };
   container.append(
     glift.svg
       .rect()

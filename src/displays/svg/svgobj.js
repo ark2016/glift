@@ -110,6 +110,7 @@ glift.displays.svg.dom = {
   emptyChildrenAndUpdate: function (obj) {
     obj.emptyChildren();
     var elem = document.getElementById(obj.idOrThrow());
+    // eslint-disable-next-line no-unmodified-loop-condition
     while (elem && elem.firstChild) {
       elem.removeChild(elem.firstChild);
     }

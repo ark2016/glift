@@ -25,7 +25,7 @@ glift.platform = {
     );
   },
 
-  /** Whether a page can support SVG (and thus Glift).*/
+  /** Whether a page can support SVG (and thus Glift). */
   _supportsSvg: null,
   supportsSvg: function () {
     if (glift.platform._supportsSvg !== null)

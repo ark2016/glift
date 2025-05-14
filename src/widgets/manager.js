@@ -155,7 +155,6 @@ glift.widgets.WidgetManager.prototype = {
    * @export
    */
   draw: function () {
-    var that = this;
     var afterCollectionLoad = function () {
       if (!this.initBackgroundLoading && this.loadColInBack) {
         // Only start background loading once.
@@ -318,6 +317,7 @@ glift.widgets.WidgetManager.prototype = {
       );
     }
     var curSgfObj = this.sgfCollection[index];
+    var toProc;
     if (glift.util.typeOf(curSgfObj) === 'string') {
       var str = /** @type {string} */ (curSgfObj);
       var out = {};
@@ -328,9 +328,9 @@ glift.widgets.WidgetManager.prototype = {
         // Assume a URL.
         out.url = str;
       }
-      var toProc = out;
+      toProc = out;
     } else {
-      var toProc = /** @type {!Object} */ (curSgfObj);
+      toProc = /** @type {!Object} */ (curSgfObj);
     }
     return this.sgfDefaults.createSgfObj(toProc);
   },
@@ -343,31 +343,24 @@ glift.widgets.WidgetManager.prototype = {
    * @param {!function(glift.api.SgfOptions)} callback
    * @private
    */
-  loadSgfString_: function (sgfObj, callback) {
-    var alias = sgfObj.alias;
-    var url = sgfObj.url;
-    if (alias && this.sgfCache[alias]) {
-      // First, check the cache for aliases.
-      sgfObj.sgfString = this.sgfCache[alias];
-      callback(sgfObj);
-    } else if (url && this.sgfCache[url]) {
-      // Next, check the cache for urls.
-      sgfObj.sgfString = this.sgfCache[url];
-      callback(sgfObj);
+  loadSgfString_: function (sgfObj, onSuccess) {
+    var toProc;
+    if (sgfObj.alias && this.sgfCache[sgfObj.alias]) {
+      toProc = glift.util.simpleClone(sgfObj);
+      toProc.sgfString = this.sgfCache[sgfObj.alias];
+      onSuccess(toProc);
+    } else if (sgfObj.url && this.sgfCache[sgfObj.url]) {
+      toProc = glift.util.simpleClone(sgfObj);
+      toProc.sgfString = this.sgfCache[sgfObj.url];
+      onSuccess(toProc);
     } else if (sgfObj.url) {
-      // Check if we need to do an AJAX request.
-      this.loadSgfWithAjax(sgfObj.url, sgfObj, callback);
+      this.loadSgfWithAjax(sgfObj.url, sgfObj, onSuccess);
     } else {
-      // Lastly: Just send the SGF object back.  Typically, this will be because
-      // either:
-      //  1. The SGF has been aliased.
-      //  2. We want to start with a blank state (i.e., in the case of the
-      //     editor).
-      if (sgfObj.alias && sgfObj.sgfString) {
-        // Create a new cache entry.
-        this.sgfCache[sgfObj.alias] = sgfObj.sgfString;
+      toProc = glift.util.simpleClone(sgfObj);
+      if (toProc.alias && toProc.sgfString) {
+        this.sgfCache[toProc.alias] = toProc.sgfString;
       }
-      callback(sgfObj);
+      onSuccess(toProc);
     }
   },
 
@@ -525,12 +518,9 @@ glift.widgets.WidgetManager.prototype = {
       if (idx < this.sgfCollection.length) {
         var curObj = this.getSgfObj(idx);
         this.loadSgfString_(curObj, function () {
-          setTimeout(
-            function () {
-              loader(idx + 1);
-            }.bind(this),
-            250
-          ); // 250ms
+          setTimeout(function () {
+            loader(idx + 1);
+          }, 250); // 250ms
         });
       }
     }.bind(this);

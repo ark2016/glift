@@ -17,7 +17,7 @@ glift.dom.ErrorDoc = {
  */
 glift.dom.error = function (msg, opt_docLink) {
   var elem = document.createElement('div');
-  elem.style['color'] = '#E00';
+  elem.style.color = '#E00';
   msg = '::Glift Error::' + msg;
   elem.appendChild(document.createTextNode(msg));
   if (opt_docLink) {

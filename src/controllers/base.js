@@ -6,7 +6,6 @@ goog.provide('glift.controllers.ControllerFunc');
  *
  * @typedef {function(!glift.api.SgfOptions):!glift.controllers.BaseController}
  */
-glift.controllers.ControllerFunc;
 
 /**
  * Creates a base controller implementation.
@@ -26,9 +25,9 @@ glift.controllers.base = function () {
  * @constructor
  */
 glift.controllers.BaseController = function () {
-  //////////////////////////////////////////////////////////////
-  // Variables set during initialization but const afterwards //
-  //////////////////////////////////////////////////////////////
+  //
+  // Variables set during initialization but const afterwards
+  //
 
   /**
    * The initial SGF String.
@@ -81,9 +80,9 @@ glift.controllers.BaseController = function () {
    */
   this.markKo_ = true;
 
-  /////////////////////////////////////////
-  // Variables set during initialization //
-  /////////////////////////////////////////
+  //
+  // Variables set during initialization
+  //
 
   /**
    * The treepath representing the pth to the current position.
@@ -223,7 +222,7 @@ glift.controllers.BaseController.prototype = {
    * @return {?glift.flattener.Flattened} The flattened representation.
    */
   addStone: function (point, color) {
-    throw 'Not Implemented';
+    throw new Error('Not Implemented');
   },
 
   /**
@@ -307,7 +306,7 @@ glift.controllers.BaseController.prototype = {
    * @return {!Array<!glift.rules.PropDescriptor>}
    */
   getGameInfo: function () {
-    return this.movetree.getTreeFromRoot().properties().getGameInfo();
+    return this.movetree.getGameInfo();
   },
 
   /**
@@ -531,9 +530,9 @@ glift.controllers.BaseController.prototype = {
     return this.flattenedState();
   },
 
-  /////////////////////
+  /// //////////////////
   // Private Methods //
-  /////////////////////
+  /// //////////////////
 
   /**
    * Back out a movetree addition (used for going back a move).
@@ -554,11 +553,11 @@ glift.controllers.BaseController.prototype = {
         }
       }
     }
-    for (var color in captures) {
-      var c = /** @type {glift.enums.states} */ (color);
-      var arr = /** @type {!Array<!glift.Point>} */ (captures[c]);
-      for (var i = 0; i < arr.length; i++) {
-        this.goban.addStone(arr[i], c);
+    for (var captureColor in captures) {
+      var captureC = /** @type {glift.enums.states} */ (captureColor);
+      var captureArr = /** @type {!Array<!glift.Point>} */ (captures[captureC]);
+      for (var i = 0; i < captureArr.length; i++) {
+        this.goban.addStone(captureArr[i], captureC);
       }
     }
   },

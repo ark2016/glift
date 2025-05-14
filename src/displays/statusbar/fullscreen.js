@@ -66,7 +66,6 @@ glift.displays.statusbar.StatusBar.prototype.unfullscreen = function () {
     wrapperDivEl = glift.dom.elem(widget.wrapperDivId),
     state = widget.getCurrentState(),
     manager = widget.manager,
-    prevScrollTop = manager.prevScrollTop,
     // We can safely cast the body; There's no way to get here unless
     // 'fullscreen()' has already been called.
     body = glift.dom.elem(/** @type {!HTMLBodyElement} */ (document.body));

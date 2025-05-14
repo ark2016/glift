@@ -98,7 +98,7 @@ glift.displays.icons.WrappedIcon.prototype = {
    */
   _addAssociatedWrapped: function (wrapped) {
     if (wrapped.originalBbox === undefined) {
-      throw 'Wrapped icon not actually a wrapped icon: ' + wrapped;
+      throw new Error('Wrapped icon not actually a wrapped icon: ' + wrapped);
     }
     this.associatedIcons.push(wrapped);
     return wrapped;
@@ -166,7 +166,7 @@ glift.displays.icons.WrappedIcon.prototype = {
    */
   centerWithinSubbox: function (wrapped, vMargin, hMargin) {
     if (this.subboxIcon === undefined) {
-      throw 'No subbox defined, so cannot centerWithin.';
+      throw new Error('No subbox defined, so cannot centerWithin.');
     }
     var centerObj = glift.displays.centerWithin(
       this.subboxIcon.bbox,
@@ -235,7 +235,7 @@ glift.displays.icons.WrappedIcon.prototype = {
    * @return {string} the SVG transform string.
    */
   transformString: function () {
-    if (this.transformObj != undefined) {
+    if (this.transformObj !== undefined) {
       return (
         'translate(' +
         this.transformObj.xMove +

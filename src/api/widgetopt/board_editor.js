@@ -49,21 +49,22 @@
       statusBarIcons: ['game-info', 'move-indicator', 'fullscreen'],
 
       stoneClick: function (event, widget, pt) {
+        var partialData;
         widget.display.intersections().clearTempMarks();
         var iconName = widget.iconBar.getIcon('multiopen').getActive().iconName;
         var currentPlayer = widget.controller.getCurrentPlayer();
 
         if (placementMap[iconName]) {
           var color = placementMap[iconName];
-          var partialData = widget.controller.addPlacement(pt, color);
+          partialData = widget.controller.addPlacement(pt, color);
           widget.applyBoardData(partialData);
         } else if (iconToMark[iconName]) {
-          var partialData = widget.controller.addMark(pt, iconToMark[iconName]);
+          partialData = widget.controller.addMark(pt, iconToMark[iconName]);
           if (partialData) {
             widget.applyBoardData(partialData);
           }
         } else if (iconName === 'twostones') {
-          var partialData = widget.controller.addStone(pt, currentPlayer);
+          partialData = widget.controller.addStone(pt, currentPlayer);
           if (partialData) {
             widget.applyBoardData(partialData);
           }
@@ -72,6 +73,7 @@
       },
 
       stoneMouseover: function (event, widget, pt) {
+        var colorKey;
         var marks = glift.enums.marks;
         var hoverColors = { BLACK: 'BLACK_HOVER', WHITE: 'WHITE_HOVER' };
         var currentPlayer = widget.controller.getCurrentPlayer();
@@ -79,12 +81,12 @@
         var iconName = widget.iconBar.getIcon('multiopen').getActive().iconName;
 
         if (placementMap[iconName] !== undefined) {
-          var colorKey = placementMap[iconName];
+          colorKey = placementMap[iconName];
           if (widget.controller.canAddStone(pt, currentPlayer)) {
             intersections.setStoneColor(pt, hoverColors[colorKey]);
           }
         } else if (iconName === 'twostones') {
-          var colorKey = widget.controller.getCurrentPlayer();
+          colorKey = widget.controller.getCurrentPlayer();
           if (widget.controller.canAddStone(pt, currentPlayer)) {
             intersections.setStoneColor(pt, hoverColors[colorKey]);
           }

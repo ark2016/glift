@@ -72,7 +72,7 @@
     );
     var comps = [];
     var bboxes = [];
-    wboxes.map(function (comp, bbox) {
+    wboxes.forEach(function (comp, bbox) {
       comps.push(comp);
       bboxes.push(bbox);
     });

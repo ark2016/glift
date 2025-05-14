@@ -19,8 +19,7 @@ glift.dom = {
     var argtype = glift.util.typeOf(arg);
     if (argtype === 'string') {
       // Assume an element ID.
-      arg = /** @type {string} */ (arg);
-      var el = document.getElementById(arg);
+      var el = document.getElementById(/** @type {string} */ (arg));
       if (el === null) {
         return null;
       } else {

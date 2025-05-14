@@ -63,7 +63,6 @@ glift.controllers.GameViewer.prototype = {
    * Returns null in the case that we're at the root already.
    */
   previousCommentOrBranch: function (maxMovesPrevious) {
-    var displayDataList = [];
     var displayData = null;
     var movesSeen = 0;
     do {

@@ -156,7 +156,7 @@ glift.widgets.BaseWidget.prototype = {
         .bar({
           divId: divIds[glift.BoardComponent.ICONBAR],
           positioning: positioning.mustGetBbox(glift.BoardComponent.ICONBAR),
-          icons: icons,
+          icons,
           parentBbox: parentDivBbox,
           theme: displayTheme,
           allDivIds: divIds,
@@ -288,8 +288,9 @@ glift.widgets.BaseWidget.prototype = {
       glift.dom.ux.setNotSelectable(newId);
       return newId;
     };
-    positioning.map(function (key, bbox) {
+    positioning.forEach(function (key, bbox) {
       out[key] = createDiv(bbox);
+      return undefined;
     });
     return out;
   },
@@ -349,7 +350,7 @@ glift.widgets.BaseWidget.prototype = {
     var keyMappings = glift.util.simpleClone(this.sgfOptions.keyMappings || {});
     if (this.manager.fullscreenDivId) {
       // We're fullscreened.  Add ESC to escape =)
-      keyMappings['ESCAPE'] = 'iconActions.unfullscreen.click';
+      keyMappings.ESCAPE = 'iconActions.unfullscreen.click';
     }
 
     for (var keyName in keyMappings) {

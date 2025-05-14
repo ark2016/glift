@@ -3,7 +3,7 @@
 
   test('Must be able te create a controller', function () {
     throws(function () {
-      var controller = glift.controllers.staticProblem();
+      glift.controllers.staticProblem();
     }, /not defined/);
   });
 

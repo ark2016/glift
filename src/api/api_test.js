@@ -1,6 +1,5 @@
 (function () {
   module('glift.api.createTest');
-  var testUtil = glift.testUtil;
 
   test('Successfully create a basic widget (Game Viewer)', function () {
     var manager = glift.api.create({

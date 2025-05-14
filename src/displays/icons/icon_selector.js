@@ -40,7 +40,6 @@ glift.displays.icons.IconSelector.prototype = {
     // TODO(kashomon): This needs to be cleaned up. It's currently quite the
     // mess.
     this.destroy();
-    var that = this;
     var parentBbox = glift.displays.bboxFromDiv(this.parentDivId);
 
     var barElem = glift.dom.elem(this.iconBarId);
@@ -48,7 +47,6 @@ glift.displays.icons.IconSelector.prototype = {
 
     var iconBarBbox = glift.displays.bboxFromDiv(this.iconBarId);
     var iconBbox = this.icon.bbox;
-    var columnWidth = iconBbox.height();
     // This assumes that the iconbar is always on the bottom.
     var columnHeight = parentBbox.height() - iconBarBbox.height();
     var paddingPx = 5; // TODO(kashomon): Get from theme.
@@ -99,8 +97,8 @@ glift.displays.icons.IconSelector.prototype = {
       var idGen = glift.displays.svg.ids.gen(columnId);
       var container = glift.svg.group().setId(idGen.iconGroup());
       svg.append(container);
-      for (var i = 0, len = transforms.length; i < len; i++) {
-        var icon = rewrapped.shift();
+      for (var j = 0, len = transforms.length; j < len; j++) {
+        var icon = rewrapped.shift(); // Use rewrapped here
         var id = svgId + '_' + icon.iconName;
         icon.setElementId(id);
         this.iconList[columnIndex].push(icon);
@@ -119,10 +117,10 @@ glift.displays.icons.IconSelector.prototype = {
 
     this._createIconButtons();
     this._setBackgroundEvent();
-    for (var i = 0; i < this.svgColumnList.length; i++) {
+    for (var k = 0; k < this.svgColumnList.length; k++) {
       glift.displays.svg.dom.attachToParent(
-        this.svgColumnList[i],
-        this.columnIdList[i]
+        this.svgColumnList[k],
+        this.columnIdList[k]
       );
     }
     return this;
@@ -154,9 +152,8 @@ glift.displays.icons.IconSelector.prototype = {
   },
 
   _setBackgroundEvent: function () {
-    var that = this;
     glift.dom.elem(this.wrapperDivId).on('click', function (e) {
-      this.remove();
+      this.remove(); // TODO(kashomon): This 'this' is incorrect.
     });
     return this;
   },

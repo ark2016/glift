@@ -84,7 +84,6 @@ glift.displays.statusbar.StatusBar.prototype = {
       return;
     }
     var num = (number || '0') + ''; // Force to be a string.
-    var denom = (denominator || '0') + ''; // Force to be a string.
     var color = this.theme.statusBar.icons.DEFAULT.fill;
     this.iconBar.addTempText(
       'widget-page',

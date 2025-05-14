@@ -44,7 +44,7 @@
       0,
       0
     );
-    ok(wrapped != undefined);
+    ok(wrapped !== undefined);
     deepEqual(
       oneDec(centered.bbox.topLeft().x() - subboxIcon.bbox.topLeft().x()),
       oneDec(subboxIcon.bbox.botRight().x() - centered.bbox.botRight().x()),
@@ -65,7 +65,7 @@
       0,
       0
     );
-    ok(wrapped != undefined);
+    ok(wrapped !== undefined);
     deepEqual(
       oneDec(centered.bbox.topLeft().x() - wrapped.bbox.topLeft().x()),
       oneDec(wrapped.bbox.botRight().x() - centered.bbox.botRight().x()),

@@ -3,8 +3,7 @@
   var displays = glift.displays,
     boardRegions = glift.enums.boardRegions,
     overf = displays.cropbox.OVERFLOW,
-    ragp = displays.cropbox.CROP_PAD,
-    util = glift.util;
+    ragp = displays.cropbox.CROP_PAD;
 
   test('For 19x19', function () {
     var box = displays.cropbox.getFromRegion(boardRegions.ALL, 19);

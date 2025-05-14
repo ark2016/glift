@@ -4,3 +4,4 @@ deps/
 test/libs/
 test/htmltests_gen/
 *.min.js 
+test/ 

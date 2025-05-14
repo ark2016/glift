@@ -126,7 +126,7 @@ glift.controllers.StaticProblem.prototype = {
       outData.setProblemResult(correctness);
       return outData;
     } else {
-      throw 'Unexpected result output: ' + correctness;
+      throw new Error('Unexpected result output: ' + correctness);
     }
   },
 

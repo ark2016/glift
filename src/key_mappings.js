@@ -144,7 +144,6 @@ glift.keyMappings = {
     }
 
     var activeId = glift.global.activeInstanceId;
-    var bindingMap = glift.keyMappings._keyBindingMap;
     var funcOrIcon = glift.keyMappings.getFuncOrIcon(activeId, keyName);
     if (!funcOrIcon) {
       return;

@@ -52,9 +52,8 @@ glift.displays.board.Intersections.prototype = {
    */
   setStoneColor: function (pt, color) {
     pt = pt.rotate(this.boardPoints.numIntersections, this.rotation);
-    var key = pt.toString();
     if (this.theme.stones[color] === undefined) {
-      throw 'Unknown color key [' + color + ']';
+      throw new Error('Unknown color key [' + color + ']');
     }
 
     var stoneGroup = this.svg.child(this.idGen.stoneGroup());
@@ -330,12 +329,11 @@ glift.displays.board.Intersections.prototype = {
    * @return {glift.displays.board.Intersections} this
    */
   addGuideLines: function (pt) {
-    var container = this.svg.child(this.idGen.markGroup());
-    container.rmChild(this.idGen.guideLine());
+    this.svg.child(this.idGen.markGroup()).rmChild(this.idGen.guideLine());
 
     var bpt = this.boardPoints.getCoord(pt);
     var boardPoints = this.boardPoints;
-    container.append(
+    this.svg.child(this.idGen.markGroup()).append(
       glift.svg
         .path()
         .setAttr(
@@ -357,9 +355,7 @@ glift.displays.board.Intersections.prototype = {
    * @return {glift.displays.board.Intersections} this
    */
   clearGuideLines: function () {
-    var container = this.svg
-      .child(this.idGen.markGroup())
-      .rmChild(this.idGen.guideLine());
+    this.svg.child(this.idGen.markGroup()).rmChild(this.idGen.guideLine());
     return this;
   },
 
@@ -403,9 +399,9 @@ glift.displays.board.Intersections.prototype = {
     var shadowGroup = this.svg.child(this.idGen.stoneShadowGroup());
     if (shadowGroup) {
       var shadows = shadowGroup.children();
-      for (var i = 0, len = shadows.length; i < len; i++) {
+      for (var j = 0, shadowLen = shadows.length; j < shadowLen; j++) {
         glift.dom
-          .elem(/** @type {string} */ (shadows[i].id()))
+          .elem(/** @type {string} */ (shadows[j].id()))
           .setAttrObj(shadowAttrs);
       }
     }
@@ -538,7 +534,7 @@ glift.displays.board.Intersections.prototype = {
     }
 
     var pt = glift.util.point(intPtx, intPty);
-    if (this.rotation != glift.enums.rotations.NO_ROTATION) {
+    if (this.rotation !== glift.enums.rotations.NO_ROTATION) {
       pt = pt.antirotate(this.boardPoints.numIntersections, this.rotation);
     }
     return pt;

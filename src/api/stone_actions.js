@@ -10,7 +10,6 @@ goog.provide('glift.api.StoneFn');
  *  !glift.Point)
  * }
  */
-glift.api.StoneFn;
 
 /**
  * Actions for stones.  If the user specifies his own actions, then the

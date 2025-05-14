@@ -85,6 +85,7 @@ glift.displays.icons._centerWrapped = function (
   direction
 ) {
   var bboxes = [];
+  var centeringData;
   if (
     direction !== glift.displays.icons.CenterDir.H &&
     direction !== glift.displays.icons.CenterDir.V
@@ -97,7 +98,7 @@ glift.displays.icons._centerWrapped = function (
 
   // Row center returns: { transforms: [...], bboxes: [...] }
   if (direction === glift.displays.icons.CenterDir.H) {
-    var centeringData = glift.displays.rowCenterSimple(
+    centeringData = glift.displays.rowCenterSimple(
       divBbox,
       bboxes,
       vMargin,
@@ -105,7 +106,7 @@ glift.displays.icons._centerWrapped = function (
       minSpacing
     );
   } else {
-    var centeringData = glift.displays.columnCenterSimple(
+    centeringData = glift.displays.columnCenterSimple(
       divBbox,
       bboxes,
       vMargin,
@@ -117,8 +118,8 @@ glift.displays.icons._centerWrapped = function (
 
   // TODO(kashomon): Can the transforms be less than the centerede icons? I
   // think so.  In any case, this case probably needs to be handled.
-  for (var i = 0; i < transforms.length && i < wrappedIcons.length; i++) {
-    wrappedIcons[i].performTransform(transforms[i]);
+  for (var j = 0; j < transforms.length && j < wrappedIcons.length; j++) {
+    wrappedIcons[j].performTransform(transforms[j]);
   }
   return transforms;
 };

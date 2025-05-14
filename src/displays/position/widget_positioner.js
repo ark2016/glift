@@ -212,28 +212,22 @@ glift.displays.position.WidgetPositioner.prototype = {
       column.setComponent(components.BOARD, board);
     }
 
-    var previousComp = null;
-    var previousCompTop = null;
     var colWidth = board ? board.width() : wrapperDiv.width();
     var colLeft = board ? board.left() : wrapperDiv.left();
-    column.orderFn(
-      function (comp) {
-        if (comp === components.BOARD) {
-          previousComp = comp;
-          top += board.height();
-          return;
-        }
-        var split = splitMap[comp];
-        var bbox = glift.orientation.bbox.fromSides(
-          glift.util.point(colLeft, top),
-          colWidth,
-          split.height()
-        );
-        column.setComponent(comp, bbox);
-        top += bbox.height();
-        previousComp = comp;
-      }.bind(this)
-    );
+    column.orderFn(function (comp) {
+      if (comp === components.BOARD) {
+        top += board.height();
+        return;
+      }
+      var split = splitMap[comp];
+      var bbox = glift.orientation.bbox.fromSides(
+        glift.util.point(colLeft, top),
+        colWidth,
+        split.height()
+      );
+      column.setComponent(comp, bbox);
+      top += bbox.height();
+    });
     return column;
   },
 
@@ -263,7 +257,6 @@ glift.displays.position.WidgetPositioner.prototype = {
       // Grab array of component-ratio objs.
       var col = columnSplits[colKey];
       var colOut = [];
-      var extra = 0;
 
       // Add up the unused pieces.
       var total = 0;
@@ -280,9 +273,9 @@ glift.displays.position.WidgetPositioner.prototype = {
       }
 
       // Apportion the total amount so that the relative ratios are preserved.
-      for (var i = 0; i < colOut.length; i++) {
-        var part = colOut[i];
-        part.ratio = part.ratio / total;
+      for (var j = 0; j < colOut.length; j++) {
+        var outPart = colOut[j];
+        outPart.ratio = outPart.ratio / total;
       }
       out[colKey] = colOut;
     }
@@ -351,9 +344,9 @@ glift.displays.position.WidgetPositioner.prototype = {
     return splits;
   },
 
-  ////////////////////////////
+  /// /////////////////////////
   // Private helper methods //
-  ////////////////////////////
+  /// /////////////////////////
 
   /** Converts the components to use array into a set (object=>true/false). */
   _getComponentSet: function () {

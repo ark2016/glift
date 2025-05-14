@@ -4,7 +4,7 @@
 
   test('Test sgf and sgfList: Should throw an error', function () {
     throws(function () {
-      var mgr = createNoDraw(
+      createNoDraw(
         {
           sgfCollection: ['foo', 'bar'],
           sgf: 'Zam',
@@ -100,13 +100,13 @@
     deepEqual(mgr.metadata, undefined);
     deepEqual(mgr.getCurrentSgfObj().metadata, undefined);
 
-    var mgr = createNoDraw({
+    var mgr2 = createNoDraw({
       sgf: { metadata: 'zed' },
       divId: 'glift_display1',
       metadata: { foo: 'bar' },
     });
-    deepEqual(mgr.metadata, { foo: 'bar' });
-    deepEqual(mgr.getCurrentSgfObj().metadata, 'zed');
+    deepEqual(mgr2.metadata, { foo: 'bar' });
+    deepEqual(mgr2.getCurrentSgfObj().metadata, 'zed');
   });
 
   test('Test processing SGF mapping', function () {
@@ -120,7 +120,7 @@
         zed: testSgf,
       },
     });
-    deepEqual(mgr.sgfCache['zed'], testSgf);
+    deepEqual(mgr.sgfCache.zed, testSgf);
     mgr.loadSgfString_(mgr.getSgfObj(0), function (obj) {
       deepEqual(obj.sgfString, testSgf);
     });

@@ -1,19 +1,14 @@
 (function () {
   module('glift.displays.environmentTest');
-  var util = glift.util,
-    displays = glift.displays,
-    enums = glift.enums,
-    env = glift.displays.environment,
-    cropbox = displays.cropbox,
+  var env = glift.displays.environment,
     pt = glift.util.point,
     tl = pt(0, 0),
     bbox = glift.orientation.bbox,
-    opts = {},
     WIDTH = 300,
     HEIGHT = 400;
 
   var createEnv = function (opt) {
-    var opt = opt || {};
+    opt = opt || {};
     var boardBox =
       opt.boardBox !== undefined
         ? opt.boardBox
@@ -45,12 +40,12 @@
       'Must create a square board for a long box'
     );
 
-    var guiEnv = createEnv({
+    var guiEnv2 = createEnv({
       boardBox: bbox.fromPts(tl, pt(HEIGHT, WIDTH)),
     }).init();
     deepEqual(
-      Math.round(guiEnv.goBoardBox.height()),
-      Math.round(guiEnv.goBoardBox.width()),
+      Math.round(guiEnv2.goBoardBox.height()),
+      Math.round(guiEnv2.goBoardBox.width()),
       'Must create a square board for a tall box'
     );
   });

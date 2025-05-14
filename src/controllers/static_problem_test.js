@@ -1,22 +1,18 @@
 (function () {
   module('glift.controllers.staticProblemTest');
   var cont = glift.controllers,
-    util = glift.util,
     conv = glift.util.pointFromSgfCoord,
     sgfs = testdata.sgfs,
-    mk = glift.enums.marks,
     states = glift.enums.states,
     options = { sgfString: sgfs.realproblem, problemConditions: { GB: [] } },
-    msgs = glift.enums.controllerMessages,
-    problemResults = glift.enums.problemResults,
-    ptlistToMap = testUtil.ptlistToMap;
+    problemResults = glift.enums.problemResults;
 
   test('Test create & initialize problem controller', function () {
     var c = cont.staticProblem(options),
       wstone = conv('pc'),
       bstone = conv('oc');
     ok(c.problemConditions !== undefined, 'problemConditions must be defined');
-    ok(c.problemConditions['GB'] !== undefined, 'GB must be specified');
+    ok(c.problemConditions.GB !== undefined, 'GB must be specified');
     // deepEqual(c.sgfString, sgfs.realproblem); -- no longer true
     var flattened = c.initialize().flattenedState();
 
@@ -94,7 +90,7 @@
     );
   });
 
-  //13,3; 12,2 Black
+  // 13,3; 12,2 Black
   test('Test Add Stone: Continue', function () {
     var c = cont.staticProblem({
       sgfString: sgfs.complexproblem,

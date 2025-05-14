@@ -37,6 +37,7 @@ glift.displays.board.addMark = function (
   var marks = glift.enums.marks;
   var coordPt = boardPoints.getCoord(pt).coordPt;
   var markId = idGen.mark(pt);
+  var baseDelta;
 
   var fudge = boardPoints.radius / 8;
   // TODO(kashomon): Move the labels code to a separate function.  It's pretty
@@ -85,7 +86,7 @@ glift.displays.board.addMark = function (
         .setId(markId)
     );
   } else if (mark === marks.SQUARE) {
-    var baseDelta = boardPoints.radius / rootTwo;
+    baseDelta = boardPoints.radius / rootTwo;
     // If the square is right next to the stone edge, it doesn't look as nice
     // as if it's offset by a little bit.
     var halfWidth = baseDelta - fudge;
@@ -103,7 +104,7 @@ glift.displays.board.addMark = function (
         .setId(markId)
     );
   } else if (mark === marks.XMARK) {
-    var baseDelta = boardPoints.radius / rootTwo;
+    baseDelta = boardPoints.radius / rootTwo;
     var halfDelta = baseDelta - fudge;
     var topLeft = coordPt.translate(-1 * halfDelta, -1 * halfDelta);
     var topRight = coordPt.translate(halfDelta, -1 * halfDelta);
@@ -149,7 +150,6 @@ glift.displays.board.addMark = function (
         .setId(markId)
     );
   } else if (mark === marks.STONE_MARKER) {
-    var stoneMarkerTheme = stonesTheme.marks['STONE_MARKER'];
     container.append(
       glift.svg
         .circle()

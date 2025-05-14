@@ -15,9 +15,9 @@ glift.themes.classes = {
   /** An elem that's absolutely positioned */
   ABSOLUTE_ELEM: 'glift-absolute-elem',
 
-  //////////////////////////
+  /// ///////////////////////
   // Basic board elements //
-  //////////////////////////
+  /// ///////////////////////
 
   BOARD: 'glift-board',
   STARPOINTS: 'glift-starpoints',

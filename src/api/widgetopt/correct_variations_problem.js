@@ -55,7 +55,7 @@ glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function () {
               }, widget.sgfOptions.correctVariationsResetTime);
             }
           }
-        } else if (flattened.problemResult() == problemResults.INCORRECT) {
+        } else if (flattened.problemResult() === problemResults.INCORRECT) {
           widget.iconBar.destroyTempIcons();
           widget.iconBar.setCenteredTempIcon(
             'multiopen-boxonly',

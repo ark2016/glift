@@ -54,7 +54,6 @@ glift.controllers.BoardEditor.prototype = {
    * this._ptTolabelMap: A map from pt (string) to {label + optional data}.
    */
   _initLabelTrackers: function () {
-    var prop = glift.rules.prop;
     var marks = glift.enums.marks;
     var numericLabelMap = {}; // number-string to 'true'
     var alphaLabelMap = {}; // alphabetic label to 'true'
@@ -62,8 +61,8 @@ glift.controllers.BoardEditor.prototype = {
     for (var i = 0; i < 100; i++) {
       numericLabelMap[i + 1] = true;
     }
-    for (var i = 0; i < 26; i++) {
-      var label = '' + String.fromCharCode('A'.charCodeAt(0) + i);
+    for (var j = 0; j < 26; j++) {
+      var label = '' + String.fromCharCode('A'.charCodeAt(0) + j);
       alphaLabelMap[label] = true;
     }
 
@@ -77,13 +76,13 @@ glift.controllers.BoardEditor.prototype = {
     var alphaRegex = /^[A-Z]$/;
     var digitRegex = /^\d*$/;
 
-    for (var i = 0; i < marksToExamine.length; i++) {
-      var curMark = marksToExamine[i];
+    for (var k = 0; k < marksToExamine.length; k++) {
+      var curMark = marksToExamine[k];
       var sgfProp = glift.sgf.markToProperty(curMark);
       var mtLabels = this.movetree.properties().getAllValues(sgfProp);
       if (mtLabels) {
-        for (var j = 0; j < mtLabels.length; j++) {
-          var splat = mtLabels[j].split(':');
+        for (var l = 0; l < mtLabels.length; l++) {
+          var splat = mtLabels[l].split(':');
           var markData = { mark: curMark };
           var lbl = null;
           if (splat.length > 1) {
@@ -222,7 +221,7 @@ glift.controllers.BoardEditor.prototype = {
       return this.removeMark(point);
     }
 
-    var markData = { mark: mark };
+    var markData = { mark };
     var data = null;
     if (mark === marks.LABEL_NUMERIC) {
       data = this._useCurrentNumericMark();
@@ -281,16 +280,13 @@ glift.controllers.BoardEditor.prototype = {
    */
   addStone: function (point, color) {
     if (!this.canAddStone(point, color)) {
-      return null;
+      return this.flattenedState();
     }
-
-    // TODO(kashomon): Use the addResult
-    var addResult = this.goban.addStone(point, color);
-
-    this.movetree.addNode();
+    this.goban.addStone(point, color);
     this.movetree
       .properties()
       .add(glift.sgf.colorToToken(color), point.toSgfCoord());
+    this._initLabelTrackers(); // Reset the label data.
     return this.flattenedState();
   },
 

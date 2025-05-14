@@ -1,6 +1,5 @@
 (function () {
   module('glift.controllers.boardEditorTest');
-  var sgfs = testdata.sgfs;
   var boardEditor = glift.controllers.boardEditor;
 
   test('Basic Creation', function () {
@@ -92,7 +91,6 @@
   });
 
   test('Add placement; test captures', function () {
-    var marks = glift.enums.marks;
     var BLACK = glift.enums.states.BLACK;
     var WHITE = glift.enums.states.WHITE;
     var point = glift.util.point;

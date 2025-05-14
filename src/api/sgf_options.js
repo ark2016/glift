@@ -23,7 +23,7 @@ goog.provide('glift.api.WidgetTypeOptions');
  *  stoneMouseout: (glift.api.StoneFn|undefined)
  * }}
  */
-glift.api.WidgetTypeOptions;
+// glift.api.WidgetTypeOptions; // Удалено
 
 /**
  * The defaults for SGF objects. These are equivalent to the options used for
@@ -243,14 +243,14 @@ glift.api.SgfOptions = function (opt_o) {
    */
   this.hooks = new glift.api.HookOptions(o.hooks);
 
-  //-------------------------------------------------------------------------
+  // -----
   // These options must always be overriden by the widget type overrides.
   //
   // This could easily be changed, but right now this exists as a reminder to
   // the widget creator that they should override these options. In practice,
   // it seems that these particular options need to be set on a per-widget
   // basis anyway.
-  //-------------------------------------------------------------------------
+  // -----
 
   /**
    * Icons to use in the status bar.
@@ -407,9 +407,13 @@ glift.api.SgfOptions.prototype = {
     }
 
     var sdef = /** @type {!Object} */ (this);
-    for (var key in sdef) {
-      if (!sgf[key] && sdef[key] !== undefined && key !== 'createSgfObj') {
-        sgf[key] = sdef[key];
+    for (var sdefKey in sdef) {
+      if (
+        !sgf[sdefKey] &&
+        sdef[sdefKey] !== undefined &&
+        sdefKey !== 'createSgfObj'
+      ) {
+        sgf[sdefKey] = sdef[sdefKey];
       }
     }
 

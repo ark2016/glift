@@ -2,10 +2,8 @@
   module('glift.displays.resizedBoxTest');
   var util = glift.util,
     displays = glift.displays,
-    enums = glift.enums,
     boardRegions = glift.enums.boardRegions,
     getResizedBox = glift.displays.getResizedBox;
-  (cropbox = displays.cropbox), (WIDTH = 300), (HEIGHT = 400);
 
   test('Test get CropDimensions: ALL must make dims square', function () {
     var cropbox = displays.cropbox.getFromRegion(boardRegions.ALL, 19);

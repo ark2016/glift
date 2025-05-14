@@ -69,7 +69,6 @@
     var transOne = transforms[0];
     deepEqual(transOne.scale, 4, 'xscale');
     deepEqual(transOne.yMove, 5, 'yMove');
-    var transTwo = transforms[1];
     deepEqual(transOne.scale, 4, 'xscale');
     deepEqual(transOne.yMove, 5, 'yMove');
   });

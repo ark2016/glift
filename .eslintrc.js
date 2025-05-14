@@ -30,11 +30,16 @@ module.exports = {
     throws: 'readonly',
     // Test data globals (if any, e.g. from *_test.js or testdata/*.js files being sourced globally)
     testdata: 'readonly',
-    testUtil: 'readonly'
+    testUtil: 'readonly',
   },
   rules: {
     // Здесь можно будет добавлять или переопределять правила ESLint
     // Например:
     // 'no-unused-vars': 'warn', // Предупреждать о неиспользуемых переменных
+    'no-unused-vars': 'warn', // Временно ослабляем до предупреждения
+    camelcase: 'off', // Временно отключаем, т.к. много opt_параметров
+    'one-var': 'off', // Временно отключаем для упрощения
+    'no-var': 'off', // Временно отключаем, будем исправлять var на let/const постепенно
+    'no-redeclare': 'error', // Раскомментируем
   },
 };
