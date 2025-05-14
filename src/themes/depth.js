@@ -1,22 +1,45 @@
-goog.provide('glift.themes.registered.DEPTH');
+/**
+ * Тема оформления "Depth" для Glift.
+ * Тема с объемными камнями и тенями.
+ * 
+ * @module themes/depth
+ */
+
+import { baseTheme } from './base_theme.js';
 
 /**
- * @extends {glift.themes.base}
+ * Настройки темы Depth
  */
-glift.themes.registered.DEPTH = {
+export const DEPTH = {
+  ...baseTheme,
   stones: {
-    shadows: {
+    ...baseTheme.stones,
+    BLACK: { 
+      fill: 'url(#blackStoneGradient)', 
       stroke: 'none',
-      fill: '#777',
+      opacity: 0.95
     },
-    WHITE: {
-      stroke: 'white',
-      fill: 'white',
+    WHITE: { 
+      fill: 'url(#whiteStoneGradient)', 
+      stroke: '#909090',
+      strokeWidth: 0.1,
+      opacity: 0.95
     },
     WHITE_HOVER: {
       fill: 'white',
       stroke: 'white',
       opacity: 0.5,
     },
+    shadows: {
+      stroke: 'none',
+      fill: '#777',
+    },
+    shadow: true
   },
+  board: {
+    ...baseTheme.board,
+    fill: '#DCB35C',
+    borderColor: '#5E2E0C',
+    shadow: true
+  }
 };

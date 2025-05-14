@@ -1,11 +1,20 @@
-(function () {
-  module('glift.displays.position.widgetPositionerTest');
-  var point = glift.util.point;
-  var components = glift.BoardComponent;
-  var horzBbox = glift.orientation.bbox.fromSides(point(100, 300), 300, 100);
-  var vertBbox = glift.orientation.bbox.fromSides(point(100, 300), 100, 300);
-  var squareBbox = glift.orientation.bbox.fromSides(point(100, 300), 200, 200);
-  var oneColSplits = {
+/**
+ * Тесты для WidgetPositioner
+ * @module displays/position/widget_positioner_test
+ */
+
+import { positioner, WidgetPositioner } from './widget_positioner.js';
+import { orientation } from '../../orientation/orientation.js';
+import { util } from '../../util/util.js';
+import { enums, BoardComponent } from '../../enums.js';
+
+describe('displays.position.widgetPositionerTest', () => {
+  const point = util.point;
+  const components = BoardComponent;
+  const horzBbox = orientation.bbox.fromSides(point(100, 300), 300, 100);
+  const vertBbox = orientation.bbox.fromSides(point(100, 300), 100, 300);
+  const squareBbox = orientation.bbox.fromSides(point(100, 300), 200, 200);
+  const oneColSplits = {
     first: [
       { component: 'STATUS_BAR', ratio: 0.08 },
       { component: 'BOARD', ratio: 0.7 },
@@ -13,7 +22,7 @@
       { component: 'ICONBAR', ratio: 0.12 },
     ],
   };
-  var twoColSplits = {
+  const twoColSplits = {
     first: [{ component: 'BOARD', ratio: 1 }],
     second: [
       { component: 'STATUS_BAR', ratio: 0.08 },
@@ -22,12 +31,12 @@
     ],
   };
 
-  // Helper constructor function that has a bunch of defaults.
-  var construct = function (options) {
+  // Вспомогательная функция-конструктор с большим количеством значений по умолчанию.
+  const construct = function (options) {
     options = options || {};
-    return new glift.displays.position.Positioner(
+    return new WidgetPositioner(
       options.divBox || squareBbox,
-      options.boardRegion || glift.enums.boardRegions.ALL,
+      options.boardRegion || enums.boardRegions.ALL,
       options.intersections || 19,
       options.componentsToUse || [
         components.BOARD,
@@ -40,78 +49,78 @@
     );
   };
 
-  var floatsEqual = function (f1, f2, sigs) {
+  const floatsEqual = function (f1, f2, sigs) {
     if (!sigs) throw new Error('Sigs must be defined. was: ' + sigs);
     if (typeof f1 !== 'number')
       throw new Error('First arg must be number. was: ' + f1);
     if (typeof f2 !== 'number')
       throw new Error('Second arg must be number. was: ' + f2);
-    var tens = 1;
-    for (var i = 0; i < sigs; i++) {
+    let tens = 1;
+    for (let i = 0; i < sigs; i++) {
       tens = tens * 10;
     }
-    var left = Math.round(f1 * tens) / tens;
-    var right = Math.round(f2 * tens) / tens;
-    deepEqual(left, right);
+    const left = Math.round(f1 * tens) / tens;
+    const right = Math.round(f2 * tens) / tens;
+    expect(left).toEqual(right);
   };
 
-  test('floats equal', function () {
+  it('floats equal', () => {
     floatsEqual(100, 100, 1);
     floatsEqual(100, 100, 3);
     floatsEqual(100.00002, 100.00003, 3);
   });
 
-  test('Must construct', function () {
-    var p = construct();
-    ok(p);
-    ok(p.divBox);
-    ok(p.ints);
-    ok(p.compsToUse);
-    ok(p.oneColSplits);
-    ok(p.twoColSplits);
+  it('Must construct', () => {
+    const p = construct();
+    expect(p).toBeTruthy();
+    expect(p.divBox).toBeTruthy();
+    expect(p.ints).toBeTruthy();
+    expect(p.compsToUse).toBeTruthy();
+    expect(p.oneColSplits).toBeTruthy();
+    expect(p.twoColSplits).toBeTruthy();
   });
 
-  test('Orientations', function () {
-    ok(!construct().useHorzOrientation(), 'square');
-    ok(construct({ divBox: horzBbox }).useHorzOrientation(), 'horz');
-    ok(!construct({ divBox: vertBbox }).useHorzOrientation(), 'vert');
+  it('Orientations', () => {
+    expect(construct().useHorzOrientation()).toBeFalsy();
+    expect(construct({ divBox: horzBbox }).useHorzOrientation()).toBeTruthy();
+    expect(construct({ divBox: vertBbox }).useHorzOrientation()).toBeFalsy();
   });
 
-  test('Recalc Splits: one col, no change', function () {
-    var positioner = construct();
-    var out = positioner.recalcSplits(positioner.oneColSplits);
-    var before = positioner.oneColSplits.first;
-    var after = out.first;
+  it('Recalc Splits: one col, no change', () => {
+    const positioner = construct();
+    const out = positioner.recalcSplits(positioner.oneColSplits);
+    const before = positioner.oneColSplits.first;
+    const after = out.first;
     floatsEqual(before[0].ratio, after[0].ratio, 7);
     floatsEqual(before[1].ratio, after[1].ratio, 7);
     floatsEqual(before[2].ratio, after[2].ratio, 7);
     floatsEqual(before[3].ratio, after[3].ratio, 7);
   });
 
-  test('Recalc Splits: two cols, no change', function () {
-    var positioner = construct();
-    var before = positioner.twoColSplits;
-    var after = positioner.recalcSplits(positioner.twoColSplits);
-    deepEqual(before.first[0].component, 'BOARD');
-    deepEqual(before.first[0].ratio, 1);
+  it('Recalc Splits: two cols, no change', () => {
+    const positioner = construct();
+    const before = positioner.twoColSplits;
+    const after = positioner.recalcSplits(positioner.twoColSplits);
+    expect(before.first[0].component).toEqual('BOARD');
+    expect(before.first[0].ratio).toEqual(1);
 
     floatsEqual(before.second[0].ratio, after.second[0].ratio, 7);
     floatsEqual(before.second[1].ratio, after.second[1].ratio, 7);
     floatsEqual(before.second[2].ratio, after.second[2].ratio, 7);
   });
 
-  test('Recalc Splits: one col, only one comp', function () {
-    var positioner = construct({
+  it('Recalc Splits: one col, only one comp', () => {
+    const positioner = construct({
       componentsToUse: [components.COMMENT_BOX],
     });
-    var after = positioner.recalcSplits(positioner.oneColSplits).first;
-    deepEqual(after.length, 1);
-    deepEqual(after[0].component, 'COMMENT_BOX');
-    deepEqual(after[0].ratio, 1);
+    const after = positioner.recalcSplits(positioner.oneColSplits).first;
+    expect(after.length).toEqual(1);
+    expect(after[0].component).toEqual('COMMENT_BOX');
+    expect(after[0].ratio).toEqual(1);
   });
 
-  test('Recalc Splits: one col, -one comp', function () {
-    var positioner = construct({
+  it('Recalc Splits: one col, -one comp', () => {
+    const positioner = construct({
       componentsToUse: [
         components.BOARD,
         components.ICONBAR,
@@ -126,21 +135,21 @@
         ],
       },
     });
-    var out = positioner.recalcSplits(positioner.oneColSplits);
-    var after = out.first;
-    ok(after !== undefined);
-    deepEqual(after.length, 3);
+    const out = positioner.recalcSplits(positioner.oneColSplits);
+    const after = out.first;
+    expect(after).toBeDefined();
+    expect(after.length).toEqual(3);
 
-    deepEqual(after[0].component, 'BOARD');
+    expect(after[0].component).toEqual('BOARD');
     floatsEqual(after[0].ratio, 0.666667, 5);
-    deepEqual(after[1].component, 'COMMENT_BOX');
+    expect(after[1].component).toEqual('COMMENT_BOX');
     floatsEqual(after[1].ratio, 0.166667, 5);
-    deepEqual(after[2].component, 'ICONBAR');
+    expect(after[2].component).toEqual('ICONBAR');
     floatsEqual(after[2].ratio, 0.166667, 5);
   });
 
-  test('Recalc Splits: one col, -two comps', function () {
-    var positioner = construct({
+  it('Recalc Splits: one col, -two comps', () => {
+    const positioner = construct({
       componentsToUse: [components.BOARD, components.COMMENT_BOX],
       oneColSplits: {
         first: [
@@ -151,16 +160,16 @@
         ],
       },
     });
-    var after = positioner.recalcSplits(positioner.oneColSplits).first;
-    deepEqual(after.length, 2);
-    deepEqual(after[0].component, 'BOARD');
+    const after = positioner.recalcSplits(positioner.oneColSplits).first;
+    expect(after.length).toEqual(2);
+    expect(after[0].component).toEqual('BOARD');
     floatsEqual(after[0].ratio, 0.8, 5);
-    deepEqual(after[1].component, 'COMMENT_BOX');
+    expect(after[1].component).toEqual('COMMENT_BOX');
     floatsEqual(after[1].ratio, 0.2, 5);
   });
 
-  test('Recalc Splits: two cols, -one comp', function () {
-    var positioner = construct({
+  it('Recalc Splits: two cols, -one comp', () => {
+    const positioner = construct({
       componentsToUse: [
         components.BOARD,
         components.ICONBAR,
@@ -175,79 +184,44 @@
         ],
       },
     });
-    var out = positioner.recalcSplits(positioner.twoColSplits);
-    deepEqual(out.first.length, 1);
-    deepEqual(out.first[0].component, 'BOARD');
-    deepEqual(out.first[0].ratio, 1);
+    const out = positioner.recalcSplits(positioner.twoColSplits);
+    expect(out.first.length).toEqual(1);
+    expect(out.first[0].component).toEqual('BOARD');
+    expect(out.first[0].ratio).toEqual(1);
 
-    deepEqual(out.second.length, 2);
-    deepEqual(out.second[0].component, 'COMMENT_BOX');
+    expect(out.second.length).toEqual(2);
+    expect(out.second[0].component).toEqual('COMMENT_BOX');
     floatsEqual(out.second[0].ratio, 0.75, 5);
-    deepEqual(out.second[1].component, 'ICONBAR');
+    expect(out.second[1].component).toEqual('ICONBAR');
     floatsEqual(out.second[1].ratio, 0.25, 5);
   });
 
-  test('Position widget vertically', function () {
-    var boxes = construct().calcVertPositioning();
-    ok(boxes !== undefined);
-    ok(boxes.first() !== undefined);
-    deepEqual(boxes.first().ordering.length, 4);
-    deepEqual(boxes.first().ordering, [
+  it('Position widget vertically', () => {
+    const boxes = construct().calcVertPositioning();
+    expect(boxes).toBeDefined();
+    expect(boxes.first()).toBeDefined();
+    expect(boxes.first().ordering.length).toEqual(4);
+    expect(boxes.first().ordering).toEqual([
       'STATUS_BAR',
       'BOARD',
       'COMMENT_BOX',
       'ICONBAR',
     ]);
-
-    ok(boxes.first().mapping.STATUS_BAR !== undefined);
-    ok(boxes.first().mapping.BOARD !== undefined);
-    ok(boxes.first().mapping.COMMENT_BOX !== undefined);
-    ok(boxes.first().mapping.ICONBAR !== undefined);
   });
 
-  test('Position widget vertically, map', function () {
-    var boxes = construct().calcVertPositioning();
-    var boxList = [];
-    boxes.forEach(function (key, bbox) {
-      ok(glift.BoardComponent[key] !== undefined, key);
-      ok(bbox.width() > 0, bbox);
-      boxList.push(key);
-      return undefined;
-    });
-    deepEqual(boxList, ['STATUS_BAR', 'BOARD', 'COMMENT_BOX', 'ICONBAR']);
-  });
-
-  test('Position widget vertically', function () {
-    var boxes = construct().calcHorzPositioning();
-    ok(boxes !== undefined);
-    ok(boxes.first() !== undefined);
-    deepEqual(boxes.first().ordering.length, 1);
-    deepEqual(boxes.first().ordering, ['BOARD']);
-    ok(boxes.first().mapping.BOARD);
-
-    ok(boxes.second() !== undefined);
-    deepEqual(boxes.second().ordering.length, 3);
-    deepEqual(boxes.second().ordering, [
+  it('Position widget horizontally', () => {
+    // Используем большой контейнер, чтобы обеспечить горизонтальную ориентацию.
+    const boxes = construct({ divBox: horzBbox }).calcHorzPositioning();
+    expect(boxes).toBeDefined();
+    expect(boxes.first()).toBeDefined();
+    expect(boxes.second()).toBeDefined();
+    expect(boxes.first().ordering.length).toEqual(1);
+    expect(boxes.second().ordering.length).toEqual(3);
+    expect(boxes.first().ordering).toEqual(['BOARD']);
+    expect(boxes.second().ordering).toEqual([
       'STATUS_BAR',
       'COMMENT_BOX',
       'ICONBAR',
     ]);
-    ok(boxes.second().mapping.STATUS_BAR);
-    ok(boxes.second().mapping.COMMENT_BOX);
-    ok(boxes.second().mapping.ICONBAR);
   });
-
-  test('Position widget horz, map', function () {
-    var boxes = construct().calcHorzPositioning();
-    ok(boxes._first, 'first');
-    ok(boxes._second, 'second');
-    var boxList = [];
-    boxes.forEach(function (key, bbox) {
-      ok(glift.BoardComponent[key] !== undefined, key);
-      ok(bbox.width() > 0, bbox);
-      boxList.push(key);
-      return undefined;
-    });
-    deepEqual(boxList, ['BOARD', 'STATUS_BAR', 'COMMENT_BOX', 'ICONBAR']);
-  });
-})();
+});

@@ -1,174 +1,194 @@
-goog.provide('glift.displays.icons.WrappedIcon');
-
-goog.require('glift.displays.icons');
-
 /**
- * Create a wrapper icon.
- *
- * @param {string} iconName name of the relevant icon.
- * @return {!glift.displays.icons.WrappedIcon}
+ * Модуль для работы с обёрнутыми иконками в Glift.
+ * @module displays/icons/wrapped_icon
  */
-glift.displays.icons.wrappedIcon = function (iconName) {
-  return new glift.displays.icons.WrappedIcon(iconName);
-};
+
+import { util } from '../../util/util.js';
+import { orientation } from '../../orientation/orientation.js';
+import { displays } from '../../displays/displays.js';
+import { svg as iconSvg } from './svg.js';
 
 /**
- * Wrap an array of iconNames.
+ * Создает обёртку для иконки.
+ *
+ * @param {string} iconName имя соответствующей иконки.
+ * @return {!WrappedIcon}
+ */
+export function wrapIcon(iconName) {
+  return new WrappedIcon(iconName);
+}
+
+/**
+ * Оборачивает массив имен иконок.
  *
  * @param {!Array<string|!Array<string>>} iconsRaw
- * return {Array<glift.displays.icons.WrappedIcon>}
+ * @return {Array<WrappedIcon>}
  */
-glift.displays.icons.wrapIcons = function (iconsRaw) {
-  var out = [];
-  for (var i = 0; i < iconsRaw.length; i++) {
-    var item = iconsRaw[i];
-    if (glift.util.typeOf(item) === 'string') {
-      out.push(glift.displays.icons.wrappedIcon(/** @type {string} */ (item)));
-    } else if (glift.util.typeOf(item) === 'array') {
-      var subIcons = item;
-      // Looks like we only accept the multiopen icon for this category...
-      var outerIcon = glift.displays.icons.wrappedIcon('multiopen');
-      for (var j = 0; j < subIcons.length; j++) {
+export function wrapIcons(iconsRaw) {
+  const out = [];
+  for (let i = 0; i < iconsRaw.length; i++) {
+    const item = iconsRaw[i];
+    if (util.typeOf(item) === 'string') {
+      out.push(wrapIcon(/** @type {string} */ (item)));
+    } else if (util.typeOf(item) === 'array') {
+      const subIcons = item;
+      // Только иконка multiopen принимается для этой категории...
+      const outerIcon = wrapIcon('multiopen');
+      for (let j = 0; j < subIcons.length; j++) {
         outerIcon.addAssociatedIcon(subIcons[j]);
       }
       out.push(outerIcon);
     }
   }
   return out;
-};
+}
 
 /**
- * Validate that an iconName is valid.
+ * Проверяет, что имя иконки допустимо.
  * @param {string} iconName
  * @return {string}
  */
-glift.displays.icons.validateIcon = function (iconName) {
+export function validateIcon(iconName) {
   if (
     iconName === undefined ||
-    glift.displays.icons.svg[iconName] === undefined
+    iconSvg[iconName] === undefined
   ) {
     throw new Error('Icon unknown: [' + iconName + ']');
   }
   return iconName;
-};
+}
 
 /**
- * Icon wrapper for convenience.  All you need is:
- *  - The name of the icon
- *
- * @param {string} iconName Name of the icon.
- *
- * @constructor
- * @final
+ * Обёртка для иконки для удобства. Всё, что нужно - это:
+ * - Имя иконки
  */
-glift.displays.icons.WrappedIcon = function (iconName) {
-  this.iconName = glift.displays.icons.validateIcon(iconName);
-  var iconData = glift.displays.icons.svg[iconName];
-  this.iconStr = iconData.string;
-  this.originalBbox = glift.orientation.bbox.fromPts(
-    glift.util.point(iconData.bbox.x, iconData.bbox.y),
-    glift.util.point(iconData.bbox.x2, iconData.bbox.y2)
-  );
-  this.associatedIcons = []; // Added with addAssociatedIcon
-  this.activeAssociated = 0; // Index into the above array
-  this.bbox = this.originalBbox; // can change on "translate"
-  this.transformObj = undefined; // Set if the icon is transformed
-  this.elementId = undefined; // set with setElementId.  The id in the DOM.
-  this.subboxIcon = undefined; // Set from setSubboxIcon(...);
-  if (iconData.subboxName !== undefined) {
-    this.setSubboxIcon(iconData.subboxName);
-  }
-};
-
-/**
- * Wrapped icon methods.
- */
-glift.displays.icons.WrappedIcon.prototype = {
+export class WrappedIcon {
   /**
-   * Add an associated icon and return the new icon.
+   * @param {string} iconName Имя иконки.
    */
-  addAssociatedIcon: function (iconName) {
-    var newIcon = glift.displays.icons.wrappedIcon(iconName);
+  constructor(iconName) {
+    this.iconName = validateIcon(iconName);
+    const iconData = iconSvg[iconName];
+    this.iconStr = iconData.string;
+    this.originalBbox = orientation.bbox.fromPts(
+      util.point(iconData.bbox.x, iconData.bbox.y),
+      util.point(iconData.bbox.x2, iconData.bbox.y2)
+    );
+    this.associatedIcons = []; // Добавляется с помощью addAssociatedIcon
+    this.activeAssociated = 0; // Индекс в массиве выше
+    this.bbox = this.originalBbox; // может изменяться при "translate"
+    this.transformObj = undefined; // Задается, если иконка трансформирована
+    this.elementId = undefined; // задается с помощью setElementId. ID в DOM.
+    this.subboxIcon = undefined; // Устанавливается из setSubboxIcon(...);
+    if (iconData.subboxName !== undefined) {
+      this.setSubboxIcon(iconData.subboxName);
+    }
+  }
+
+  /**
+   * Добавляет связанную иконку и возвращает новую иконку.
+   * @param {string} iconName
+   * @return {WrappedIcon}
+   */
+  addAssociatedIcon(iconName) {
+    const newIcon = wrapIcon(iconName);
     this.associatedIcons.push(newIcon);
     return newIcon;
-  },
+  }
 
   /**
-   * Add an associated icon and return the icon (for parity with the above).
+   * Добавляет связанную обёрнутую иконку и возвращает иконку (для паритета с вышеуказанным).
+   * @param {WrappedIcon} wrapped
+   * @return {WrappedIcon}
+   * @private
    */
-  _addAssociatedWrapped: function (wrapped) {
+  _addAssociatedWrapped(wrapped) {
     if (wrapped.originalBbox === undefined) {
       throw new Error('Wrapped icon not actually a wrapped icon: ' + wrapped);
     }
     this.associatedIcons.push(wrapped);
     return wrapped;
-  },
+  }
 
   /**
-   * Clear the associated icons, returning the old list.
+   * Очищает связанные иконки, возвращая старый список.
+   * @return {Array<WrappedIcon>}
    */
-  clearAssociatedIcons: function () {
-    var oldIcons = this.associatedIcons;
+  clearAssociatedIcons() {
+    const oldIcons = this.associatedIcons;
     this.associatedIcons = [];
     return oldIcons;
-  },
+  }
 
   /**
-   * Return a the wrapped icon from the associated icon list. If index isn't
-   * specified, the assumption is that the index is the active index;
+   * Возвращает обёрнутую иконку из списка связанных иконок.
+   * Если индекс не указан, предполагается, что индекс - активный индекс.
+   * @param {number=} index
+   * @return {WrappedIcon}
    */
-  getAssociated: function (index) {
+  getAssociated(index) {
     index = index || this.activeAssociated;
     return this.associatedIcons[index];
-  },
+  }
 
   /**
-   * Get the active associated icon.
+   * Получает активную связанную иконку.
+   * @return {WrappedIcon}
    */
-  getActive: function () {
+  getActive() {
     return this.associatedIcons[this.activeAssociated];
-  },
+  }
 
   /**
-   * Set the 'active' icon. Note: this doesn't refresh the icons on screen.
-   * That task is left to the bar or selector.
+   * Устанавливает 'активную' иконку. Примечание: это не обновляет иконки на экране.
+   * Эта задача оставлена панели или селектору.
+   * @param {string} iconName
+   * @return {WrappedIcon} this
    */
-  setActive: function (iconName) {
-    for (var i = 0, len = this.associatedIcons.length; i < len; i++) {
-      var icon = this.associatedIcons[i];
+  setActive(iconName) {
+    for (let i = 0, len = this.associatedIcons.length; i < len; i++) {
+      const icon = this.associatedIcons[i];
       if (icon.iconName === iconName) {
         this.activeAssociated = i;
       }
     }
     return this;
-  },
+  }
 
   /**
-   * Set the div element id.
+   * Устанавливает id элемента div.
+   * @param {string} id
+   * @return {WrappedIcon} this
    */
-  setElementId: function (id) {
+  setElementId(id) {
     this.elementId = id;
     return this;
-  },
+  }
 
   /**
-   * Set a subbox, so we can center icons within the subbox.  A caveat is that
-   * the subbox must be specified as an icon.
+   * Устанавливает вложенный блок, чтобы мы могли центрировать иконки внутри вложенного блока.
+   * Предупреждение: вложенный блок должен быть указан как иконка.
+   * @param {string} iconName
+   * @return {WrappedIcon}
    */
-  setSubboxIcon: function (iconName) {
-    this.subboxIcon = glift.displays.icons.wrappedIcon(iconName);
+  setSubboxIcon(iconName) {
+    this.subboxIcon = wrapIcon(iconName);
     return this.subboxIcon;
-  },
+  }
 
   /**
-   * Center a icon (specified as a wrapped icon) within a subbox. Returns the
-   * wrapped icon with the proper scaling.
+   * Центрирует иконку (указанную как обёрнутую иконку) в пределах вложенного блока.
+   * Возвращает обёрнутую иконку с правильным масштабированием.
+   * @param {WrappedIcon} wrapped
+   * @param {number} vMargin
+   * @param {number} hMargin
+   * @return {WrappedIcon}
    */
-  centerWithinSubbox: function (wrapped, vMargin, hMargin) {
+  centerWithinSubbox(wrapped, vMargin, hMargin) {
     if (this.subboxIcon === undefined) {
       throw new Error('No subbox defined, so cannot centerWithin.');
     }
-    var centerObj = glift.displays.centerWithin(
+    const centerObj = displays.centerWithin(
       this.subboxIcon.bbox,
       wrapped.bbox,
       vMargin,
@@ -176,14 +196,18 @@ glift.displays.icons.WrappedIcon.prototype = {
     );
     wrapped.performTransform(centerObj.transform);
     return wrapped;
-  },
+  }
 
   /**
-   * Center a icon (specified as a wrapped icon) within the current icon.
-   * Returns the wrapped icon with the proper scaling.
+   * Центрирует иконку (указанную как обёрнутую иконку) в пределах текущей иконки.
+   * Возвращает обёрнутую иконку с правильным масштабированием.
+   * @param {WrappedIcon} wrapped
+   * @param {number} vMargin
+   * @param {number} hMargin
+   * @return {WrappedIcon}
    */
-  centerWithinIcon: function (wrapped, vMargin, hMargin) {
-    var centerObj = glift.displays.centerWithin(
+  centerWithinIcon(wrapped, vMargin, hMargin) {
+    const centerObj = displays.centerWithin(
       this.bbox,
       wrapped.bbox,
       vMargin,
@@ -191,21 +215,23 @@ glift.displays.icons.WrappedIcon.prototype = {
     );
     wrapped.performTransform(centerObj.transform);
     return wrapped;
-  },
+  }
 
   /**
-   * The transform parameter looks like the following:
+   * Параметр transform выглядит следующим образом:
    *  {
    *    scale: num,
    *    xMove: num,
    *    yMove: num
    *  }
    *
-   * This translates the bounding box of the icon.
+   * Это преобразует ограничивающий прямоугольник иконки.
    *
-   * Note that the scale is performed first, then the translate is performed.
+   * Обратите внимание, что сначала выполняется масштабирование, затем - перемещение.
+   * @param {Object} transformObj
+   * @return {WrappedIcon} this
    */
-  performTransform: function (transformObj) {
+  performTransform(transformObj) {
     if (transformObj.scale) {
       this.bbox = this.bbox.scale(transformObj.scale);
     }
@@ -215,26 +241,28 @@ glift.displays.icons.WrappedIcon.prototype = {
     if (this.subboxIcon !== undefined) {
       this.subboxIcon.performTransform(transformObj);
     }
-    // TODO(kashomon): Should we transform the associated icons?
+    // TODO(kashomon): Следует ли трансформировать связанные иконки?
     this.transformObj = transformObj;
     return this;
-  },
+  }
 
   /**
-   * Reset the bounding box to the initial position.
+   * Сбрасывает ограничивающий прямоугольник до исходного положения.
+   * @return {WrappedIcon} this
    */
-  resetTransform: function () {
+  resetTransform() {
     this.bbox = this.originalBbox;
     this.transformObj = undefined;
     return this;
-  },
+  }
 
   /**
-   * Get the scaling string to be used as a SVG transform parameter.
+   * Получает строку масштабирования, которая будет использоваться
+   * в качестве параметра преобразования SVG.
    *
-   * @return {string} the SVG transform string.
+   * @return {string} строка преобразования SVG.
    */
-  transformString: function () {
+  transformString() {
     if (this.transformObj !== undefined) {
       return (
         'translate(' +
@@ -249,12 +277,17 @@ glift.displays.icons.WrappedIcon.prototype = {
     } else {
       return '';
     }
-  },
+  }
 
   /**
-   * Create a new wrapper icon.  This 'forgets' all
+   * Создает копию обёрнутой иконки.
+   * @return {WrappedIcon}
    */
-  rewrapIcon: function () {
-    return glift.displays.icons.wrappedIcon(this.iconName);
-  },
-};
+  rewrapIcon() {
+    const newIcon = wrapIcon(this.iconName);
+    if (this.subboxIcon !== undefined) {
+      newIcon.setSubboxIcon(this.subboxIcon.iconName);
+    }
+    return newIcon;
+  }
+}

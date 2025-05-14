@@ -1,3 +1,9 @@
-goog.provide('glift.orientation');
+/**
+ * Модуль ориентации для библиотеки Glift.
+ * Содержит классы и функции для управления ориентацией и обрезкой доски.
+ * 
+ * @module orientation
+ */
 
-glift.orientation = {};
+// Экспортируем пустой объект orientation, который будет наполнен другими модулями
+export const orientation = {};

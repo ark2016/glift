@@ -1,17 +1,18 @@
-goog.provide('glift.enums');
-
-goog.require('glift');
+/**
+ * Модуль, содержащий различные константы, используемые в библиотеке Glift.
+ * @module util/enums
+ */
 
 /**
- * Various constants used throughout glift.
+ * Enums для игры Го и настроек библиотеки.
  */
-glift.enums = {
+export const enums = {
   /**
-   * Camel cases an enum. Can be useful for things that have functions or
-   * packages named from enum names.
+   * Преобразует enum в camelCase формат. Может быть полезно для функций или 
+   * пакетов, названных по имени enum.
    *
-   * @param {string} input The enum to input
-   * @return {string} transformed enum name.
+   * @param {string} input Входная строка enum
+   * @return {string} Преобразованное имя enum
    */
   toCamelCase: function (input) {
     return input.toLowerCase().replace(/_(.)?/g, function (match, group1) {
@@ -21,29 +22,30 @@ glift.enums = {
 };
 
 /**
- * Also sometimes referred to as colors.
+ * Состояния камней на доске (цвета).
  * @enum{string}
  */
-glift.enums.states = {
+export const states = {
   BLACK: 'BLACK',
   WHITE: 'WHITE',
   EMPTY: 'EMPTY',
 };
 
 /**
+ * Варианты выравнивания доски.
  * @enum{string}
  */
-glift.enums.boardAlignments = {
+export const boardAlignments = {
   TOP: 'TOP',
   RIGHT: 'RIGHT',
   CENTER: 'CENTER',
 };
 
 /**
- * List of directions. Used for a variety of tasks.
+ * Список направлений. Используется для различных задач.
  * @enum{string}
  */
-glift.enums.directions = {
+export const directions = {
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
   TOP: 'TOP',
@@ -51,10 +53,10 @@ glift.enums.directions = {
 };
 
 /**
- * List of board regions. Usually used for cropping.
+ * Список регионов доски. Обычно используется для обрезки.
  * @enum{string}
  */
-glift.enums.boardRegions = {
+export const boardRegions = {
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
   TOP: 'TOP',
@@ -64,72 +66,72 @@ glift.enums.boardRegions = {
   BOTTOM_LEFT: 'BOTTOM_LEFT',
   BOTTOM_RIGHT: 'BOTTOM_RIGHT',
   ALL: 'ALL',
-  // Automatically determine the board region.
+  // Автоматически определить регион доски.
   AUTO: 'AUTO',
-  // Minimal cropbox, modulo some heuristics. To do this, you usually need a
-  // movetree, and usually, you need next-path information.
+  // Минимальный размер обрезки, учитывая некоторые эвристики. Для этого обычно 
+  // нужно дерево ходов и, как правило, информация о следующем пути.
   MINIMAL: 'MINIMAL',
 };
 
 /**
+ * Типы меток на доске.
  * @enum {string}
  */
-glift.enums.marks = {
+export const marks = {
   CIRCLE: 'CIRCLE',
   SQUARE: 'SQUARE',
   TRIANGLE: 'TRIANGLE',
   XMARK: 'XMARK',
-  // STONE_MARKER marks the last played stone
+  // STONE_MARKER отмечает последний сыгранный камень
   STONE_MARKER: 'STONE_MARKER',
   LABEL: 'LABEL',
 
-  // These last few 'marks' are variations on the LABEL mark type.
-  // TODO(kashomon): Consolidate these somehow.
+  // Следующие типы "меток" являются вариациями типа LABEL.
+  // TODO: Объединить их каким-то образом.
   //
-  // Neither LABEL_ALPHA nor LABEL_NUMERIC are used for rendering, but they
-  // are extremly convenient to have this distinction when passing information
-  // from the display to the controller
+  // Ни LABEL_ALPHA, ни LABEL_NUMERIC не используются для рендеринга, но
+  // это различие очень удобно при передаче информации от отображения к контроллеру
   LABEL_ALPHA: 'LABEL_ALPHA',
   LABEL_NUMERIC: 'LABEL_NUMERIC',
 
-  // There last two are variations on the LABEL mark. VARIATION_MARKER is used
-  // so we can color labels differently for variations.
+  // Следующие два - вариации метки LABEL. VARIATION_MARKER используется
+  // чтобы мы могли окрашивать метки по-разному для вариаций.
   VARIATION_MARKER: 'VARIATION_MARKER',
 
-  // We color 'correct' variations differently in problems,
+  // Мы окрашиваем 'правильные' вариации по-разному в задачах
   CORRECT_VARIATION: 'CORRECT_VARIATION',
 
-  // We color 'correct' variations differently in problems,
+  // Отметка позиции Ko
   KO_LOCATION: 'KO_LOCATION',
 };
 
 /**
- * Enum to indicate how a move for a problem was resolved.
+ * Enum для указания, как был разрешен ход для задачи.
  * @enum {string}
  */
-glift.enums.problemResults = {
+export const problemResults = {
   CORRECT: 'CORRECT',
   INCORRECT: 'INCORRECT',
   INDETERMINATE: 'INDETERMINATE',
-  FAILURE: 'FAILURE', // i.e., none of these (couldn't place stone).
+  FAILURE: 'FAILURE', // то есть, ни один из этих (не удалось разместить камень).
 };
 
 /**
- * Whether or not to show variations in the UI.
+ * Показывать ли вариации в интерфейсе.
  * @enum {string}
  */
-glift.enums.showVariations = {
+export const showVariations = {
   ALWAYS: 'ALWAYS',
   NEVER: 'NEVER',
   MORE_THAN_ONE: 'MORE_THAN_ONE',
 };
 
 /**
- * Rotations we can apply to Go Boards. Doesn't rotate the fundamental data (the
- * SGF points), but rotates at the time the board is drawn.
+ * Повороты, которые мы можем применить к доскам Го. Не поворачивает 
+ * фундаментальные данные (точки SGF), но поворачивает во время отрисовки доски.
  * @enum {string}
  */
-glift.enums.rotations = {
+export const rotations = {
   NO_ROTATION: 'NO_ROTATION',
   CLOCKWISE_90: 'CLOCKWISE_90',
   CLOCKWISE_180: 'CLOCKWISE_180',
@@ -137,14 +139,25 @@ glift.enums.rotations = {
 };
 
 /**
- * Flips that can be applied to a go board.
+ * Отражения, которые можно применить к доске Го.
  * @enum {string}
  */
-glift.enums.Flip = {
-  /** Don't perform a flip. A no-action default. */
+export const Flip = {
+  /** Не выполнять отражение. Действие по умолчанию. */
   NO_FLIP: 'NO_FLIP',
-  /** Flip vertically. In otherwords, flip points over the X axis (the Y points). */
+  /** Вертикальное отражение. Другими словами, отразить точки относительно оси X (координаты Y). */
   VERTICAL: 'VERTICAL',
-  /** Flip horizontally. In otherwords, flip points over the Y axis (the X points). */
+  /** Горизонтальное отражение. Другими словами, отразить точки относительно оси Y (координаты X). */
   HORIZONTAL: 'HORIZONTAL',
 };
+
+// Добавляем все enum в объект enums для обратной совместимости
+enums.states = states;
+enums.boardAlignments = boardAlignments;
+enums.directions = directions;
+enums.boardRegions = boardRegions;
+enums.marks = marks;
+enums.problemResults = problemResults;
+enums.showVariations = showVariations;
+enums.rotations = rotations;
+enums.Flip = Flip;

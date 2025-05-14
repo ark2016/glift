@@ -5,6 +5,19 @@
  */
 
 /**
+ * Преобразует enum в camelCase формат. Может быть полезно для функций или 
+ * пакетов, названных по имени enum.
+ *
+ * @param {string} input Входная строка enum
+ * @return {string} Преобразованное имя enum
+ */
+export function toCamelCase(input) {
+  return input.toLowerCase().replace(/_(.)?/g, function (match, group1) {
+    return group1 ? group1.toUpperCase() : '';
+  });
+}
+
+/**
  * Возможные состояния камней.
  * @enum {string}
  */
@@ -62,6 +75,24 @@ export const marks = {
   
   /** Маркер правильного варианта. */
   CORRECT_VARIATION: 'CORRECT_VARIATION'
+};
+
+/**
+ * Результаты решения задач.
+ * @enum {string}
+ */
+export const problemResults = {
+  /** Правильный ответ. */
+  CORRECT: 'CORRECT',
+  
+  /** Неправильный ответ. */
+  INCORRECT: 'INCORRECT',
+  
+  /** Неопределенный результат. */
+  INDETERMINATE: 'INDETERMINATE',
+  
+  /** Неудача (недопустимый ход). */
+  FAILURE: 'FAILURE'
 };
 
 /**

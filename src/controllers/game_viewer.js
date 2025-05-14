@@ -1,51 +1,59 @@
-goog.provide('glift.controllers.GameViewer');
+/**
+ * Контроллер просмотрщика игры для навигации по записям игр SGF.
+ * 
+ * Просмотрщик игры инкапсулирует идею перемещения по SGF только для чтения.
+ * 
+ * @module controllers/game_viewer
+ */
 
-goog.require('glift.controllers.BaseController');
+import { BaseController, createBaseController } from './base.js';
+import { Point } from '../util/index.js';
+import { enums } from '../util/enums.js';
+import { CONTROLLER_TYPES } from './base.js';
 
 /**
- * A GameViewer encapsulates the idea of traversing a read-only SGF.
+ * Создает контроллер просмотрщика игры.
  *
- * @type {!glift.controllers.ControllerFunc}
+ * @param {!Object} sgfOptions Опции SGF
+ * @return {!GameViewer} Новый контроллер просмотрщика игры
  */
-glift.controllers.gameViewer = function (sgfOptions) {
-  const ctrl = glift.controllers;
-  const baseController = glift.util.beget(ctrl.base());
-  
-  const newController = /** @type {!glift.controllers.BaseController} */ (
-    glift.util.setMethods(baseController, ctrl.GameViewer.prototype)
-  );
-  
+export const createGameViewerController = (sgfOptions) => {
   if (!sgfOptions) {
-    throw new Error('SGF Options was not defined, but must be defined');
+    throw new Error('SGF Options не определены, но должны быть определены');
   }
   
-  newController.initOptions(sgfOptions);
-  return newController;
+  const controller = new GameViewer();
+  controller.initOptions(sgfOptions);
+  return controller;
 };
 
 /**
- * Game Viewer controller for navigating SGF game records.
+ * Контроллер просмотрщика игры для навигации по SGF записям игр.
  *
- * @extends {glift.controllers.BaseController}
- * @constructor
+ * @extends {BaseController}
  */
-glift.controllers.GameViewer = function () {};
-
-glift.controllers.GameViewer.prototype = {
+export class GameViewer extends BaseController {
   /**
-   * Called during initOptions, in the BaseController.
-   *
-   * Creates a persisted treepath and an index to remember the last
-   * variation taken by the player.
+   * Создает новый экземпляр контроллера просмотрщика игры.
    */
-  extraOptions() {},
+  constructor() {
+    super();
+  }
 
   /**
-   * Find the variation associated with the played move.
+   * Вызывается во время initOptions в BaseController.
    *
-   * @param {!glift.Point} point The point where the stone was placed
-   * @param {glift.enums.states} color The stone color
-   * @return {?glift.flattener.Flattened} Flattened state or null if invalid move
+   * Создает сохраненный treepath и индекс для запоминания последней
+   * вариации, выбранной игроком.
+   */
+  extraOptions() {}
+
+  /**
+   * Найти вариацию, связанную с сыгранным ходом.
+   *
+   * @param {!Point} point Точка, где был размещен камень
+   * @param {enums.states} color Цвет камня
+   * @return {?Object} Уплощенное состояние или null, если ход недействителен
    */
   addStone(point, color) {
     const possibleMap = this.possibleNextMoves_();
@@ -57,13 +65,13 @@ glift.controllers.GameViewer.prototype = {
     
     const nextVariationNum = possibleMap[key];
     return this.nextMove(nextVariationNum);
-  },
+  }
 
   /**
-   * Go back to the previous branch or comment.
+   * Вернуться к предыдущей ветке или комментарию.
    *
-   * @param {number=} maxMovesPrevious Maximum number of moves to go back
-   * @return {!glift.flattener.Flattened} Flattened state
+   * @param {number=} maxMovesPrevious Максимальное количество ходов для возврата
+   * @return {!Object} Уплощенное состояние
    */
   previousCommentOrBranch(maxMovesPrevious) {
     let displayData = null;
@@ -80,16 +88,16 @@ glift.controllers.GameViewer.prototype = {
       }
     } while (displayData && !comment && numChildren <= 1);
     
-    // Reset the 'next' variation to zero
+    // Сбросить 'следующую' вариацию на ноль
     this.setNextVariation(0);
     return this.flattenedState();
-  },
+  }
 
   /**
-   * Go to the next branch or comment.
+   * Перейти к следующей ветке или комментарию.
    *
-   * @param {number=} maxMovesNext Maximum number of moves to go forward
-   * @return {!glift.flattener.Flattened} Flattened state
+   * @param {number=} maxMovesNext Максимальное количество ходов вперед
+   * @return {!Object} Уплощенное состояние
    */
   nextCommentOrBranch(maxMovesNext) {
     let displayData = null;
@@ -107,41 +115,41 @@ glift.controllers.GameViewer.prototype = {
     } while (displayData && !comment && numChildren <= 1);
     
     return this.flattenedState();
-  },
+  }
 
   /**
-   * Move up what variation will be next retrieved.
-   * @return {!glift.controllers.GameViewer} this, for chaining
+   * Переместить вверх вариацию, которая будет извлечена следующей.
+   * @return {!GameViewer} this, для цепочки вызовов
    */
   moveUpVariations() {
     const numChildren = this.movetree.node().numChildren();
     return this.setNextVariation(
       (this.nextVariationNumber() + 1) % numChildren
     );
-  },
+  }
 
   /**
-   * Move down what variation will be next retrieved.
-   * @return {!glift.controllers.GameViewer} this, for chaining
+   * Переместить вниз вариацию, которая будет извлечена следующей.
+   * @return {!GameViewer} this, для цепочки вызовов
    */
   moveDownVariations() {
-    // Module is defined incorrectly for negative numbers.
-    // We need to add n to the result.
+    // Модуль определен неправильно для отрицательных чисел.
+    // Нам нужно добавить n к результату.
     const numChildren = this.movetree.node().numChildren();
     return this.setNextVariation(
       (this.nextVariationNumber() - 1 + numChildren) % numChildren
     );
-  },
+  }
 
   /**
-   * Get the possible next moves.
+   * Получить возможные следующие ходы.
    *
-   * Implemented as a map from point-string+color to variationNumber:
-   * e.g., "10,10-BLACK" : 1
-   * For pass, we use 'PASS' as the point string.
+   * Реализовано как отображение от строки-точки+цвета к номеру вариации:
+   * например, "10,10-BLACK" : 1
+   * Для пасса мы используем 'PASS' в качестве строки точки.
    *
    * @private
-   * @return {!Object<string, number>} Map of move key to variation number
+   * @return {!Object<string, number>} Карта ключа хода к номеру вариации
    */
   possibleNextMoves_() {
     const possibleMap = {};
@@ -155,5 +163,15 @@ glift.controllers.GameViewer.prototype = {
     }
     
     return possibleMap;
-  },
-};
+  }
+  
+  /**
+   * Обрабатывает клик на точку доски.
+   * @param {!Object} pt - Точка на доске
+   * @return {boolean} Успешность обработки
+   */
+  handleClick(pt) {
+    const currentPlayer = this.getCurrentPlayer();
+    return this.addStone(pt, currentPlayer) !== null;
+  }
+}

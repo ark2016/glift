@@ -1,13 +1,16 @@
-goog.provide('glift.BoardComponent');
-
 /**
  * Типы компонентов пользовательского интерфейса, которые существуют в UI Glift.
  * Используются для определения структуры и компоновки виджета.
  *
+ * @module board_component
+ */
+
+/**
+ * Типы компонентов пользовательского интерфейса.
  * @enum {string}
  * @readonly
  */
-glift.BoardComponent = Object.freeze({
+export const BoardComponent = Object.freeze({
   /**
    * Основная доска для игры Го.
    * Отображает камни, разметку, линии координат и т.д.

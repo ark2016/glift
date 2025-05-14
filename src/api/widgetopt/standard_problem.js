@@ -1,40 +1,59 @@
 /**
- * Additional options for the standard problems, where the entire problem is
- * stored client-side.
+ * Дополнительные опции для стандартных задач, где вся задача 
+ * хранится на стороне клиента.
+ * @module api/widgetopt/standard_problem
  */
-glift.api.widgetopt[glift.WidgetType.STANDARD_PROBLEM] = function () {
+
+/**
+ * Возвращает опции для виджета стандартных задач.
+ * @return {Object} Объект с опциями виджета
+ */
+export function standardProblemOptions() {
   return {
-    markLastMove: undefined, // rely on defaults
-    keyMappings: undefined, // rely on defaults
-    enableMousewheel: undefined, // rely on defaults (false)
+    markLastMove: undefined, // полагаемся на значения по умолчанию
+    keyMappings: undefined, // полагаемся на значения по умолчанию
+    enableMousewheel: undefined, // полагаемся на значения по умолчанию (false)
 
-    problemConditions: undefined, // rely on defaults, which are set up to work
-    // for the Standard problem.
+    problemConditions: undefined, // полагаемся на значения по умолчанию, 
+    // которые настроены для стандартной задачи.
 
-    controllerFunc: glift.controllers.staticProblem,
+    controllerFunc: null, // будет заменено на staticProblem при подключении контроллеров
 
-    // TODO(kashomon): Consider using multiopen-boxonly instead of checkbox
+    // TODO: Рассмотреть возможность использования multiopen-boxonly вместо checkbox
     icons: [
       'undo-problem-move',
       'problem-explanation',
-      'multiopen-boxonly', // Problem Status
+      'multiopen-boxonly', // Статус задачи
     ],
 
-    showVariations: glift.enums.showVariations.NEVER,
+    showVariations: null, // будет заменено на NEVER при использовании перечислений
 
     statusBarIcons: ['fullscreen'],
 
+    /**
+     * Обработчик клика по камню на доске
+     * @param {Event} event - Событие клика
+     * @param {Object} widget - Объект виджета
+     * @param {Object} pt - Точка на доске
+     */
     stoneClick: function (event, widget, pt) {
-      var hooks = widget.hooks();
-      var currentPlayer = widget.controller.getCurrentPlayer();
-      var flattened = widget.controller.addStone(pt, currentPlayer);
-      var problemResults = glift.enums.problemResults;
+      const hooks = widget.hooks();
+      const currentPlayer = widget.controller.getCurrentPlayer();
+      const flattened = widget.controller.addStone(pt, currentPlayer);
+      const problemResults = {
+        CORRECT: 'CORRECT',
+        INCORRECT: 'INCORRECT',
+        FAILURE: 'FAILURE'
+      };
+      
       if (flattened.problemResult() === problemResults.FAILURE) {
-        // Illegal move -- nothing to do.  Don't make the player fail based on
-        // an illegal move.
+        // Неправильный ход -- ничего не делаем. Не делаем игрока проигравшим
+        // из-за неправильного хода.
         return;
       }
+      
       widget.applyBoardData(flattened);
+      
       if (flattened.problemResult() === problemResults.CORRECT) {
         widget.iconBar.setCenteredTempIcon(
           'multiopen-boxonly',
@@ -51,7 +70,7 @@ glift.api.widgetopt[glift.WidgetType.STANDARD_PROBLEM] = function () {
       }
     },
 
-    stoneMouseover: undefined,
-    stoneMouseout: undefined,
+    stoneMouseover: undefined, // полагаемся на значения по умолчанию
+    stoneMouseout: undefined, // полагаемся на значения по умолчанию
   };
-};
+}

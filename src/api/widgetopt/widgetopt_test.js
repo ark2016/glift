@@ -1,40 +1,53 @@
-(function () {
-  module('glift.api.widgetopt');
+/**
+ * Тесты для модуля widgetopt.
+ * @module api/widgetopt/widgetopt_test
+ */
 
-  // List of supported widget types in the Options rewrite.
-  var supportedList = [
-    glift.WidgetType.BOARD_EDITOR,
-    glift.WidgetType.CORRECT_VARIATIONS_PROBLEM,
-    glift.WidgetType.EXAMPLE,
-    glift.WidgetType.GAME_VIEWER,
-    glift.WidgetType.REDUCED_GAME_VIEWER,
-    glift.WidgetType.STANDARD_PROBLEM,
-  ];
+import { WIDGET_TYPE } from '../../widget_type.js';
+import { widgetopt } from './index.js';
 
-  var keys = [
-    'controllerFunc',
-    'enableMousewheel',
-    'icons',
-    'keyMappings',
-    'markLastMove',
-    'problemConditions',
-    'showVariations',
-    'statusBarIcons',
-    'stoneClick',
-    'stoneMouseout',
-    'stoneMouseover',
-  ];
+/**
+ * Запускает тесты для опций виджетов
+ */
+export function runTests() {
+  describe('api.widgetopt', () => {
+    // Список поддерживаемых типов виджетов
+    const supportedList = [
+      WIDGET_TYPE.BOARD_EDITOR,
+      WIDGET_TYPE.CORRECT_VARIATIONS_PROBLEM,
+      WIDGET_TYPE.EXAMPLE,
+      WIDGET_TYPE.GAME_VIEWER,
+      WIDGET_TYPE.REDUCED_GAME_VIEWER,
+      WIDGET_TYPE.STANDARD_PROBLEM,
+    ];
 
-  test('widgetopt: Testing availability', function () {
-    for (var i = 0; i < supportedList.length; i++) {
-      var widgetType = supportedList[i];
-      var wfn = glift.api.widgetopt[widgetType];
-      ok(wfn, 'fn must be defined:' + widgetType);
-      var w = wfn();
-      ok(w, 'type must be defined:' + widgetType);
-      for (var j = 0; j < keys.length; j++) {
-        ok(keys[j] in w, 'key not present:' + keys[j]);
+    const keys = [
+      'controllerFunc',
+      'enableMousewheel',
+      'icons',
+      'keyMappings',
+      'markLastMove',
+      'problemConditions',
+      'showVariations',
+      'statusBarIcons',
+      'stoneClick',
+      'stoneMouseout',
+      'stoneMouseover',
+    ];
+
+    it('должен предоставлять все опции для всех типов виджетов', () => {
+      for (let i = 0; i < supportedList.length; i++) {
+        const widgetType = supportedList[i];
+        const wfn = widgetopt[widgetType];
+        expect(wfn).toBeDefined();
+        
+        const w = wfn();
+        expect(w).toBeDefined();
+        
+        for (let j = 0; j < keys.length; j++) {
+          expect(w).toHaveProperty(keys[j]);
+        }
       }
-    }
+    });
   });
-})();
+}

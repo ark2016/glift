@@ -11,7 +11,7 @@ import { boardLabels } from './board_labels.js';
 import { lines } from './lines.js';
 import { starpoints } from './starpoints.js';
 import { shadows, stones } from './stones.js';
-import { markContainer } from './marks.js';
+import { markContainer, addMark } from './marks.js';
 import { buttons } from './buttons.js';
 
 // Экспортируем все компоненты
@@ -27,5 +27,6 @@ export {
   shadows,
   stones,
   markContainer,
+  addMark,
   buttons
 }; 

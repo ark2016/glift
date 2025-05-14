@@ -5,12 +5,13 @@
 
 // Импортируем классы виджетов
 import { BaseWidget } from './base_widget.js';
-import { IdGenerator } from './id_generator.js';
+import { IdGenerator, idGenerator } from './id_generator.js';
 
 // Экспортируем все классы виджетов
 export {
   BaseWidget,
-  IdGenerator
+  IdGenerator,
+  idGenerator
 };
 
 /**

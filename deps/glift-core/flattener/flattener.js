@@ -1,11 +1,103 @@
-goog.provide('glift.flattener');
+/**
+ * Модуль flattener помогает преобразовать доску Го в формат для отображения.
+ * Это полезно для всех видов рендеринга доски Го, будь то печатный рендеринг или
+ * динамический пользовательский интерфейс.
+ * 
+ * @module flattener/flattener
+ */
+
+import { enums } from '../util/enums.js';
+import { orientation } from '../orientation/orientation.js';
+import { rules } from '../rules/rules.js';
 
 /**
- * Helps flatten a go board into a diagram definition. The flattened go board is
- * useful for all sorts of go-board rendering, be it print-rendering or a
- * dynamic UI.
+ * Опции для flattener
+ *
+ * Некоторые примечания о параметрах:
+ *
+ * Необязательные параметры:
+ *  - goban: используется для извлечения всех начальных камней.
+ *  - nextMovesPath. По умолчанию []. Обычно используется только для
+ *    печатных диаграмм.
+ *  - initPosition. По умолчанию undefined. Если не определено, мы полагаемся на
+ *    начальную позицию, предоставленную деревом ходов.
+ *  - startingMoveNum. Опционально переопределить номер хода. Если не установлен,
+ *    автоматически определяется в зависимости от того, находится ли позиция на
+ *    основном пути или в вариации.
+ *
+ *  Необязательные параметры обрезки.
+ *  - boardRegion: указывает, какую область обрезать.
+ *  - autoBoxCropOnNextMoves. Если установлено, будет автоматически обрезать на основе
+ *    пути следующих ходов.
+ *  - regionRestrictions. Массив разрешенных boardRegions. Если вычисленный
+ *    регион не является членом этого набора, по умолчанию используется 'ALL'.
+ *  - autoBoxCropOnNextMoves. Выполнять ли автоматическую обрезку.
+ *
+ *  Опции для меток
+ *  - showNextVariationsType: Показывать ли вариации.
+ *  - markLastMove: Ставить ли специальную метку на последний ход
+ *  - markKo: Показывать ли место Ко с меткой.
+ *  - clearMarks: Удалять ли все метки из диаграммы. Примечание: это
+ *    влияет только на метки в SGF и не влияет
+ *    на метки пути следующих ходов (так как это весь смысл пути следующих ходов).
+ *  - ignoreLabels: Игнорировать ли любые предложения меток. Это имеет
+ *    эффект очистки всех меток
+ *
+ *  Опции для задач
+ *  - problemConditions: определяют, как оценивать, является ли позиция
+ *    'правильной'. Очевидно, полезно только для задач. В настоящее время только
+ *    для показа правильных/неправильных ходов в проводнике.
+ *
+ * @typedef {{
+ *  goban: (Object|undefined),
+ *  initPosition: (string|Array<number>|undefined),
+ *  nextMovesPath: (string|Array<number>|undefined),
+ *  startingMoveNum: (number|undefined),
+ *  boardRegion: (string|undefined),
+ *  autoRotateCropPrefs: (Object|undefined),
+ *  regionRestrictions: (Array<string>|undefined),
+ *  showNextVariationsType: (string|undefined),
+ *  markLastMove: (boolean|undefined),
+ *  selectedNextMove: (Object|undefined),
+ *  showKoLocation: (boolean|undefined),
+ *  problemConditions: (Object|undefined),
+ *  clearMarks: (boolean|undefined),
+ *  ignoreLabels: (boolean|undefined)
+ * }}
  */
-glift.flattener = {};
+
+/**
+ * Эти данные предназначены для использования следующим образом:
+ *    '<color> <mvnum> at <collisionStoneColor> <label>'
+ * например:
+ *    'Black 13 at White 2'
+ *
+ * Описание:
+ *  {
+ *    color: <цвет хода для воспроизведения>,
+ *    mvnum: <номер хода>,
+ *    label: <метка, где произошла коллизия>,
+ *    collisionStoneColor: <цвет камня под меткой>
+ *  }
+ *
+ * @typedef {{
+ *  color: string,
+ *  mvnum: number,
+ *  label: (string|undefined),
+ *  collisionStoneColor: (string|undefined)
+ * }}
+ */
+export class Collision {
+  /**
+   * @param {Object} options Опции для создания коллизии
+   */
+  constructor(options = {}) {
+    this.color = options.color;
+    this.mvnum = options.mvnum;
+    this.label = options.label;
+    this.collisionStoneColor = options.collisionStoneColor;
+  }
+}
 
 /**
  * Flattener Options
@@ -88,8 +180,8 @@ glift.flattener.Options;
 glift.flattener.Collision;
 
 /**
- * Flatten the combination of movetree, goban, cropping, and treepath into an
- * array (really a 2D array) of symbols, (a Flattened object).
+ * Уплощает комбинацию дерева ходов, гобана, обрезки и пути дерева в
+ * массив символов (объект Flattened).
  *
  * @param {!glift.rules.MoveTree} movetreeInitial The movetree is used for
  *    extracting:
@@ -675,4 +767,11 @@ glift.flattener.clearLabels_ = function (markMap) {
     }
   }
   markMap.labels = {};
+};
+
+// Экспортируем функцию flatten и объект flattener для обратной совместимости
+export const flatten = glift.flattener.flatten;
+export const flattener = {
+  flatten,
+  Collision
 };

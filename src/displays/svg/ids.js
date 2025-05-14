@@ -1,30 +1,34 @@
-goog.provide('glift.displays.svg.ids');
-goog.provide('glift.displays.svg.IdGenerator');
+import { Element } from './elements.js';
 
 /**
- * Collection of SVG ID utilities.
+ * Утилиты для создания идентификаторов SVG-элементов.
+ * @module displays/svg/ids
  */
-glift.displays.svg.ids = {
+
+/**
+ * Набор утилит для работы с идентификаторами SVG-элементов.
+ */
+export const ids = {
   /**
-   * Create an ID generator.
-   * @param {string} divId
-   * @return {!glift.displays.svg.IdGenerator}
+   * Создаёт генератор идентификаторов.
+   * @param {string} divId Идентификатор контейнера
+   * @return {!IdGenerator}
    */
-  gen: function (divId) {
-    return new glift.displays.svg.IdGenerator(divId);
+  gen: function(divId) {
+    return new IdGenerator(divId);
   },
 
   /**
-   * Get an ID for a SVG element (return the stringForm id).
+   * Получает идентификатор для SVG-элемента (возвращает строковый id).
    *
-   * @param {string} divId
-   * @param {glift.displays.svg.Element} type
-   * @param {(!glift.Point|!Object|string)=} opt_extraData
-   * extraData may be undefined.  Usually a point, but also be an icon name.
-   * @return {string} The relevant Id.
+   * @param {string} divId Идентификатор контейнера
+   * @param {string} type Тип элемента
+   * @param {(!{x: function(): number, y: function(): number}|!Object|string)=} opt_extraData
+   * Дополнительные данные (может отсутствовать). Обычно точка, но может быть и именем иконки.
+   * @return {string} Соответствующий идентификатор
    */
-  element: function (divId, type, opt_extraData) {
-    var base = divId + '_' + type;
+  element: function(divId, type, opt_extraData) {
+    const base = divId + '_' + type;
     if (opt_extraData !== undefined) {
       if (opt_extraData.x !== undefined) {
         return base + '_' + opt_extraData.x() + '_' + opt_extraData.y();
@@ -38,233 +42,233 @@ glift.displays.svg.ids = {
 };
 
 /**
- * Id Generator constructor.
- *
- * @param {string} divId
- * @constructor @final @struct
+ * Генератор идентификаторов для SVG-элементов.
  */
-glift.displays.svg.IdGenerator = function (divId) {
-  /** @const {string}  */
-  this.divId = divId;
+export class IdGenerator {
+  /**
+   * @param {string} divId Идентификатор контейнера
+   * @param {string=} opt_prefix Опциональный префикс для идентификаторов
+   */
+  constructor(divId, opt_prefix = '') {
+    /** @const {string} */
+    this.divId = opt_prefix ? `${opt_prefix}_${divId}` : divId;
 
-  var eidFn = glift.displays.svg.ids.element;
-  var svgEnum = glift.displays.svg.Element;
+    const eidFn = ids.element;
 
-  /** @const @private {string} */
-  this.svg_ = eidFn(this.divId, svgEnum.SVG);
-  /** @const @private {string} */
-  this.board_ = eidFn(this.divId, svgEnum.BOARD);
-  /** @const @private {string} */
-  this.boardCoordLabelGroup_ = eidFn(this.divId, svgEnum.BOARD_COORD_LABELS);
-  /** @const @private {string} */
-  this.stoneGroup_ = eidFn(this.divId, svgEnum.STONE_CONTAINER);
-  /** @const @private {string} */
-  this.stoneShadowGroup_ = eidFn(this.divId, svgEnum.STONE_SHADOW_CONTAINER);
-  /** @const @private {string} */
-  this.starpointGroup_ = eidFn(this.divId, svgEnum.STARPOINT_CONTAINER);
-  /** @const @private {string} */
-  this.buttonGroup_ = eidFn(this.divId, svgEnum.BUTTON_CONTAINER);
-  /** @const @private {string} */
-  this.boardButton_ = eidFn(this.divId, svgEnum.FULL_BOARD_BUTTON);
-  /** @const @private {string} */
-  this.lineGroup_ = eidFn(this.divId, svgEnum.BOARD_LINE_CONTAINER);
-  /** @const @private {string} */
-  this.markGroup_ = eidFn(this.divId, svgEnum.MARK_CONTAINER);
-  /** @const @private {string} */
-  this.iconGroup_ = eidFn(this.divId, svgEnum.ICON_CONTAINER);
-  /** @const @private {string} */
-  this.intersectionsGroup_ = eidFn(this.divId, svgEnum.INTERSECTIONS_CONTAINER);
-  /** @const @private {string} */
-  this.tempMarkGroup_ = eidFn(this.divId, svgEnum.TEMP_MARK_GROUP);
-};
+    /** @private {string} */
+    this.svg_ = eidFn(this.divId, Element.SVG);
+    /** @private {string} */
+    this.board_ = eidFn(this.divId, Element.BOARD);
+    /** @private {string} */
+    this.boardCoordLabelGroup_ = eidFn(this.divId, Element.BOARD_COORD_LABELS);
+    /** @private {string} */
+    this.stoneGroup_ = eidFn(this.divId, Element.STONE_CONTAINER);
+    /** @private {string} */
+    this.stoneShadowGroup_ = eidFn(this.divId, Element.STONE_SHADOW_CONTAINER);
+    /** @private {string} */
+    this.starpointGroup_ = eidFn(this.divId, Element.STARPOINT_CONTAINER);
+    /** @private {string} */
+    this.buttonGroup_ = eidFn(this.divId, Element.BUTTON_CONTAINER);
+    /** @private {string} */
+    this.boardButton_ = eidFn(this.divId, Element.FULL_BOARD_BUTTON);
+    /** @private {string} */
+    this.lineGroup_ = eidFn(this.divId, Element.BOARD_LINE_CONTAINER);
+    /** @private {string} */
+    this.markGroup_ = eidFn(this.divId, Element.MARK_CONTAINER);
+    /** @private {string} */
+    this.iconGroup_ = eidFn(this.divId, Element.ICON_CONTAINER);
+    /** @private {string} */
+    this.intersectionsGroup_ = eidFn(this.divId, Element.INTERSECTIONS_CONTAINER);
+    /** @private {string} */
+    this.tempMarkGroup_ = eidFn(this.divId, Element.TEMP_MARK_GROUP);
+  }
 
-glift.displays.svg.IdGenerator.prototype = {
-  /** @return {string} ID for the svg container. */
-  svg: function () {
+  /** @return {string} Идентификатор для контейнера SVG. */
+  svg() {
     return this.svg_;
-  },
+  }
 
-  /** @return {string} ID for the board. */
-  board: function () {
+  /** @return {string} Идентификатор для доски. */
+  board() {
     return this.board_;
-  },
+  }
 
-  /** @return {string} Group id for the board coordinate label group */
-  boardCoordLabelGroup: function () {
+  /** @return {string} Идентификатор группы для меток координат на доске */
+  boardCoordLabelGroup() {
     return this.boardCoordLabelGroup_;
-  },
+  }
 
-  /** @return {string} ID for the intersections group. */
-  intersections: function () {
+  /** @return {string} Идентификатор для группы пересечений. */
+  intersections() {
     return this.intersectionsGroup_;
-  },
+  }
 
-  /** @return {string} Group id for the stones. */
-  stoneGroup: function () {
+  /** @return {string} Идентификатор группы для камней. */
+  stoneGroup() {
     return this.stoneGroup_;
-  },
+  }
 
   /**
-   * @param {!glift.Point} pt
-   * @return {string}  Id for a stone.
+   * @param {!{x: function(): number, y: function(): number}} pt Точка 
+   * @return {string} Идентификатор для камня.
    */
-  stone: function (pt) {
-    return glift.displays.svg.ids.element(
+  stone(pt) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.STONE,
+      Element.STONE,
       pt
     );
-  },
+  }
 
-  /** @return {string} Group id for the stone shadows. */
-  stoneShadowGroup: function () {
+  /** @return {string} Идентификатор группы для теней камней. */
+  stoneShadowGroup() {
     return this.stoneShadowGroup_;
-  },
+  }
 
   /**
-   * @param {!glift.Point} pt
-   * @return {string}  Id for a stone shadow.
+   * @param {!{x: function(): number, y: function(): number}} pt Точка
+   * @return {string} Идентификатор для тени камня.
    */
-  stoneShadow: function (pt) {
-    return glift.displays.svg.ids.element(
+  stoneShadow(pt) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.STONE_SHADOW,
+      Element.STONE_SHADOW,
       pt
     );
-  },
+  }
 
-  /** @return {string} Group id for the star points. */
-  starpointGroup: function () {
+  /** @return {string} Идентификатор группы для отметок звездных точек. */
+  starpointGroup() {
     return this.starpointGroup_;
-  },
+  }
 
   /**
-   * @param {!glift.Point} pt
-   * @return {string} Id for a star point
+   * @param {!{x: function(): number, y: function(): number}} pt Точка
+   * @return {string} Идентификатор для звездной точки
    */
-  starpoint: function (pt) {
-    return glift.displays.svg.ids.element(
+  starpoint(pt) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.STARPOINT,
+      Element.STARPOINT,
       pt
     );
-  },
+  }
 
-  /** @return {string} Group id for a button group. */
-  buttonGroup: function () {
+  /** @return {string} Идентификатор группы для кнопок. */
+  buttonGroup() {
     return this.buttonGroup_;
-  },
+  }
 
   /**
-   * @param {!string} name Of the button.
-   * @return {string} Id for the button.
+   * @param {!string} name Имя кнопки.
+   * @return {string} Идентификатор для кнопки.
    */
-  button: function (name) {
-    return glift.displays.svg.ids.element(
+  button(name) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.BUTTON,
+      Element.BUTTON,
       name
     );
-  },
+  }
 
-  /** @return {string} ID for a full-board button. */
-  fullBoardButton: function () {
+  /** @return {string} Идентификатор для кнопки полной доски. */
+  fullBoardButton() {
     return this.boardButton_;
-  },
+  }
 
-  /** @return {string} Group ID for the lines. */
-  lineGroup: function () {
+  /** @return {string} Идентификатор группы для линий. */
+  lineGroup() {
     return this.lineGroup_;
-  },
+  }
 
   /**
-   * @param {!glift.Point} pt
-   * @return {string} Id for a board line.
+   * @param {!{x: function(): number, y: function(): number}} pt Точка
+   * @return {string} Идентификатор для линии доски.
    */
-  line: function (pt) {
-    return glift.displays.svg.ids.element(
+  line(pt) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.BOARD_LINE,
+      Element.BOARD_LINE,
       pt
     );
-  },
+  }
 
-  /** @return {string} Group id a Mark Container. */
-  markGroup: function () {
+  /** @return {string} Идентификатор группы для отметок. */
+  markGroup() {
     return this.markGroup_;
-  },
+  }
 
   /**
-   * @param {!glift.Point} pt
-   * @return {string} ID for a mark.
+   * @param {!{x: function(): number, y: function(): number}} pt Точка
+   * @return {string} Идентификатор для отметки.
    */
-  mark: function (pt) {
-    return glift.displays.svg.ids.element(
+  mark(pt) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.MARK,
+      Element.MARK,
       pt
     );
-  },
+  }
 
-  /** @return {string} Group id for temporary marks. */
-  tempMarkGroup: function () {
+  /** @return {string} Идентификатор группы для временных отметок. */
+  tempMarkGroup() {
     return this.tempMarkGroup_;
-  },
+  }
 
-  /** @return {string} ID for a guideline. */
-  guideLine: function () {
-    return glift.displays.svg.ids.element(
+  /** @return {string} Идентификатор для направляющей линии. */
+  guideLine() {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.GUIDE_LINE
+      Element.GUIDE_LINE
     );
-  },
+  }
 
-  /** @return {string} Group ID for the icons.  */
-  iconGroup: function () {
+  /** @return {string} Идентификатор группы для иконок. */
+  iconGroup() {
     return this.iconGroup_;
-  },
+  }
 
   /**
-   * @param {string} name Of the icon.
-   * @return {string} ID for an icon.
+   * @param {string} name Имя иконки.
+   * @return {string} Идентификатор для иконки.
    */
-  icon: function (name) {
-    return glift.displays.svg.ids.element(
+  icon(name) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.ICON,
+      Element.ICON,
       name
     );
-  },
+  }
 
-  /** @return {string} ID for the temp icon group. */
-  tempIconGroup: function () {
-    return glift.displays.svg.ids.element(
+  /** @return {string} Идентификатор для временной группы иконок. */
+  tempIconGroup() {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.TEMP_ICON_CONTAINER
+      Element.TEMP_ICON_CONTAINER
     );
-  },
-
-  /**
-   * @param {string} name Of the icon.
-   * @return {string} ID for the temp icon.
-   */
-  tempIcon: function (name) {
-    return glift.displays.svg.ids.element(
-      this.divId,
-      glift.displays.svg.Element.TEMP_ICON,
-      name
-    );
-  },
+  }
 
   /**
-   * @param {string} name Of the icon.
-   * @return {string} ID for the temp icon text.
+   * @param {string} name Имя иконки.
+   * @return {string} Идентификатор для временной иконки.
    */
-  tempIconText: function (name) {
-    return glift.displays.svg.ids.element(
+  tempIcon(name) {
+    return ids.element(
       this.divId,
-      glift.displays.svg.Element.TEMP_TEXT,
+      Element.TEMP_ICON,
       name
     );
-  },
-};
+  }
+
+  /**
+   * @param {string} textId Идентификатор текста.
+   * @return {string} Идентификатор для временного текста.
+   */
+  tempIconText(textId) {
+    return ids.element(
+      this.divId,
+      Element.TEMP_TEXT,
+      textId
+    );
+  }
+}

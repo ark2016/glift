@@ -4,7 +4,7 @@
 
 // Импортируем существующие компоненты тем
 import { DEFAULT, DEPTH, MOODY, TRANSPARENT, TEXTBOOK } from './themes.js';
-import { CssBaseTheme } from './css_base_theme.js';
+import { cssBaseTheme, CssDef } from './css_base_theme.js';
 import * as classes from './classes.js';
 
 /**
@@ -61,6 +61,7 @@ export {
   MOODY,
   TRANSPARENT,
   TEXTBOOK,
-  CssBaseTheme,
+  cssBaseTheme,
+  CssDef,
   classes
 }; 

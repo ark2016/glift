@@ -1,64 +1,44 @@
-goog.provide('glift.displays.commentbox.CommentBox');
+/**
+ * Модуль для создания и управления комментариями к ходам.
+ * @module displays/commentbox/create
+ */
+
+import { orientation } from '../../orientation/index.js';
+import { point, mergeObjects } from '../../util/index.js';
+import { selectId, newElement, convertText, sanitize } from '../../dom/index.js';
 
 /**
- * Create a comment box with:
- *
- * @param {string} divId The div in which the comment box should live
- * @param {!glift.orientation.BoundingBox} posBbox The bounding box of the div
- *    (expensive to recompute)
- * @param {!glift.themes.base} theme The theme object.
- * @param {boolean} useMarkdown Whether or not to use markdown
- *
- * @return {!glift.displays.commentbox.CommentBox}
+ * Класс для работы с блоком комментариев.
  */
-glift.displays.commentbox.create = function (
-  divId,
-  posBbox,
-  theme,
-  useMarkdown
-) {
-  useMarkdown = useMarkdown || false;
-  if (!theme) {
-    throw new Error('Theme must be defined. was: ' + theme);
+export class CommentBox {
+  /**
+   * @param {string} divId ID элемента, в котором должен располагаться блок комментариев
+   * @param {!Object} positioningBbox Ограничивающий прямоугольник для позиционирования
+   * @param {!Object} theme Объект темы оформления
+   * @param {boolean} useMarkdown Использовать ли Markdown-форматирование
+   */
+  constructor(divId, positioningBbox, theme, useMarkdown) {
+    this.divId = divId;
+    this.bbox = orientation.bbox.fromPts(
+      point(0, 0),
+      point(positioningBbox.width(), positioningBbox.height())
+    );
+    this.theme = theme;
+    this.useMarkdown = useMarkdown;
+    this.el = undefined;
   }
-  return new glift.displays.commentbox.CommentBox(
-    divId,
-    posBbox,
-    theme,
-    useMarkdown
-  ).draw();
-};
 
-/**
- * Comment box object.
- *
- * @package @constructor @struct @final
- */
-glift.displays.commentbox.CommentBox = function (
-  divId,
-  positioningBbox,
-  theme,
-  useMarkdown
-) {
-  this.divId = divId;
-  this.bbox = glift.orientation.bbox.fromPts(
-    glift.util.point(0, 0),
-    glift.util.point(positioningBbox.width(), positioningBbox.height())
-  );
-  this.theme = theme;
-  this.useMarkdown = useMarkdown;
-  this.el = undefined;
-};
-
-glift.displays.commentbox.CommentBox.prototype = {
-  /** Draw the comment box */
-  draw: function () {
-    this.el = glift.dom.elem(this.divId);
+  /** 
+   * Отрисовать блок комментариев
+   * @return {!CommentBox} this, для цепочки вызовов
+   */
+  draw() {
+    this.el = selectId(this.divId);
     if (this.el === null) {
       throw new Error('Could not find element with ID ' + this.divId);
     }
     this.el.css(
-      glift.util.obj.flatMerge(
+      mergeObjects(
         {
           'overflow-y': 'auto',
           MozBoxSizing: 'border-box',
@@ -70,51 +50,73 @@ glift.displays.commentbox.CommentBox.prototype = {
     this.el.addClass('glift-comment-box');
     this.scrollFix();
     return this;
-  },
+  }
 
   /**
-   * Fix the scrolling when user gets to the bottom of a div, so that the user
-   * doesn't scroll off into no mans land.
+   * Исправляет прокрутку, когда пользователь достигает нижней части div,
+   * чтобы пользователь не прокручивал содержимое в никуда.
    */
-  scrollFix: function () {
-    var elem = document.getElementById(this.divId);
+  scrollFix() {
+    const elem = document.getElementById(this.divId);
     if ('onwheel' in elem) {
-      elem.addEventListener('wheel', function (e) {
-        var deltaY = e.deltaY;
-        var pixelsPerTick = 30;
-        // Manually move the scroll box
+      elem.addEventListener('wheel', function(e) {
+        const deltaY = e.deltaY;
+        const pixelsPerTick = 30;
+        // Вручную перемещаем область прокрутки
         this.scrollTop += deltaY * pixelsPerTick;
         e.preventDefault();
       });
     }
-  },
+  }
 
   /**
-   * Set the text of the comment box. Note: this sanitizes the text to prevent
-   * XSS and does some basic HTML-izing.
-   * @param {string} text
-   * @param {string=} opt_collisionsLabel
+   * Устанавливает текст в блоке комментариев. Примечание: это санитизирует текст для 
+   * предотвращения XSS и выполняет базовое преобразование в HTML.
+   * @param {string} text Текст комментария
+   * @param {string=} opt_collisionsLabel Опциональная метка для коллизий
    */
-  setText: function (text, opt_collisionsLabel) {
+  setText(text, opt_collisionsLabel) {
     this.el.empty();
-    var collisionsLabel = opt_collisionsLabel || '';
+    const collisionsLabel = opt_collisionsLabel || '';
     if (collisionsLabel) {
-      collisionsLabel = glift.dom.sanitize(collisionsLabel);
-      var em = glift.dom
-        .newElem('em')
-        .append(glift.dom.convertText(collisionsLabel, false));
+      const sanitizedLabel = sanitize(collisionsLabel);
+      const em = newElement('em')
+        .append(convertText(sanitizedLabel, false));
       this.el.append(em);
     }
-    this.el.append(glift.dom.convertText(text, this.useMarkdown));
-  },
+    this.el.append(convertText(text, this.useMarkdown));
+  }
 
-  /** Clear the text from the comment box. */
-  clearText: function () {
+  /** Очистить текст из блока комментариев. */
+  clearText() {
     this.el.empty();
-  },
+  }
 
-  /** Remove all the relevant comment box HTML. */
-  destroy: function () {
+  /** Удалить весь соответствующий HTML блока комментариев. */
+  destroy() {
     this.el.remove();
-  },
-};
+  }
+}
+
+/**
+ * Создать блок комментариев с заданными параметрами.
+ *
+ * @param {string} divId ID элемента, в котором должен располагаться блок комментариев
+ * @param {!Object} posBbox Ограничивающий прямоугольник элемента
+ *    (дорого пересчитывать)
+ * @param {!Object} theme Объект темы оформления
+ * @param {boolean} useMarkdown Использовать ли Markdown-форматирование
+ *
+ * @return {!CommentBox} Экземпляр блока комментариев
+ */
+export function create(divId, posBbox, theme, useMarkdown = false) {
+  if (!theme) {
+    throw new Error('Theme must be defined. was: ' + theme);
+  }
+  return new CommentBox(
+    divId,
+    posBbox,
+    theme,
+    useMarkdown
+  ).draw();
+}

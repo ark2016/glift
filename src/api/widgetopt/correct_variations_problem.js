@@ -1,32 +1,50 @@
 /**
- * Additional Options for the GameViewers
+ * Дополнительные опции для виджета с проблемами с несколькими правильными вариациями.
+ * @module api/widgetopt/correct_variations_problem
  */
-glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function () {
+
+/**
+ * Возвращает опции для виджета проблем с несколькими правильными вариациями.
+ * @return {Object} Объект с опциями виджета
+ */
+export function correctVariationsProblemOptions() {
   return {
-    markLastMove: undefined, // rely on defaults
-    keyMappings: undefined, // rely on defaults
-    enableMousewheel: undefined, // rely on defaults (false)
+    markLastMove: undefined, // полагаемся на значения по умолчанию
+    keyMappings: undefined, // полагаемся на значения по умолчанию
+    enableMousewheel: undefined, // полагаемся на значения по умолчанию (false)
 
-    problemConditions: undefined, // rely on defaults
+    problemConditions: undefined, // полагаемся на значения по умолчанию
 
-    controllerFunc: glift.controllers.staticProblem,
+    controllerFunc: null, // будет заменено на staticProblem при подключении контроллеров
 
     icons: ['refresh', 'problem-explanation', 'multiopen-boxonly'],
 
-    showVariations: glift.enums.showVariations.NEVER,
+    showVariations: null, // будет заменено на NEVER при использовании перечислений
 
     statusBarIcons: ['fullscreen'],
 
+    /**
+     * Обработчик клика по камню на доске
+     * @param {Event} event - Событие клика
+     * @param {Object} widget - Объект виджета
+     * @param {Object} pt - Точка на доске
+     */
     stoneClick: function (event, widget, pt) {
-      var currentPlayer = widget.controller.getCurrentPlayer();
-      var flattened = widget.controller.addStone(pt, currentPlayer);
-      var problemResults = glift.enums.problemResults;
+      const currentPlayer = widget.controller.getCurrentPlayer();
+      const flattened = widget.controller.addStone(pt, currentPlayer);
+      const problemResults = { 
+        CORRECT: 'CORRECT', 
+        INCORRECT: 'INCORRECT',
+        FAILURE: 'FAILURE' 
+      };
+      
       if (flattened.problemResult() === problemResults.FAILURE) {
-        // Illegal move -- nothing to do.  Don't make the player fail based on
-        // an illegal move.
+        // Неправильный ход -- ничего не делаем. Не делаем игрока проигравшим
+        // из-за неправильного хода.
         return;
       }
-      var hooks = widget.hooks();
+      
+      const hooks = widget.hooks();
       widget.applyBoardData(flattened);
 
       if (widget.correctness === undefined) {
@@ -69,7 +87,7 @@ glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function () {
       }
     },
 
-    stoneMouseover: undefined, // rely on defaults
-    stoneMouseout: undefined, // rely on defaults
+    stoneMouseover: undefined, // полагаемся на значения по умолчанию
+    stoneMouseout: undefined, // полагаемся на значения по умолчанию
   };
-};
+}

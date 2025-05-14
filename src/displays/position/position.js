@@ -1,3 +1,7 @@
-goog.provide('glift.displays.position');
+/**
+ * Модуль позиционирования элементов в интерфейсе Glift.
+ * @module displays/position
+ */
 
-glift.displays.position = {};
+// Пустой объект заменен на экспорты в index.js
+export {};

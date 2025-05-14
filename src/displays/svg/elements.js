@@ -1,14 +1,13 @@
-goog.provide('glift.displays.svg.Element');
-
 /**
- * The various SVG Elements used by Glift.
+ * Перечисление элементов SVG, используемых в Glift.
  *
- * Used to create svg element Ids.  The enum values are slightly modified to
- * be compatible with being class / id names.
+ * Используется для создания идентификаторов элементов SVG.
+ * Значения немного модифицированы для совместимости с именами классов/идентификаторов.
  *
- * @enum{string}
+ * @enum {string}
+ * @readonly
  */
-glift.displays.svg.Element = {
+export const Element = Object.freeze({
   SVG: 'svg',
   BOARD: 'board',
   BOARD_COORD_LABELS: 'board_coord_labels',
@@ -30,10 +29,10 @@ glift.displays.svg.Element = {
   STONE_SHADOW_CONTAINER: 'stone_shadow_container',
   GUIDE_LINE: 'guide_line',
 
-  // Icon-bar specific glift.enums
+  // Элементы для панели иконок
   ICON: 'icon',
   ICON_CONTAINER: 'icon_container',
   TEMP_ICON: 'temp_icon',
   TEMP_TEXT: 'temp_text',
   TEMP_ICON_CONTAINER: 'temp_icon_container',
-};
+});

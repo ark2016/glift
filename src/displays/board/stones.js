@@ -7,90 +7,71 @@
 import * as svg from '../../svg/index.js';
 
 /**
- * Создает тени для камней.
- * @param {Object} svgGroup - SVG группа для добавления теней
- * @param {Object} idGen - Генератор идентификаторов
- * @param {Object} boardPoints - Точки доски
- * @param {Object} theme - Тема оформления
- */
-export const shadows = (svgGroup, idGen, boardPoints, theme) => {
-  // Заглушка - в полной реализации здесь будут создаваться тени для камней
-  console.log('Добавление теней для камней');
-};
-
-/**
- * Создает камни на доске.
- * @param {Object} svgGroup - SVG группа для добавления камней
- * @param {Object} idGen - Генератор идентификаторов
- * @param {Object} boardPoints - Точки доски
- * @param {Object} theme - Тема оформления
- */
-export const stones = (svgGroup, idGen, boardPoints, theme) => {
-  // Заглушка - в полной реализации здесь будут создаваться камни
-  console.log('Добавление камней на доску');
-};
-
-/**
- * Create the Go stones.  They are initially invisible to the user, but they
- * all exist at the time of GoBoard creation.
+ * Создает камни на доске. Они изначально невидимы для пользователя,
+ * но все они существуют на момент создания доски Го.
  *
- * @param {!glift.svg.SvgObj} svg Base svg obj
- * @param {!glift.displays.svg.IdGenerator} idGen The ID generator for SVG.
- * @param {!glift.flattener.BoardPoints} boardPoints Board points object.
- * @param {!glift.themes.base} theme The theme object
+ * @param {svg.SvgElement} svgObj - Базовый SVG объект
+ * @param {svg.IdGenerator} idGen - Генератор ID для SVG
+ * @param {Object} boardPoints - Объект с точками доски
+ * @param {Object} theme - Объект темы оформления
+ * @return {svg.SvgElement} Контейнер с камнями
  */
-glift.displays.board.stones = function (svg, idGen, boardPoints, theme) {
-  var container = glift.svg.group().setId(idGen.stoneGroup());
-  svg.append(container);
-  var data = boardPoints.data();
-  for (var i = 0, ii = data.length; i < ii; i++) {
-    var pt = data[i];
+export const stones = (svgObj, idGen, boardPoints, theme) => {
+  const container = svg.group().setId(idGen.stoneGroup());
+  svgObj.append(container);
+  
+  const data = boardPoints.data();
+  for (let i = 0, ii = data.length; i < ii; i++) {
+    const pt = data[i];
     container.append(
-      glift.svg
-        .circle()
+      svg.circle()
         .setAttr('cx', pt.coordPt.x())
         .setAttr('cy', pt.coordPt.y())
-        .setAttr('r', boardPoints.radius - 0.4) // subtract for stroke
+        .setAttr('r', boardPoints.radius - 0.4) // уменьшаем для учета обводки
         .setAttr('opacity', 0)
         .setAttr('stone_color', 'EMPTY')
-        .setAttr('fill', 'blue') // dummy color
-        .setAttr('class', glift.displays.svg.Element.STONE)
+        .setAttr('fill', 'blue') // временный цвет
+        .setAttr('class', 'stone')
         .setId(idGen.stone(pt.intPt))
     );
   }
+  
+  return container;
 };
 
 /**
- * Create the shadows for the Go stones.  They are initially invisible to the
- * user, but they may become visible later (e.g., via mousover).  Shadows are
- * only created if the theme has a shadow.
+ * Создает тени для камней Го. Они изначально невидимы для пользователя,
+ * но могут стать видимыми позже (например, при наведении мыши). Тени 
+ * создаются только если тема содержит настройки для теней.
  *
- * @param {!glift.svg.SvgObj} svg Base svg obj
- * @param {!glift.displays.svg.IdGenerator} idGen The ID generator for SVG.
- * @param {!glift.flattener.BoardPoints} boardPoints Board points object.
- * @param {!glift.themes.base} theme The theme object
+ * @param {svg.SvgElement} svgObj - Базовый SVG объект
+ * @param {svg.IdGenerator} idGen - Генератор ID для SVG
+ * @param {Object} boardPoints - Объект с точками доски
+ * @param {Object} theme - Объект темы оформления
+ * @return {svg.SvgElement|Object} Контейнер с тенями или пустой объект
  */
-glift.displays.board.shadows = function (svg, idGen, boardPoints, theme) {
+export const shadows = (svgObj, idGen, boardPoints, theme) => {
   if (theme.stones.shadows === undefined) {
     return {};
   }
-  var container = glift.svg.group().setId(idGen.stoneShadowGroup());
-  svg.append(container);
-  var data = boardPoints.data();
-  for (var i = 0, ii = data.length; i < ii; i++) {
-    var pt = data[i];
+  
+  const container = svg.group().setId(idGen.stoneShadowGroup());
+  svgObj.append(container);
+  
+  const data = boardPoints.data();
+  for (let i = 0, ii = data.length; i < ii; i++) {
+    const pt = data[i];
     container.append(
-      glift.svg
-        .circle()
+      svg.circle()
         .setAttr('cx', pt.coordPt.x() + boardPoints.radius / 7)
         .setAttr('cy', pt.coordPt.y() + boardPoints.radius / 7)
         .setAttr('r', boardPoints.radius - 0.4)
         .setAttr('opacity', 0)
         .setAttr('fill', theme.stones.shadows.fill)
-        // .setAttr('stroke', theme.stones.shadows.stroke)
-        // .setAttr('filter', 'url(#' + divId + '_svg_blur)')
-        .setAttr('class', glift.displays.svg.Element.STONE_SHADOW)
+        .setAttr('class', 'stone-shadow')
         .setId(idGen.stoneShadow(pt.intPt))
     );
   }
+  
+  return container;
 };

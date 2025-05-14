@@ -1,6 +1,8 @@
-goog.provide('glift.displays.icons');
-
 /**
- * Objects and methods having to do with icons.
+ * Модуль иконок для библиотеки Glift.
+ * Этот файл был автоматически преобразован из Google Closure Library.
+ * @module displays/icons/icons
  */
-glift.displays.icons = {};
+
+// Пустой файл заменен на экспорты в index.js
+export {};

@@ -1,123 +1,121 @@
-goog.provide('glift.displays.environment');
-goog.provide('glift.displays.GuiEnvironment');
+/**
+ * Утилиты для среды отображения доски.
+ *
+ * Среда содержит:
+ *  - Ограничивающий прямоугольник для линий
+ *  - Ограничивающий прямоугольник для всей доски
+ *  - Ограничивающие прямоугольники для боковых панелей
+ *  - Расчеты точек доски
+ * 
+ * @module displays/environment
+ */
+
+import { orientation } from '../orientation/index.js';
+import { point } from '../util/index.js';
+import { cropbox } from './cropbox_wrapper.js';
+import { flattener } from '../flattener/index.js';
 
 /**
- * Display environment utilities and classes.
+ * Создает и возвращает среду пользовательского интерфейса.
  * 
- * The Environment contains:
- *  - The bounding box for the lines
- *  - The bounding box for the whole board
- *  - The bounding boxes for the sidebars
- *  - Board points calculations
- * 
- * @namespace
+ * @param {!Object} boardBox Ограничивающий прямоугольник для доски
+ * @param {string} boardRegion Область доски для отображения
+ * @param {number} intersections Количество пересечений (обычно 19)
+ * @param {boolean} drawBoardCoords Отображать ли координаты доски
+ * @return {!GuiEnvironment} Объект среды
  */
-glift.displays.environment = {
+export function get(boardBox, boardRegion, intersections, drawBoardCoords) {
+  // Для скорости и изоляции лучше определить boardBox извне, 
+  // чем вычислять высоту и ширину путем проверки div здесь.
+  if (!boardBox) {
+    throw new Error('No Bounding Box defined for display environment!');
+  }
+
+  return new GuiEnvironment(
+    boardBox,
+    boardRegion,
+    intersections,
+    drawBoardCoords
+  );
+}
+
+/**
+ * Среда пользовательского интерфейса для отображения доски Го.
+ * 
+ * Обрабатывает расчеты для позиционирования доски, обрезки и отрисовки.
+ */
+export class GuiEnvironment {
   /**
-   * Creates and returns a GUI environment.
-   * 
-   * @param {!glift.orientation.BoundingBox} boardBox The bounding box for the board
-   * @param {!glift.enums.boardRegions} boardRegion Region to display
-   * @param {number} intersections Number of intersections (usually 19)
-   * @param {boolean} drawBoardCoords Whether to draw board coordinates
-   * @return {!glift.displays.GuiEnvironment} The environment object
+   * @param {!Object} bbox Общий ограничивающий прямоугольник
+   * @param {string} boardRegion Область доски для отображения
+   * @param {number} intersections Количество пересечений
+   * @param {boolean} drawBoardCoords Отображать ли координаты доски
    */
-  get(boardBox, boardRegion, intersections, drawBoardCoords) {
-    // For speed and isolation purposes, it's preferred to define the boardBox
-    // externally rather than to calculate the h/w by inspecting the div here.
-    if (!boardBox) {
-      throw new Error('No Bounding Box defined for display environment!');
-    }
-
-    return new glift.displays.GuiEnvironment(
-      boardBox,
-      boardRegion,
-      intersections,
-      drawBoardCoords
-    );
-  },
-};
-
-/**
- * GUI Environment for Go board displays.
- * 
- * Handles calculations for board positioning, cropping, and drawing.
- *
- * @param {!glift.orientation.BoundingBox} bbox The overall bounding box
- * @param {!glift.enums.boardRegions} boardRegion Region of the board to display
- * @param {number} intersections Number of intersections
- * @param {boolean} drawBoardCoords Whether to draw board coordinates
- *
- * @constructor
- * @final
- * @struct
- */
-glift.displays.GuiEnvironment = class {
   constructor(bbox, boardRegion, intersections, drawBoardCoords) {
-    /** @const {!glift.orientation.BoundingBox} */
+    /** @type {!Object} */
     this.bbox = bbox;
     
-    /** @const {number} */
+    /** @type {number} */
     this.divHeight = bbox.height();
     
-    /** @const {number} */
+    /** @type {number} */
     this.divWidth = bbox.width();
     
-    /** @const {!glift.enums.boardRegions} */
+    /** @type {string} */
     this.boardRegion = boardRegion;
     
-    /** @const {number} */
+    /** @type {number} */
     this.intersections = intersections;
     
-    /** @const {boolean} */
+    /** @type {boolean} */
     this.drawBoardCoords = drawBoardCoords;
 
-    /** @type {!glift.displays.DisplayCropBox} */
-    this.cropbox = glift.displays.cropbox.getFromRegion(
+    /** @type {!Object} */
+    this.cropbox = cropbox.getFromRegion(
       this.boardRegion,
       this.intersections,
       this.drawBoardCoords
     );
 
-    // ------- Defined during init ------- //
-    /** @private {glift.orientation.BoundingBox} */
+    // ------- Определено во время инициализации ------- //
+    /** @private {Object} */
     this.divBox_ = null;
 
     /**
-     * The 'true' outer-draw box for the go board.
-     * @type {?glift.orientation.BoundingBox}
+     * 'Истинный' внешний прямоугольник для рисования доски го.
+     * @type {?Object}
      */
     this.goBoardBox = null;
 
     /**
-     * The BoardPoints object contains all intersection coordinates
-     * for drawing the go-board.
-     * @type {?glift.flattener.BoardPoints}
+     * Объект BoardPoints содержит все координаты пересечений
+     * для отрисовки доски го.
+     * @type {?Object}
      */
     this.boardPoints = null;
   }
 
   /**
-   * Initializes the internal variables for board placement.
-   * @return {!glift.displays.GuiEnvironment} this, for chaining
+   * Инициализирует внутренние переменные для размещения доски.
+   * @return {!GuiEnvironment} this, для цепочки вызовов
    */
   init() {
     const { divHeight, divWidth, cropbox } = this;
     
-    // The box for the entire div
-    const divBox = glift.orientation.bbox.fromPts(
-      glift.util.point(0, 0), // top left point
-      glift.util.point(divWidth, divHeight) // bottom right point
+    // Прямоугольник для всего div
+    const divBox = orientation.bbox.fromPts(
+      point(0, 0), // верхняя левая точка
+      point(divWidth, divHeight) // нижняя правая точка
     );
     
-    // The resized goboard box, accounting for the cropbox
-    const goBoardBox = glift.displays.getResizedBox(divBox, cropbox);
+    // Измененный размер прямоугольника доски го, учитывая область отображения
+    const goBoardBox = getResizedBox(divBox, cropbox);
     
-    // Calculate spacing between intersections
-    const spacing = glift.displays.getSpacing(goBoardBox, cropbox);
+    // Вычисляем расстояние между пересечениями
+    const spacing = getSpacing(goBoardBox, cropbox);
     
-    // Calculate the coordinates and bounding boxes for each intersection
-    const boardPoints = glift.flattener.BoardPoints.fromBbox(
+    // Вычисляем координаты и ограничивающие прямоугольники для каждого пересечения
+    const boardPoints = flattener.BoardPoints.fromBbox(
       this.cropbox.bboxWithoutCoords(),
       spacing,
       this.intersections,
@@ -129,11 +127,38 @@ glift.displays.GuiEnvironment = class {
       }
     );
 
-    // Save calculated values
+    // Сохраняем вычисленные значения
     this.divBox_ = divBox;
     this.goBoardBox = goBoardBox;
     this.boardPoints = boardPoints;
     
     return this;
   }
+}
+
+/**
+ * Получает изменённый размер прямоугольника для отображения.
+ * @param {!Object} bbox Оригинальный ограничивающий прямоугольник
+ * @param {!Object} cropbox Область обрезки
+ * @return {!Object} Изменённый ограничивающий прямоугольник
+ * @private
+ */
+function getResizedBox(bbox, cropbox) {
+  return cropbox.resizedBox(bbox);
+}
+
+/**
+ * Получает расстояние между пересечениями.
+ * @param {!Object} bbox Ограничивающий прямоугольник
+ * @param {!Object} cropbox Область обрезки
+ * @return {number} Расстояние между пересечениями
+ * @private
+ */
+function getSpacing(bbox, cropbox) {
+  return cropbox.getSpacing(bbox);
+}
+
+export const environment = {
+  get,
+  GuiEnvironment
 };

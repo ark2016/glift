@@ -8,6 +8,14 @@
  */
 
 import { Element } from '../dom/dom.js';
+import * as pathutilsModule from './pathutils.js';
+import * as svgobjModule from './svgobj.js';
+
+// Импортируем и экспортируем все из модуля pathutils
+export * from './pathutils.js';
+
+// Импортируем и экспортируем все из модуля svgobj
+export * from './svgobj.js';
 
 /**
  * Создает корневой SVG элемент с заданными атрибутами.
@@ -82,6 +90,40 @@ export const circle = (attrObj) => {
   }
   
   return circle;
+};
+
+/**
+ * Создает SVG прямоугольник. Используется для отрисовки квадратных меток.
+ * 
+ * @function
+ * @param {Object} attrObj - Объект с атрибутами для прямоугольника
+ * @param {string} [attrObj.x] - X-координата верхнего левого угла
+ * @param {string} [attrObj.y] - Y-координата верхнего левого угла
+ * @param {string} [attrObj.width] - Ширина прямоугольника
+ * @param {string} [attrObj.height] - Высота прямоугольника
+ * @param {string} [attrObj.fill] - Цвет заливки
+ * @param {string} [attrObj.stroke] - Цвет обводки
+ * @return {SvgElement} SVG элемент прямоугольника
+ * @example
+ * // Создание прямоугольной метки
+ * const rect = svg.rect({
+ *   x: '100',
+ *   y: '100',
+ *   width: '20',
+ *   height: '20',
+ *   fill: 'none',
+ *   stroke: 'black'
+ * });
+ */
+export const rect = (attrObj) => {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const rect = new SvgElement(el);
+  
+  if (attrObj) {
+    rect.setAttr(attrObj);
+  }
+  
+  return rect;
 };
 
 /**
@@ -214,6 +256,36 @@ export const text = (attrObj, textContent) => {
 };
 
 /**
+ * Утилиты для работы с путями в SVG.
+ * Предоставляет методы для создания команд SVG пути.
+ */
+export const pathutils = {
+  /**
+   * Создает команду перемещения к указанной точке.
+   * 
+   * @param {Object} pt - Точка, к которой нужно переместиться
+   * @return {string} SVG команда перемещения
+   */
+  movePt: (pt) => `M${pt.x()},${pt.y()}`,
+  
+  /**
+   * Создает команду линии к указанной точке (абсолютные координаты).
+   * 
+   * @param {Object} pt - Точка, к которой нужно провести линию
+   * @return {string} SVG команда линии
+   */
+  lineAbsPt: (pt) => `L${pt.x()},${pt.y()}`,
+  
+  /**
+   * Создает команду линии с относительными координатами.
+   * 
+   * @param {Object} pt - Точка с относительными координатами
+   * @return {string} SVG команда относительной линии
+   */
+  lineRelPt: (pt) => `l${pt.x()},${pt.y()}`
+};
+
+/**
  * Класс для генерации уникальных идентификаторов для SVG элементов.
  * Используется для обеспечения уникальности ID и для организации
  * структуры SVG-документа.
@@ -259,6 +331,25 @@ export class IdGenerator {
   }
   
   /**
+   * ID для группы линий доски.
+   * 
+   * @return {string} ID для группы линий
+   */
+  lineGroup() {
+    return this.id('line_group');
+  }
+  
+  /**
+   * ID для отдельной линии.
+   * 
+   * @param {Object} pt - Точка, через которую проходит линия
+   * @return {string} ID для линии
+   */
+  line(pt) {
+    return this.id('line_' + pt.x() + '_' + pt.y());
+  }
+  
+  /**
    * ID для звездных точек.
    * 
    * @return {string} ID для звездных точек
@@ -277,12 +368,60 @@ export class IdGenerator {
   }
   
   /**
+   * ID для группы камней.
+   * 
+   * @return {string} ID для группы камней
+   */
+  stoneGroup() {
+    return this.id('stone_group');
+  }
+  
+  /**
+   * ID для конкретного камня по его позиции.
+   * 
+   * @param {Object} pt - Точка (позиция) камня
+   * @return {string} ID для камня
+   */
+  stone(pt) {
+    return this.id('stone_' + pt.x() + '_' + pt.y());
+  }
+  
+  /**
+   * ID для группы теней камней.
+   * 
+   * @return {string} ID для группы теней камней
+   */
+  stoneShadowGroup() {
+    return this.id('stone_shadow_group');
+  }
+  
+  /**
+   * ID для тени конкретного камня по его позиции.
+   * 
+   * @param {Object} pt - Точка (позиция) камня
+   * @return {string} ID для тени камня
+   */
+  stoneShadow(pt) {
+    return this.id('stone_shadow_' + pt.x() + '_' + pt.y());
+  }
+  
+  /**
    * ID для меток.
    * 
    * @return {string} ID для меток
    */
   marks() {
     return this.id('marks');
+  }
+
+  /**
+   * ID для конкретной метки по её позиции.
+   * 
+   * @param {Object} pt - Точка (позиция) метки
+   * @return {string} ID для метки
+   */
+  mark(pt) {
+    return this.id('mark_' + pt.x() + '_' + pt.y());
   }
 }
 
@@ -364,6 +503,32 @@ class SvgElement {
    */
   setId(id) {
     this.setAttr('id', id);
+    return this;
+  }
+  
+  /**
+   * Устанавливает текстовое содержимое для текстового элемента.
+   * 
+   * @param {string} text - Текст для установки
+   * @return {SvgElement} this для цепочки вызовов
+   */
+  setText(text) {
+    this.element.textContent = text;
+    return this;
+  }
+  
+  /**
+   * Устанавливает данные для элемента. Используется для сохранения
+   * информации о точке на доске.
+   * 
+   * @param {Object} pt - Точка (позиция) на доске
+   * @return {SvgElement} this для цепочки вызовов
+   */
+  setData(pt) {
+    if (pt && pt.x !== undefined && pt.y !== undefined) {
+      this.setAttr('data-x', pt.x());
+      this.setAttr('data-y', pt.y());
+    }
     return this;
   }
   

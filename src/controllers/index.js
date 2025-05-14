@@ -1,53 +1,34 @@
 /**
  * Модуль контроллеров для библиотеки Glift.
- * Содержит классы и функции для управления игровой логикой.
+ * Контроллеры обеспечивают логический слой (мозг) виджетов доски Го.
  * 
  * @module controllers
  */
 
-// Заглушка для контроллеров - в полной реализации здесь будут настоящие контроллеры
-export const controllers = {
-  version: '2.0.0-alpha'
-};
+import { 
+  BaseController, 
+  createBaseController, 
+  CONTROLLER_TYPES 
+} from './base.js';
+
+import { GameViewer, createGameViewerController } from './game_viewer.js';
+import { StaticProblem, createStaticProblemController } from './static_problem.js';
+import { BoardEditor, createBoardEditorController } from './board_editor.js';
 
 /**
- * Базовый контроллер для всех режимов игры.
+ * Экспорт контроллеров и их фабричных функций
  */
-export class BaseController {
-  /**
-   * @param {Object} options - Опции для контроллера
-   */
-  constructor(options = {}) {
-    /**
-     * Опции контроллера.
-     * @type {Object}
-     */
-    this.options = options;
-  }
-  
-  /**
-   * Инициализирует контроллер.
-   */
-  init() {
-    console.log('Инициализация базового контроллера');
-  }
-  
-  /**
-   * Обрабатывает нажатие на точку доски.
-   * @param {Object} pt - Точка нажатия
-   */
-  handleClick(pt) {
-    console.log(`Нажатие на точку (${pt.x()},${pt.y()})`);
-  }
-  
-  /**
-   * Обрабатывает наведение на точку доски.
-   * @param {Object} pt - Точка наведения
-   */
-  handleHover(pt) {
-    console.log(`Наведение на точку (${pt.x()},${pt.y()})`);
-  }
-}
+export { 
+  BaseController, 
+  createBaseController,
+  GameViewer,
+  createGameViewerController,
+  StaticProblem,
+  createStaticProblemController,
+  BoardEditor,
+  createBoardEditorController,
+  CONTROLLER_TYPES
+};
 
 /**
  * Создает контроллер нужного типа.
@@ -56,64 +37,29 @@ export class BaseController {
  * @return {BaseController} Созданный контроллер
  */
 export const createController = (controllerType, sgfOptions) => {
-  // По умолчанию используем базовый контроллер
-  return new BaseController(sgfOptions);
+  if (!sgfOptions) {
+    throw new Error('SGF Options не определены, но должны быть определены');
+  }
+  
+  switch (controllerType) {
+    case CONTROLLER_TYPES.GAME_VIEWER:
+      return createGameViewerController(sgfOptions);
+    case CONTROLLER_TYPES.STATIC_PROBLEM:
+      return createStaticProblemController(sgfOptions);
+    case CONTROLLER_TYPES.BOARD_EDITOR:
+      return createBoardEditorController(sgfOptions);
+    case CONTROLLER_TYPES.BASE:
+    default:
+      return createBaseController(sgfOptions);
+  }
 };
 
-/**
- * Типы контроллеров.
- * @enum {string}
- * @const
- */
-export const CONTROLLER_TYPE = Object.freeze({
-  /** Базовый контроллер для игры */
-  GAME: 'GAME',
-  
-  /** Контроллер для проблем */
-  PROBLEM: 'PROBLEM',
-  
-  /** Контроллер для редактора */
-  EDITOR: 'EDITOR',
-  
-  /** Контроллер для просмотра SGF-коллекций */
-  COLLECTION: 'COLLECTION'
-});
-
-/**
- * Фабрика для создания контроллеров определенного типа.
- */
-export class ControllerFactory {
-  /**
-   * Создает новую фабрику контроллеров.
-   */
-  constructor() {
-    /**
-     * Карта зарегистрированных типов контроллеров.
-     * @type {Map<string, Function>}
-     * @private
-     */
-    this._constructors = new Map([
-      [CONTROLLER_TYPE.GAME, BaseController]
-    ]);
-  }
-  
-  /**
-   * Регистрирует новый тип контроллера.
-   * @param {string} type - Тип контроллера
-   * @param {Function} constructor - Конструктор контроллера
-   */
-  register(type, constructor) {
-    this._constructors.set(type, constructor);
-  }
-  
-  /**
-   * Создает контроллер нужного типа.
-   * @param {string} type - Тип контроллера
-   * @param {Object} options - Опции для создания контроллера
-   * @return {BaseController} Созданный контроллер
-   */
-  create(type, options) {
-    const Constructor = this._constructors.get(type) || BaseController;
-    return new Constructor(options);
-  }
+// Экспорт объекта, содержащего все типы контроллеров,
+// для обратной совместимости
+export const controllers = {
+  base: createBaseController,
+  gameViewer: createGameViewerController,
+  staticProblem: createStaticProblemController,
+  boardEditor: createBoardEditorController,
+  TYPES: CONTROLLER_TYPES
 }; 

@@ -5,6 +5,7 @@
  */
 
 import * as svg from '../../svg/index.js';
+import * as enums from '../../util/enums.js';
 
 /**
  * Создает контейнер для меток на доске.
@@ -19,7 +20,7 @@ export const markContainer = (svgGroup, idGen) => {
 /**
  * Add a mark of a particular type to the GoBoard
  */
-glift.displays.board.addMark = function (
+export const addMark = function (
   container,
   idGen,
   boardPoints,
@@ -35,10 +36,10 @@ glift.displays.board.addMark = function (
   // the files come in (beyond the base package file).  So, either we need to
   // combine intersections.js with board.js or keep this a separate static
   // method.
-  var svgpath = glift.svg.pathutils;
+  var svgpath = svg.pathutils;
   var rootTwo = 1.41421356237;
   var rootThree = 1.73205080757;
-  var marks = glift.enums.marks;
+  var marks = enums.marks;
   var coordPt = boardPoints.getCoord(pt).coordPt;
   var markId = idGen.mark(pt);
   var baseDelta;
@@ -66,11 +67,11 @@ glift.displays.board.addMark = function (
       threeDigitMod = 0.75;
     }
     var strokeWidth = parseInt(marksTheme['stroke-width'] || 1, 10);
-    if (stoneColor === glift.enums.states.BLACK) {
+    if (stoneColor === enums.states.BLACK) {
       strokeWidth = strokeWidth * 0.4;
     }
     container.append(
-      glift.svg
+      svg
         .text()
         .setText(label)
         .setData(pt)
@@ -95,7 +96,7 @@ glift.displays.board.addMark = function (
     // as if it's offset by a little bit.
     var halfWidth = baseDelta - fudge;
     container.append(
-      glift.svg
+      svg
         .rect()
         .setData(pt)
         .setAttr('x', coordPt.x() - halfWidth)
@@ -115,7 +116,7 @@ glift.displays.board.addMark = function (
     var botLeft = coordPt.translate(-1 * halfDelta, halfDelta);
     var botRight = coordPt.translate(halfDelta, halfDelta);
     container.append(
-      glift.svg
+      svg
         .path()
         .setData(pt)
         .setAttr(
@@ -142,7 +143,7 @@ glift.displays.board.addMark = function (
     );
   } else if (mark === marks.CIRCLE) {
     container.append(
-      glift.svg
+      svg
         .circle()
         .setData(pt)
         .setAttr('cx', coordPt.x())
@@ -155,7 +156,7 @@ glift.displays.board.addMark = function (
     );
   } else if (mark === marks.STONE_MARKER) {
     container.append(
-      glift.svg
+      svg
         .circle()
         .setData(pt)
         .setAttr('cx', coordPt.x())
@@ -171,7 +172,7 @@ glift.displays.board.addMark = function (
     var leftNode = coordPt.translate(r * ((-1 * rootThree) / 2), r * (1 / 2));
     var topNode = coordPt.translate(0, -1 * r);
     container.append(
-      glift.svg
+      svg
         .path()
         .setData(pt)
         .setAttr('fill', 'none')
@@ -193,7 +194,7 @@ glift.displays.board.addMark = function (
     );
   } else if (mark === marks.KO_LOCATION) {
     container.append(
-      glift.svg
+      svg
         .circle()
         .setData(pt)
         .setAttr('cx', coordPt.x())

@@ -1,16 +1,19 @@
-goog.provide('glift.api.HookOptions');
+/**
+ * Модуль обработчиков событий для Glift.
+ * @module api/hooks
+ */
 
 /**
  * Обработчики событий для интеграции с Glift.
  * Позволяют подключать внешние функции к ключевым событиям библиотеки.
  */
-class HookOptions {
+export class HookOptions {
   /**
    * Создает новый объект опций обработчиков событий.
    * 
-   * @param {!Object=} opt_o Опциональные параметры
+   * @param {Object} options - Объект с опциями
    */
-  constructor(opt_o = {}) {
+  constructor(options = {}) {
     /**
      * Функция для получения следующего SGF из внешнего источника.
      * Вместо коллекции SGF пользователи могут предоставить функцию getNextSgf.
@@ -28,7 +31,7 @@ class HookOptions {
      *
      * @type {function(function(!{sgfString: string, alias: string})):void|undefined}
      */
-    this.getNextSgf = opt_o.getNextSgf;
+    this.getNextSgf = options.getNextSgf;
 
     /**
      * Срабатывает, когда пользователь правильно решает проблему.
@@ -46,31 +49,28 @@ class HookOptions {
      *
      * @type {function():void|undefined}
      */
-    this.problemCorrect = opt_o.problemCorrect;
+    this.problemCorrect = options.problemCorrect;
 
     /**
      * Срабатывает, когда пользователь неправильно решает проблему.
      *
      * @type {function():void|undefined}
      */
-    this.problemIncorrect = opt_o.problemIncorrect;
+    this.problemIncorrect = options.problemIncorrect;
     
     /**
      * Срабатывает при изменении состояния доски.
      * Полезно для синхронизации внешнего UI с состоянием доски.
      *
-     * @type {function(!glift.flattener.Flattened):void|undefined}
+     * @type {function(!Object):void|undefined}
      */
-    this.stateChanged = opt_o.stateChanged;
+    this.stateChanged = options.stateChanged;
     
     /**
      * Срабатывает, когда виджет полностью загружен и отрисован.
      * 
-     * @type {function(!glift.widgets.BaseWidget):void|undefined}
+     * @type {function(!Object):void|undefined}
      */
-    this.widgetLoaded = opt_o.widgetLoaded;
+    this.widgetLoaded = options.widgetLoaded;
   }
 }
-
-// Присваиваем класс к пространству имен
-glift.api.HookOptions = HookOptions;

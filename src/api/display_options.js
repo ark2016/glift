@@ -1,160 +1,136 @@
-goog.provide('glift.api.DisplayOptions');
-goog.provide('glift.api.themes');
+/**
+ * Модуль опций отображения для библиотеки Glift.
+ * @module api/display_options
+ */
 
 /**
  * Доступные темы оформления
  * @enum {string}
- * @const
  */
-glift.api.themes = Object.freeze({
+export const themes = Object.freeze({
   /** Стандартная тема с обычными камнями */
   DEFAULT: 'DEFAULT',
   
-  /** Камни с тенями для объемного эффекта */
+  /** Тема с объемными эффектами теней и глубины */
   DEPTH: 'DEPTH',
   
-  /** Серый фон, камни без контура */
+  /** Тема с темным фоном и насыщенными цветами */
   MOODY: 'MOODY',
   
-  /** Прозрачная доска */
+  /** Тема с прозрачным фоном, подходит для наложения на другие элементы */
   TRANSPARENT: 'TRANSPARENT',
   
-  /** Черно-белое оформление */
+  /** Тема в стиле учебника игры Го */
   TEXTBOOK: 'TEXTBOOK'
 });
 
 /**
- * Опции отображения для Glift.
- * Управляют визуальным отображением и поведением виджетов.
- * 
- * @api стабильный
+ * Класс опций отображения.
+ * Управляет визуальными параметрами отображения Go-доски и элементов интерфейса.
  */
-class DisplayOptions {
+export class DisplayOptions {
   /**
-   * @param {!Object=} opt_o Опциональный объект с настройками отображения
+   * @param {!Object=} opt_o Опциональные параметры
    */
   constructor(opt_o = {}) {
     /**
-     * Фоновое изображение доски для игры Го.
-     * Можно указать абсолютный или относительный путь.
-     * Как и ожидается, нельзя делать запросы к другим доменам.
-     *
-     * Примеры:
-     *  'images/kaya.jpg'
-     *  'http://www.example.com/images/kaya.jpg'
-     *
+     * Тема для отображения.
      * @type {string}
      */
-    this.goBoardBackground = opt_o.goBoardBackground || '';
+    this.theme = opt_o.theme || themes.DEFAULT;
 
     /**
-     * Имя темы, используемой для этого экземпляра.
-     * Используйте константы из glift.api.themes.
-     * 
-     * @type {string}
+     * Сгущение линий по краям доски. Создает эффект перспективы.
+     * @type {boolean}
      */
-    this.theme = opt_o.theme || glift.api.themes.DEFAULT;
+    this.goBoardBackground = opt_o.goBoardBackground === undefined ? 
+        true : !!opt_o.goBoardBackground;
 
     /**
-     * Отображать ли координаты по краям доски.
-     * - Слева используются цифры 1-19
-     * - Снизу используются буквы A-T (все буквы кроме I)
-     *
+     * Активировать отображение координат доски.
      * @type {boolean}
      */
     this.drawBoardCoords = !!opt_o.drawBoardCoords;
 
     /**
-     * Минимальная высота, которую Glift будет использовать для отображения.
-     * Фактически, заставляет содержащий div иметь как минимум эту высоту.
-     * Обратите внимание, что пользователи должны указать единицы измерения.
-     * Например: '500px'
-     *
-     * @type {string}
+     * Минимальный размер (высота/ширина) для доски Го, в пикселях.
+     * @type {number}
      */
-    this.minHeight = opt_o.minHeight || '';
+    this.boardRegionSizeHint = opt_o.boardRegionSizeHint || 0;
 
     /**
-     * Аналогично minHeight, минимальная ширина для отображения Glift.
-     * Как и с высотой, пользователи должны указать единицы измерения.
-     * Например: '500px'
-     *
-     * @type {string}
+     * Размер камней. По умолчанию - 1 (стандартный размер).
+     * @type {number}
      */
-    this.minWidth = opt_o.minWidth || '';
+    this.stoneSize = opt_o.stoneSize || 1;
 
     /**
-     * Проценты разделения для одноколоночного формата виджета.
-     * Определяет пропорции для различных компонентов интерфейса.
-     *
-     * @type {!Object}
+     * Соотношение линий к размеру камней. По умолчанию 0.3.
+     * @type {number}
      */
-    this.oneColumnSplits = opt_o.oneColumnSplits || {
-      first: [
-        { component: 'STATUS_BAR', ratio: 0.06 },
-        { component: 'BOARD', ratio: 0.67 },
-        { component: 'COMMENT_BOX', ratio: 0.18 },
-        { component: 'ICONBAR', ratio: 0.09 },
-      ],
-    };
+    this.lineWidth = opt_o.lineWidth || 0.3;
 
     /**
-     * Проценты разделения для двухколоночного формата виджета.
-     *
-     * @type {!Object}
-     */
-    this.twoColumnSplits = opt_o.twoColumnSplits || {
-      first: [{ component: 'BOARD', ratio: 1 }],
-      second: [
-        { component: 'STATUS_BAR', ratio: 0.07 },
-        { component: 'COMMENT_BOX', ratio: 0.83 },
-        { component: 'ICONBAR', ratio: 0.1 },
-      ],
-    };
-
-    /**
-     * Иконка для перехода к предыдущему SGF.
-     * @type {string}
-     */
-    this.previousSgfIcon = opt_o.previousSgfIcon || 'chevron-left';
-
-    /**
-     * Иконка для перехода к следующему SGF.
-     * @type {string}
-     */
-    this.nextSgfIcon = opt_o.nextSgfIcon || 'chevron-right';
-
-    /**
-     * Отключить масштабирование для мобильных пользователей.
-     * Удобно для предотвращения случайного масштабирования.
-     * 
+     * Использовать ли растровые камни вместо векторных.
      * @type {boolean}
      */
-    this.disableZoomForMobile = !!opt_o.disableZoomForMobile;
+    this.useRasterStones = !!opt_o.useRasterStones;
 
     /**
-     * Включить ли сочетания клавиш.
-     * Обратите внимание, что в настоящее время это привязывает события
-     * нажатия клавиш к document.body, поэтому возможен конфликт
-     * с сочетаниями клавиш других приложений.
-     * По умолчанию включено.
-     * 
+     * Эффект смещения тени для добавления глубины.
      * @type {boolean}
      */
-    this.enableKeyboardShortcuts = opt_o.enableKeyboardShortcuts !== undefined
-      ? !!opt_o.enableKeyboardShortcuts
-      : true;
+    this.shadowOn = opt_o.shadowOn === undefined ? true : !!opt_o.shadowOn;
 
     /**
-     * Использовать Markdown для комментариев.
-     * Это требует, чтобы marked.js был установлен в глобальной области.
-     * (https://github.com/chjj/marked)
-     * 
+     * Активировать эффект блика на камнях.
+     * @type {boolean}
+     */
+    this.stoneReflectionOn = opt_o.stoneReflectionOn === undefined ?
+        true : !!opt_o.stoneReflectionOn;
+
+    /**
+     * Версия для печати. Убирает цвета фона и тени.
+     * @type {boolean}
+     */
+    this.printingMode = !!opt_o.printingMode;
+
+    /**
+     * Размер звездных точек относительно размера камней. По умолчанию 0.15.
+     * @type {number}
+     */
+    this.starPointSize = opt_o.starPointSize || 0.15;
+
+    /**
+     * Соотношение размера меток (буквы, числа) к размеру камней.
+     * @type {number}
+     */
+    this.labelFontRatio = opt_o.labelFontRatio || 0.85;
+
+    /**
+     * Включить использование шрифта Montserrat для текста.
+     * @type {boolean}
+     */
+    this.useMontserratFont = opt_o.useMontserratFont === undefined ? 
+        true : !!opt_o.useMontserratFont;
+
+    /**
+     * Размер внутреннего отступа для видимой области.
+     * @type {number}
+     */
+    this.viewportPadding = opt_o.viewportPadding !== undefined ? 
+        opt_o.viewportPadding : 5;
+
+    /**
+     * Отображать номера ходов вместо букв А-Z на камнях метки.
+     * @type {boolean}
+     */
+    this.useMarkPts = !!opt_o.useMarkPts;
+
+    /**
+     * Использовать ли разметку Markdown для комментариев.
      * @type {boolean}
      */
     this.useMarkdown = !!opt_o.useMarkdown;
   }
 }
-
-// Присваиваем класс к пространству имен
-glift.api.DisplayOptions = DisplayOptions;

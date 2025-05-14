@@ -1,109 +1,122 @@
-goog.provide('glift.controllers.StaticProblem');
+/**
+ * Контроллер статической задачи инкапсулирует идею решения
+ * проблемы Го. Когда игрок ставит камень, контроллер проверяет:
+ *
+ * - Действительно ли существует вариация с такой позицией/цветом.
+ * - Действительно ли существует узел где-то под вариацией, который приводит к
+ *   'правильному' результату.
+ * 
+ * @module controllers/static_problem
+ */
 
-goog.require('glift.controllers.BaseController');
+import { BaseController, createBaseController } from './base.js';
+import { Point } from '../util/index.js';
+import { states, problemResults } from '../util/enums.js';
+import { rules } from '../rules/index.js';
+import { sgf } from '../sgf/index.js';
 
 /**
- * The static problem controller encapsulates the idea of trying to solve a
- * problem.  Thus, when a player adds a stone, the controller checks to make
- * sure that:
+ * Создает контроллер статической задачи.
  *
- *  - There is actually a variation with that position / color.
- *  - There is actually a node somewhere beneath the variation that results in a
- *  'correct' outcome.
- *
- * @type {!glift.controllers.ControllerFunc}
+ * @param {!Object} sgfOptions Опции SGF
+ * @return {!StaticProblem} Новый контроллер статической задачи
  */
-glift.controllers.staticProblem = function (sgfOptions) {
-  var controllers = glift.controllers;
-  var baseController = glift.util.beget(controllers.base());
-  glift.util.setMethods(
-    baseController,
-    glift.controllers.StaticProblem.prototype
-  );
+export const createStaticProblemController = (sgfOptions) => {
   if (!sgfOptions) {
-    throw new Error('SGF Options was not defined, but must be defined');
+    throw new Error('SGF Options не определены, но должны быть определены');
   }
-  baseController.initOptions(sgfOptions);
-  return baseController;
+  
+  const controller = new StaticProblem();
+  controller.initOptions(sgfOptions);
+  return controller;
 };
 
 /**
- * Stub class to be used for inheritance.
+ * Контроллер статической задачи для обработки проблем Го.
  *
- * @extends {glift.controllers.BaseController}
- * @constructor
+ * @extends {BaseController}
  */
-glift.controllers.StaticProblem = function () {};
+export class StaticProblem extends BaseController {
+  /**
+   * Создает новый экземпляр контроллера статической задачи.
+   */
+  constructor() {
+    super();
+  }
 
-glift.controllers.StaticProblem.prototype = {
-  /** Override extra options */
-  extraOptions: function () {
-    // Rebase the movetree, if we're not at the zeroth move
+  /** 
+   * Переопределяет дополнительные опции
+   */
+  extraOptions() {
+    // Перебазируем дерево ходов, если мы не на нулевом ходе
     if (this.movetree.node().getNodeNum() !== 0) {
       this.movetree = this.movetree.rebase();
       this.treepath = [];
       this.captureHistory = [];
       this.initialPosition = [];
-      // It's a hack to reset the SGF string, but it's used by the problem
-      // explanation button/widget.
+      // Это хак для сброса строки SGF, но она используется кнопкой/виджетом
+      // объяснения задачи.
       this.sgfString = this.movetree.toSgf();
-      // Shouldn't need to reset the goban.
+      // Не нужно сбрасывать goban.
     }
-  },
+  }
 
-  /** Reload the problems. */
-  reload: function () {
+  /** 
+   * Перезагружает задачу.
+   * @return {!StaticProblem} this, для цепочки вызовов
+   */
+  reload() {
     this.initialize();
-  },
+    return this;
+  }
 
   /**
-   * Add a stone to the board.  Since this is a problem, we check for
-   * 'correctness', which we check whether all child nodes are labeled (in some
-   * fashion) as correct.
+   * Добавляет камень на доску. Поскольку это задача, мы проверяем
+   * 'правильность', которую мы проверяем, все ли дочерние узлы помечены (в каком-то
+   * виде) как правильные.
    *
-   * Note: color must be one of enums.states (either BLACK or WHITE).
+   * Примечание: цвет должен быть одним из states (либо BLACK, либо WHITE).
    *
-   * @param {!glift.Point} point
-   * @param {!glift.enums.states} color
-   * @return {!glift.flattener.Flattened} flattened obj
+   * @param {!Point} point Точка, куда добавляется камень
+   * @param {string} color Цвет камня
+   * @return {!Object} уплощенный объект
    */
-  addStone: function (point, color) {
-    var problemResults = glift.enums.problemResults;
-    var CORRECT = problemResults.CORRECT;
-    var INCORRECT = problemResults.INCORRECT;
-    var INDETERMINATE = problemResults.INDETERMINATE;
-    var FAILURE = problemResults.FAILURE;
+  addStone(point, color) {
+    const CORRECT = problemResults.CORRECT;
+    const INCORRECT = problemResults.INCORRECT;
+    const INDETERMINATE = problemResults.INDETERMINATE;
+    const FAILURE = problemResults.FAILURE;
 
     if (
       !this.goban.placeable(point) ||
       !this.goban.testAddStone(point, color)
     ) {
-      var flattened = this.flattenedState();
+      const flattened = this.flattenedState();
       flattened.setProblemResult(FAILURE);
       return flattened;
     }
 
-    var nextVarNum = this.movetree.findNextMove(point, color);
+    const nextVarNum = this.movetree.findNextMove(point, color);
     if (nextVarNum === null) {
-      // There are no variations corresponding to the move made (i.e.,
-      // nextVarNum is null), so we assume that the move is INCORRECT. However,
-      // we still add the move down the movetree, adding a node if necessary.
-      // This allows us to maintain a consistent state.
-      this.movetree.addNode(); // add node and move down
+      // Нет вариаций, соответствующих сделанному ходу (т.е.,
+      // nextVarNum равен null), поэтому мы предполагаем, что ход НЕПРАВИЛЬНЫЙ. Однако,
+      // мы все еще добавляем ход вниз по дереву ходов, добавляя узел при необходимости.
+      // Это позволяет нам поддерживать консистентное состояние.
+      this.movetree.addNode(); // добавляем узел и перемещаемся вниз
       this.movetree
         .properties()
-        .add(glift.sgf.colorToToken(color), point.toSgfCoord());
+        .add(sgf.colorToToken(color), sgf.pointToString(point));
       this.movetree.moveUp();
       nextVarNum = this.movetree.node().numChildren() - 1;
     }
 
-    var outData = this.nextMove(nextVarNum);
-    var correctness = glift.rules.problems.positionCorrectness(
+    const outData = this.nextMove(nextVarNum);
+    let correctness = rules.problems.positionCorrectness(
       this.movetree,
       this.problemConditions
     );
     if (correctness === CORRECT) {
-      // Don't play out variations for CORRECT>
+      // Не разыгрывать вариации для КОРРЕКТНОГО хода.
       outData.setProblemResult(correctness);
       return outData;
     } else if (
@@ -111,33 +124,43 @@ glift.controllers.StaticProblem.prototype = {
       correctness === INCORRECT ||
       correctness === INDETERMINATE
     ) {
-      // Play for the opposite player. Variation selection used to be random,
-      // but randomness is confusing.
-      var nextVariation = 0;
+      // Играем за противоположного игрока. Выбор вариации раньше был случайным,
+      // но случайность вносит путаницу.
+      const nextVariation = 0;
       this.nextMove(nextVariation);
-      // It's possible that *this* move is correct, so we do another correctness
-      // check.
-      // (see https://github.com/Kashomon/glift/issues/122).
-      correctness = glift.rules.problems.positionCorrectness(
+      // Возможно, что *этот* ход правильный, поэтому мы делаем еще одну проверку
+      // корректности.
+      // (см. https://github.com/Kashomon/glift/issues/122).
+      correctness = rules.problems.positionCorrectness(
         this.movetree,
         this.problemConditions
       );
-      outData = this.flattenedState();
+      const outData = this.flattenedState();
       outData.setProblemResult(correctness);
       return outData;
     } else {
-      throw new Error('Unexpected result output: ' + correctness);
+      throw new Error('Неожиданный результат вывода: ' + correctness);
     }
-  },
+  }
 
   /**
-   * Get the current correctness status.
-   * @return {glift.enums.problemResults}
+   * Получить текущий статус корректности.
+   * @return {string}
    */
-  correctnessStatus: function () {
-    return glift.rules.problems.positionCorrectness(
+  correctnessStatus() {
+    return rules.problems.positionCorrectness(
       this.movetree,
       this.problemConditions
     );
-  },
-};
+  }
+  
+  /**
+   * Обрабатывает клик на точку доски.
+   * @param {!Object} pt - Точка на доске
+   * @return {boolean} Успешность обработки
+   */
+  handleClick(pt) {
+    const currentPlayer = this.getCurrentPlayer();
+    return this.addStone(pt, currentPlayer) !== null;
+  }
+}

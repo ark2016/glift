@@ -17,7 +17,7 @@ import { lines } from './lines.js';
 import { starpoints } from './starpoints.js';
 import { shadows } from './stones.js';
 import { stones } from './stones.js';
-import { markContainer } from './marks.js';
+import { markContainer, addMark } from './marks.js';
 import { buttons } from './buttons.js';
 
 // Создаем заглушки для flattener, пока не имплементируем этот модуль полностью

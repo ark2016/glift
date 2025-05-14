@@ -1,5 +1,7 @@
-goog.provide('glift.api.StoneActions');
-goog.provide('glift.api.StoneFn');
+/**
+ * Модуль действий с камнями для Glift.
+ * @module api/stone_actions
+ */
 
 /**
  * Определение типа для функции обработки действий с камнями.
@@ -7,11 +9,11 @@ goog.provide('glift.api.StoneFn');
  *
  * @typedef {function(
  *  !Event,
- *  !glift.widgets.BaseWidget,
- *  !glift.Point
- * )}
+ *  !Object,
+ *  !Object
+ * )} StoneFn
  */
-glift.api.StoneFn;
+export const StoneFn = {}; // Только для документации, не используется
 
 /**
  * Действия для камней на игровой доске.
@@ -19,7 +21,7 @@ glift.api.StoneFn;
  * Если пользователь указывает свои действия, они имеют приоритет
  * над встроенными действиями.
  */
-class StoneActions {
+export class StoneActions {
   /**
    * @param {!Object=} opt_o Опциональные параметры с функциями действий
    */
@@ -28,7 +30,7 @@ class StoneActions {
      * Добавляет отображение "призрачного" камня при наведении курсора.
      * Показывает предварительный просмотр камня, который будет установлен при клике.
      *
-     * @type {!glift.api.StoneFn}
+     * @type {!StoneFn}
      */
     this.mouseover = opt_o.mouseover || ((event, widget, pt) => {
       const hoverColors = { 
@@ -49,14 +51,14 @@ class StoneActions {
      * Удаляет "призрачный" камень при выходе курсора.
      * Возвращает пересечение к исходному пустому состоянию.
      *
-     * @type {!glift.api.StoneFn}
+     * @type {!StoneFn}
      */
     this.mouseout = opt_o.mouseout || ((event, widget, pt) => {
       const currentPlayer = widget.controller.getCurrentPlayer();
       
       if (widget.controller.canAddStone(pt, currentPlayer)) {
         widget.display?.intersections()
-          .setStoneColor(pt, glift.enums.states.EMPTY);
+          .setStoneColor(pt, 'EMPTY');
       }
     });
 
@@ -65,7 +67,7 @@ class StoneActions {
      * По умолчанию делегирует управление обычному обработчику кликов.
      * В будущем может быть расширена для включения направляющих линий.
      *
-     * @type {!glift.api.StoneFn}
+     * @type {!StoneFn}
      */
     this.touchend = opt_o.touchend || ((event, widget, pt) => {
       // Предотвращаем стандартные действия браузера
@@ -81,11 +83,8 @@ class StoneActions {
      * В базовой реализации отсутствует, так как зависит от типа виджета.
      * Должен быть переопределен в конкретных экземплярах.
      *
-     * @type {glift.api.StoneFn|undefined}
+     * @type {StoneFn|undefined}
      */
     this.click = opt_o.click;
   }
 }
-
-// Присваиваем класс к пространству имен
-glift.api.StoneActions = StoneActions;

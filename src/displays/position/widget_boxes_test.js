@@ -1,66 +1,75 @@
-(function () {
-  module('glift.displays.position.widgetBoxesTest');
-  var defaultBbox1 = glift.orientation.bbox.fromPts(
-    glift.util.point(0, 0),
-    glift.util.point(100, 100)
-  );
-  var defaultBbox2 = glift.orientation.bbox.fromPts(
-    glift.util.point(10, 10),
-    glift.util.point(200, 200)
-  );
-  var defaultBbox3 = glift.orientation.bbox.fromPts(
-    glift.util.point(10, 10),
-    glift.util.point(150, 300)
-  );
-  var comps = glift.BoardComponent;
+/**
+ * Тесты для классов WidgetBoxes и WidgetColumn
+ * @module displays/position/widget_boxes_test
+ */
 
-  var make = function (opts) {
-    return new glift.displays.position.WidgetBoxes();
+import { WidgetBoxes, WidgetColumn } from './widget_boxes.js';
+import { orientation } from '../../orientation/orientation.js';
+import { util } from '../../util/util.js';
+import { BoardComponent } from '../../enums.js';
+
+describe('displays.position.widgetBoxesTest', () => {
+  const defaultBbox1 = orientation.bbox.fromPts(
+    util.point(0, 0),
+    util.point(100, 100)
+  );
+  const defaultBbox2 = orientation.bbox.fromPts(
+    util.point(10, 10),
+    util.point(200, 200)
+  );
+  const defaultBbox3 = orientation.bbox.fromPts(
+    util.point(10, 10),
+    util.point(150, 300)
+  );
+  const comps = BoardComponent;
+
+  const make = function () {
+    return new WidgetBoxes();
   };
 
-  test('Widget Column construction', function () {
-    var w = new glift.displays.position.WidgetColumn();
-    deepEqual(w.mapping, {});
-    deepEqual(w.ordering, []);
+  it('Widget Column construction', () => {
+    const w = new WidgetColumn();
+    expect(w.mapping).toEqual({});
+    expect(w.ordering).toEqual([]);
   });
 
-  test('Widget Column: set/get', function () {
-    var w = new glift.displays.position.WidgetColumn();
+  it('Widget Column: set/get', () => {
+    const w = new WidgetColumn();
     w.setComponent(comps.BOARD, defaultBbox1);
     w.setComponent(comps.COMMENT_BOX, defaultBbox2);
-    ok(w.getBbox(comps.BOARD) === defaultBbox1);
-    ok(w.getBbox(comps.COMMENT_BOX) === defaultBbox2);
+    expect(w.getBbox(comps.BOARD)).toBe(defaultBbox1);
+    expect(w.getBbox(comps.COMMENT_BOX)).toBe(defaultBbox2);
   });
 
-  test('Widget Column: ordering: set/orderfn', function () {
-    var w = new glift.displays.position.WidgetColumn();
+  it('Widget Column: ordering: set/orderfn', () => {
+    const w = new WidgetColumn();
     w.setOrderingFromRatioArray([
       { component: 'BOARD', ratio: 0.2 },
       { component: 'COMMENT_BOX', ratio: 0.3 },
       { component: 'ICONBAR', ratio: 0.4 },
     ]);
-    var out = [];
+    const out = [];
     w.orderFn(function (compName) {
       out.push(compName);
     });
-    deepEqual(out, ['BOARD', 'COMMENT_BOX', 'ICONBAR']);
+    expect(out).toEqual(['BOARD', 'COMMENT_BOX', 'ICONBAR']);
   });
 
-  test('Must construct Widget boxes', function () {
-    var b = make({});
-    deepEqual(b._first, null);
-    deepEqual(b._second, null);
+  it('Must construct Widget boxes', () => {
+    const b = make();
+    expect(b._first).toBeNull();
+    expect(b._second).toBeNull();
   });
 
-  test('Widget Boxes: map', function () {
-    var wboxes = new glift.displays.position.WidgetBoxes();
+  it('Widget Boxes: map', () => {
+    const wboxes = new WidgetBoxes();
     wboxes.setFirst(
-      new glift.displays.position.WidgetColumn()
+      new WidgetColumn()
         .setOrderingFromRatioArray([{ component: 'BOARD', ratio: 1 }])
         .setComponent('BOARD', defaultBbox1)
     );
     wboxes.setSecond(
-      new glift.displays.position.WidgetColumn()
+      new WidgetColumn()
         .setOrderingFromRatioArray([
           { component: 'STATUS_BAR', ratio: 0.3 },
           { component: 'COMMENT_BOX', ratio: 0.3 },
@@ -70,19 +79,18 @@
         .setComponent('COMMENT_BOX', defaultBbox2)
         .setComponent('ICONBAR', defaultBbox3)
     );
-    var comps = [];
-    var bboxes = [];
+    const comps = [];
+    const bboxes = [];
     wboxes.forEach(function (comp, bbox) {
       comps.push(comp);
       bboxes.push(bbox);
     });
-    deepEqual(comps, ['BOARD', 'STATUS_BAR', 'COMMENT_BOX', 'ICONBAR']);
-    deepEqual(bboxes, [defaultBbox1, defaultBbox1, defaultBbox2, defaultBbox3]);
+    expect(comps).toEqual(['BOARD', 'STATUS_BAR', 'COMMENT_BOX', 'ICONBAR']);
+    expect(bboxes).toEqual([defaultBbox1, defaultBbox1, defaultBbox2, defaultBbox3]);
 
-    var pt = glift.util.point;
-    deepEqual(
-      wboxes.fullWidgetBbox(),
-      glift.orientation.bbox.fromPts(pt(0, 0), pt(200, 300))
+    const pt = util.point;
+    expect(wboxes.fullWidgetBbox()).toEqual(
+      orientation.bbox.fromPts(pt(0, 0), pt(200, 300))
     );
   });
-})();
+});

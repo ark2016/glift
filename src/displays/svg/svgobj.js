@@ -1,55 +1,59 @@
-goog.provide('glift.displays.svg.dom');
+/**
+ * Методы DOM для работы с SVG.
+ * @module displays/svg/dom
+ */
 
-/** Dom methods for manipulating SVG. */
-glift.displays.svg.dom = {
+/** 
+ * Набор методов DOM для манипуляции с SVG элементами.
+ */
+export const dom = {
   /**
-   * Attach content to a div.
-   * @param {!glift.svg.SvgObj} svgObj
-   * @param {string} divId
+   * Присоединяет SVG-контент к элементу по его ID.
+   * @param {!Object} svgObj Объект SVG 
+   * @param {string} divId ID элемента-контейнера
    */
-  attachToParent: function (svgObj, divId) {
-    var svgContainer = document.getElementById(divId);
+  attachToParent: function(svgObj, divId) {
+    const svgContainer = document.getElementById(divId);
     if (svgContainer) {
-      glift.displays.svg.dom.attachToElem_(svgObj, svgContainer);
+      dom.attachToElem_(svgObj, svgContainer);
     }
   },
 
   /**
-   * Attach content to an already defined element.
-   * @param {!glift.svg.SvgObj} svgObj
-   * @param {!Element|!glift.dom.Element} elem
+   * Присоединяет SVG-контент к уже определенному элементу.
+   * @param {!Object} svgObj Объект SVG
+   * @param {!Element|!Object} elem HTML-элемент или объект-обертка
    * @private
    */
-  attachToElem_: function (svgObj, elem) {
-    var possibleElem = /** @type {!Element} */ (elem);
+  attachToElem_: function(svgObj, elem) {
+    const possibleElem = /** @type {!Element} */ (elem);
     if (possibleElem && possibleElem.nodeType) {
-      possibleElem.appendChild(glift.displays.svg.dom.asElement(svgObj));
+      possibleElem.appendChild(dom.asElement(svgObj));
     } else {
-      var domEl = /** @type {!glift.dom.Element} */ (elem);
-      domEl.el.appendChild(glift.displays.svg.dom.asElement(svgObj));
+      const domEl = /** @type {!Object} */ (elem);
+      domEl.el.appendChild(dom.asElement(svgObj));
     }
   },
 
   /**
-   * Append an SVG element and attach to the DOM.
-   * @param {!glift.svg.SvgObj} svgObj
-   * @param {!glift.svg.SvgObj} obj
+   * Добавляет SVG-элемент и присоединяет его к DOM.
+   * @param {!Object} svgObj Родительский объект SVG
+   * @param {!Object} obj Объект SVG для добавления
    */
-  appendAndAttach: function (svgObj, obj) {
+  appendAndAttach: function(svgObj, obj) {
     svgObj.append(obj);
     if (svgObj.id()) {
-      glift.displays.svg.dom.attachToParent(obj, svgObj.idOrThrow());
+      dom.attachToParent(obj, svgObj.idOrThrow());
     }
   },
 
-  // TODO(kashomon): Currently unused. Remove?
   /**
-   * Remove from the element from the DOM.
-   * @param {!glift.svg.SvgObj} obj
+   * Удаляет элемент из DOM.
+   * @param {!Object} obj Объект SVG для удаления
    */
-  removeFromDom: function (obj) {
+  removeFromDom: function(obj) {
     if (obj.id()) {
-      var elem = document.getElementById(obj.idOrThrow());
+      const elem = document.getElementById(obj.idOrThrow());
       if (elem) {
         elem.parentNode.removeChild(elem);
       }
@@ -57,13 +61,13 @@ glift.displays.svg.dom = {
   },
 
   /**
-   * Turn the obj node (and all children nodes) into SVG elements.
-   * @param {!glift.svg.SvgObj} o
-   * @return {!Element} The elment
+   * Преобразует узел объекта (и все дочерние узлы) в элементы SVG.
+   * @param {!Object} o Объект SVG
+   * @return {!Element} HTML-элемент SVG
    */
-  asElement: function (o) {
-    var elem = document.createElementNS('http://www.w3.org/2000/svg', o.type());
-    for (var attr in o.attrObj()) {
+  asElement: function(o) {
+    const elem = document.createElementNS('http://www.w3.org/2000/svg', o.type());
+    for (const attr in o.attrObj()) {
       if (attr === 'xlink:href') {
         elem.setAttributeNS(
           'http://www.w3.org/1999/xlink',
@@ -75,27 +79,26 @@ glift.displays.svg.dom = {
       }
     }
     if (o.type() === 'text') {
-      var textNode = document.createTextNode(o.text());
+      const textNode = document.createTextNode(o.text());
       elem.appendChild(textNode);
     }
-    for (var i = 0; i < o.children().length; i++) {
-      elem.appendChild(glift.displays.svg.dom.asElement(o.children()[i]));
+    for (let i = 0; i < o.children().length; i++) {
+      elem.appendChild(dom.asElement(o.children()[i]));
     }
     return elem;
   },
 
   /**
-   * Update a particular attribute in the DOM with at attribute that exists on
-   * this element.
-   * @param {!glift.svg.SvgObj} obj
-   * @param {string} attrName
+   * Обновляет определенный атрибут в DOM атрибутом, существующим в этом элементе.
+   * @param {!Object} obj Объект SVG
+   * @param {string} attrName Имя атрибута
    */
-  updateAttrInDom: function (obj, attrName) {
-    var id = obj.id();
+  updateAttrInDom: function(obj, attrName) {
+    const id = obj.id();
     if (id) {
-      var elem = document.getElementById(id);
+      const elem = document.getElementById(id);
       if (elem && attrName && obj.attr(attrName)) {
-        var value = /** @type (boolean|number|string) */ (obj.attr(attrName));
+        const value = /** @type {boolean|number|string} */ (obj.attr(attrName));
         elem.setAttribute(attrName, value);
       }
     } else {
@@ -104,13 +107,12 @@ glift.displays.svg.dom = {
   },
 
   /**
-   * Empty out all the children and update.
-   * @param {!glift.svg.SvgObj} obj
+   * Очищает все дочерние элементы и обновляет DOM.
+   * @param {!Object} obj Объект SVG
    */
-  emptyChildrenAndUpdate: function (obj) {
+  emptyChildrenAndUpdate: function(obj) {
     obj.emptyChildren();
-    var elem = document.getElementById(obj.idOrThrow());
-    // eslint-disable-next-line no-unmodified-loop-condition
+    const elem = document.getElementById(obj.idOrThrow());
     while (elem && elem.firstChild) {
       elem.removeChild(elem.firstChild);
     }

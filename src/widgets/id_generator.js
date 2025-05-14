@@ -1,39 +1,43 @@
-goog.provide('glift.widgets.idGenerator');
-goog.require('glift.widgets');
-
-// TODO(kashomon): This isn't really widgets specific, but it's only being used
-// in this directory. Long term, it perhaps needs a better resting place.
-// However, since the IDs are used to disambiguate different instances of glift,
-// perhaps this is an ok location.
+/**
+ * Генератор последовательных уникальных идентификаторов для Glift.
+ * 
+ * @module widgets/id_generator
+ */
 
 /**
- * Generates sequential numbers unique across all Glift instances on the page.
+ * Генерирует последовательные номера, уникальные для всех экземпляров Glift на странице.
  */
-class IdGenerator {
+export class IdGenerator {
   /**
-   * @param {number=} seed Initial seed value
+   * @param {number|string=} seed Начальное значение или префикс
    */
   constructor(seed = 0) {
     /**
-     * Current seed value
+     * Текущее значение счетчика
      * @private {number}
      */
-    this.seed_ = seed;
+    this.seed_ = typeof seed === 'number' ? seed : 0;
+    
+    /**
+     * Префикс для генерируемых ID (если был указан)
+     * @private {string|undefined}
+     */
+    this.prefix_ = typeof seed === 'string' ? seed : undefined;
   }
 
   /**
-   * Returns the next ID as a string and increments the counter.
-   * @return {string} The next unique ID
+   * Возвращает следующий ID в виде строки и увеличивает счетчик.
+   * @return {string} Следующий уникальный ID
    */
   next() {
-    const id = `${this.seed_}`;
+    const id = this.prefix_ ? `${this.prefix_}_${this.seed_}` : `${this.seed_}`;
     this.seed_ += 1;
     return id;
   }
 }
 
 /**
- * Global ID generator instance, initialized with seed 0.
+ * Глобальный экземпляр генератора ID, инициализированный с начальным значением 0.
  * @type {!IdGenerator}
  */
-glift.widgets.idGenerator = new IdGenerator(0);
+export const idGenerator = new IdGenerator(0);

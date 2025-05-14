@@ -1,95 +1,108 @@
-goog.provide('glift.displays.statusbar');
-goog.provide('glift.displays.statusbar.StatusBar');
-
-glift.displays.statusbar = {
-  /**
-   * Create a statusbar.  Also does option pre-preprocessing if necessary.
-   *
-   * @return {!glift.displays.statusbar.StatusBar} The status bar instance.
-   */
-  create: function (options) {
-    return new glift.displays.statusbar.StatusBar(
-      options.iconBarPrototype,
-      options.theme,
-      options.widget,
-      options.allPositioning
-    );
-  },
-};
+/**
+ * Модуль статусбара для библиотеки Glift.
+ * @module displays/statusbar/statusbar
+ */
 
 /**
- * The status bar component. Displays at the top of Glift and is used to display
- * Game information like move number, settings, and game info.
- *
- * @constructor @final @struct
+ * Опции для создания статусбара.
+ * 
+ * @typedef {Object} StatusBarOptions
+ * @property {Object} iconBarPrototype - Прототип панели иконок
+ * @property {Object} theme - Тема оформления
+ * @property {Object} widget - Виджет
+ * @property {Object} allPositioning - Позиционирование всех элементов
  */
-glift.displays.statusbar.StatusBar = function (
-  iconBarPrototype,
-  theme,
-  widget,
-  positioning
-) {
-  this.iconBar = iconBarPrototype;
-  this.theme = theme;
-  // TODO(kashomon): Restructure in such a way so the status bar doesn't need to
-  // depend on the widget object
-  this.widget = widget;
 
-  // Bboxes for all components.
-  this.positioning = positioning;
+/**
+ * Создает статусбар. Также выполняет предварительную обработку опций, если необходимо.
+ *
+ * @param {StatusBarOptions} options Опции для создания статусбара
+ * @return {StatusBar} Экземпляр статусбара
+ */
+export function createStatusBar(options) {
+  return new StatusBar(
+    options.iconBarPrototype,
+    options.theme,
+    options.widget,
+    options.allPositioning
+  );
+}
 
-  // TODO(kashomon): Don't depend on manager data.
-  this.totalPages = widget.manager.sgfCollection.length;
-  this.pageIndex = widget.manager.sgfColIndex + 1;
-};
-
-glift.displays.statusbar.StatusBar.prototype = {
+/**
+ * Компонент статусбара. Отображается в верхней части Glift и используется для
+ * отображения информации об игре, такой как номер хода, настройки и информация об игре.
+ */
+export class StatusBar {
   /**
-   * Draws the statusbar.
-   * @return {!glift.displays.statusbar.StatusBar} this
+   * @param {Object} iconBarPrototype Прототип панели иконок
+   * @param {Object} theme Тема оформления
+   * @param {Object} widget Виджет
+   * @param {Object} positioning Позиционирование
    */
-  draw: function () {
+  constructor(iconBarPrototype, theme, widget, positioning) {
+    this.iconBar = iconBarPrototype;
+    this.theme = theme;
+    // TODO(kashomon): Реструктурировать так, чтобы статусбар не зависел от объекта виджета
+    this.widget = widget;
+
+    // Ограничивающие прямоугольники для всех компонентов.
+    this.positioning = positioning;
+
+    // TODO(kashomon): Не зависеть от данных менеджера.
+    this.totalPages = widget.manager.sgfCollection.length;
+    this.pageIndex = widget.manager.sgfColIndex + 1;
+  }
+
+  /**
+   * Рисует статусбар.
+   * @return {StatusBar} this
+   */
+  draw() {
     this.iconBar.draw();
     this.setPageNumber(this.pageIndex, this.totalPages);
     return this;
-  },
+  }
 
   /**
-   * Sets the move number for the current move.
-   * @param {number} number
+   * Устанавливает номер хода для текущего хода.
+   * @param {number} number Номер хода
+   * @return {StatusBar} this
    */
-  setMoveNumber: function (number) {
-    // TODO(kashomon): Note: This hardcodes the move-indicator name.
+  setMoveNumber(number) {
+    // TODO(kashomon): Примечание: Это жестко кодирует имя индикатора хода.
     if (!this.iconBar.hasIcon('move-indicator')) {
-      return;
+      return this;
     }
-    var num = (number || '0') + ''; // Force to be a string.
-    var color = this.theme.statusBar.icons.DEFAULT.fill;
+    const num = (number || '0') + ''; // Принудительно строка.
+    const color = this.theme.statusBar.icons.DEFAULT.fill;
     // var mod = num.length > 2 ? 0.35 : null;
     this.iconBar.addTempText(
       'move-indicator',
       num,
       { fill: color, stroke: color },
-      null /* size modifier, as float */
+      null /* модификатор размера, как float */
     );
-  },
+    return this;
+  }
 
   /**
-   * Sets the page number for the current move
-   * @param {number} number
-   * @param {number} denominator
+   * Устанавливает номер страницы для текущего хода.
+   * @param {number} number Номер страницы
+   * @param {number} denominator Знаменатель (общее количество страниц)
+   * @return {StatusBar} this
    */
-  setPageNumber: function (number, denominator) {
+  setPageNumber(number, denominator) {
     if (!this.iconBar.hasIcon('widget-page')) {
-      return;
+      return this;
     }
-    var num = (number || '0') + ''; // Force to be a string.
-    var color = this.theme.statusBar.icons.DEFAULT.fill;
+    const num = (number || '0') + ''; // Принудительно строка.
+    const color = this.theme.statusBar.icons.DEFAULT.fill;
     this.iconBar.addTempText(
       'widget-page',
       num,
       { fill: color, stroke: color },
       0.85
     );
-  },
-};
+    return this;
+  }
+}

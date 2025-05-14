@@ -1,30 +1,38 @@
-goog.require('glift.displays.statusbar.StatusBar');
+/**
+ * Модуль полноэкранного режима для статусбара.
+ * @module displays/statusbar/fullscreen
+ */
+
+import { StatusBar } from './statusbar.js';
+import { dom } from '../../dom/dom.js';
+import { util } from '../../util/util.js';
 
 /**
- * Makes Glift full-screen. Sort of. True fullscreen isn't supported yet.
- *
- * Note: Key bindings are set in the base_widget.
+ * Делает Glift полноэкранным. Пока поддерживается только псевдо-полноэкранный режим.
+ * Примечание: Привязки клавиш устанавливаются в базовом виджете.
+ * 
+ * @return {void}
  */
-// TODO(kashomon): Make into a first-class class.
-glift.displays.statusbar.StatusBar.prototype.fullscreen = function () {
-  // TODO(kashomon): Support true fullscreen: issues/69
-  var widget = this.widget,
-    wrapperDivId = widget.wrapperDivId,
-    newDivId = wrapperDivId + '_fullscreen',
-    newDiv = glift.dom.newDiv(newDivId),
-    state = widget.getCurrentState(),
-    manager = widget.manager;
+StatusBar.prototype.fullscreen = function() {
+  // TODO: Поддержка настоящего полноэкранного режима
+  const widget = this.widget;
+  const wrapperDivId = widget.wrapperDivId;
+  const newDivId = wrapperDivId + '_fullscreen';
+  const newDiv = dom.newDiv(newDivId);
+  const state = widget.getCurrentState();
+  const manager = widget.manager;
 
-  var body = document.body;
+  let body = document.body;
   if (body == null) {
     throw new Error(
-      'document.body was null, ' +
-        'but it must not be null for fullscreen to work'
+      'document.body был null, ' +
+      'но он не должен быть null для работы полноэкранного режима'
     );
   }
-  body = glift.dom.elem(/* @type {!HTMLBodyElement} */ body);
+  body = dom.elem(body);
 
-  var cssObj = glift.util.obj.flatMerge(
+  // Применяем стили для полноэкранного режима
+  const cssObj = util.obj.flatMerge(
     {
       position: 'absolute',
       top: '0px',
@@ -33,55 +41,77 @@ glift.displays.statusbar.StatusBar.prototype.fullscreen = function () {
       right: '0px',
       margin: '0px',
       padding: '0px',
-      // Some sites set the z-index obnoxiously high (looking at you bootstrap).
-      // So, to make it really fullscreen, we need to set the z-index higher.
-      'z-index': 110000,
+      // Некоторые сайты устанавливают z-index очень высоким (смотрю на тебя, bootstrap).
+      // Поэтому для полноценного полноэкранного режима нам нужно установить z-index еще выше.
+      'z-index': 110000
     },
     this.theme.statusBar.fullscreen
   );
   newDiv.css(cssObj);
 
-  // Prevent scrolling outside the div
+  // Предотвращаем прокрутку за пределами div
   body.addClass('glift-fullscreen-no-scroll').append(newDiv);
+  
+  // Сохраняем текущую позицию прокрутки
   manager.prevScrollTop =
     window.pageYOffset ||
     document.body.scrollTop ||
     document.documentElement.scrollTop ||
     null;
-  window.scrollTo(0, 0); // Scroll to the top.
+  
+  // Прокручиваем страницу вверх
+  window.scrollTo(0, 0);
+  
+  // Обновляем ID div'а в менеджере
   manager.fullscreenDivId = newDivId;
+  
+  // Пересоздаем виджет в новом контейнере
   widget.destroy();
   widget.wrapperDivId = newDivId;
   widget.draw();
   widget.applyState(state);
+  
+  // Включаем автоматическое изменение размеров при изменении окна
   manager.enableFullscreenAutoResize();
 };
 
-/** Returns Glift to non-fullscreen */
-glift.displays.statusbar.StatusBar.prototype.unfullscreen = function () {
+/**
+ * Возвращает Glift из полноэкранного режима в обычный
+ * 
+ * @return {void}
+ */
+StatusBar.prototype.unfullscreen = function() {
   if (!this.widget.manager.isFullscreen()) {
     return;
   }
-  var widget = this.widget,
-    wrapperDivEl = glift.dom.elem(widget.wrapperDivId),
-    state = widget.getCurrentState(),
-    manager = widget.manager,
-    // We can safely cast the body; There's no way to get here unless
-    // 'fullscreen()' has already been called.
-    body = glift.dom.elem(/** @type {!HTMLBodyElement} */ (document.body));
+  
+  const widget = this.widget;
+  const wrapperDivEl = dom.elem(widget.wrapperDivId);
+  const state = widget.getCurrentState();
+  const manager = widget.manager;
+  const body = dom.elem(document.body);
 
+  // Удаляем полноэкранный div
   widget.destroy();
-  wrapperDivEl.remove(); // remove the fullscreen div completely
+  wrapperDivEl.remove();
+  
+  // Восстанавливаем исходный контейнер
   widget.wrapperDivId = widget.manager.divId;
+  
+  // Восстанавливаем позицию прокрутки
   window.scrollTo(0, manager.prevScrollTop || 0);
 
-  // Re-enable scrolling now that we're done with fullscreen.
+  // Возвращаем возможность прокрутки страницы
   body.removeClass('glift-fullscreen-no-scroll');
 
+  // Сбрасываем сохраненные значения
   manager.fullscreenDivId = null;
   manager.prevScrollTop = null;
 
+  // Пересоздаем виджет в исходном контейнере
   widget.draw();
   widget.applyState(state);
+  
+  // Отключаем автоматическое изменение размеров
   widget.manager.disableFullscreenAutoResize();
 };

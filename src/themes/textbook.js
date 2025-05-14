@@ -1,16 +1,36 @@
-goog.provide('glift.themes.registered.TEXTBOOK');
+/**
+ * Тема оформления "Textbook" для Glift.
+ * Черно-белая тема, напоминающая оформление учебников по игре Го.
+ * 
+ * @module themes/textbook
+ */
+
+import { baseTheme } from './base_theme.js';
 
 /**
- * @extends {glift.themes.base}
+ * Настройки темы Textbook
  */
-glift.themes.registered.TEXTBOOK = {
+export const TEXTBOOK = {
+  ...baseTheme,
+  stones: {
+    ...baseTheme.stones,
+    BLACK: { fill: 'black', stroke: 'none' },
+    WHITE: { fill: 'white', stroke: 'black', strokeWidth: 0.5 }
+  },
   board: {
-    fill: '#FFF',
+    ...baseTheme.board,
+    fill: 'white',
+    borderColor: 'black',
+    shadow: false
   },
-
+  lines: {
+    ...baseTheme.lines,
+    stroke: 'black'
+  },
   commentBox: {
+    ...baseTheme.comment,
     css: {
-      background: '#FFF',
-    },
-  },
+      background: '#FFF'
+    }
+  }
 };

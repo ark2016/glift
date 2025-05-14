@@ -65,7 +65,18 @@
   <script>
     var gliftWidget;
     
-    document.addEventListener('DOMContentLoaded', function() {
+    // Функция для проверки загрузки всех зависимостей перед инициализацией
+    function checkDependencies() {
+      if (typeof glift !== 'undefined' && typeof testdata !== 'undefined' && typeof testdata.sgfs !== 'undefined') {
+        initializeGlift();
+      } else {
+        // Ждем 100 мс и пробуем снова
+        setTimeout(checkDependencies, 100);
+      }
+    }
+    
+    // Инициализируем Glift, когда все зависимости загружены
+    function initializeGlift() {
       try {
         // Создаем виджет Glift
         gliftWidget = glift.create({
@@ -81,6 +92,11 @@
           '<div class="error">Ошибка загрузки библиотеки Glift: ' + e.message + '</div>';
         console.error(e);
       }
+    }
+    
+    // Начинаем проверку зависимостей после загрузки DOM
+    document.addEventListener('DOMContentLoaded', function() {
+      checkDependencies();
     });
     
     function showCoordinates() {

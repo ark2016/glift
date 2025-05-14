@@ -10,22 +10,39 @@ import {
   coordToString,
   stringToCoord,
   pointFromString,
-  pointFromSgfCoord
+  pointFromSgfCoord as sgfToPoint
 } from '../../deps/glift-core/util/util.js';
 
 // Импортируем класс Point
 import { Point } from '../../deps/glift-core/util/point.js';
 
-import * as enumValues from './enums.js';
+// Импортируем объектные утилиты
+import * as objUtil from './obj.js';
+
+// Импортируем утилиты цветов
+import * as colorUtil from './colors.js';
+
+// Импортируем утилиты массивов
+import * as arrayUtil from './array.js';
+
+import { states, marks, problemResults, rotations, boardRegions } from './enums.js';
 
 // Экспортируем все утилиты
 export {
   coordToString,
   stringToCoord,
   pointFromString,
-  pointFromSgfCoord,
   Point
 };
+
+// Экспортируем объектные утилиты
+export * from './obj.js';
+
+// Экспортируем утилиты цветов
+export * from './colors.js';
+
+// Экспортируем утилиты массивов
+export * from './array.js';
 
 /**
  * Проверяет, является ли значение определенным (не undefined и не null).
@@ -55,9 +72,6 @@ export const uuid = () => {
 export const mergeObjects = (target, ...sources) => {
   return Object.assign(target, ...sources);
 };
-
-// Экспортируем перечисления
-export const enums = enumValues;
 
 /**
  * Функция для определения типа переменной.
@@ -122,16 +136,16 @@ export const point = (x, y) => {
     
     // Поворачивает точку на доске указанного размера
     rotate: (size, rotation) => {
-      if (rotation === enums.rotations.NO_ROTATION) {
+      if (rotation === rotations.NO_ROTATION) {
         return point(x, y);
       }
       
       // Для квадратной доски размера size
-      if (rotation === enums.rotations.CLOCKWISE_90) {
+      if (rotation === rotations.CLOCKWISE_90) {
         return point(y, size - 1 - x);
-      } else if (rotation === enums.rotations.CLOCKWISE_180) {
+      } else if (rotation === rotations.CLOCKWISE_180) {
         return point(size - 1 - x, size - 1 - y);
-      } else if (rotation === enums.rotations.CLOCKWISE_270) {
+      } else if (rotation === rotations.CLOCKWISE_270) {
         return point(size - 1 - y, x);
       }
       
@@ -141,16 +155,16 @@ export const point = (x, y) => {
     
     // Отменяет поворот точки на доске указанного размера
     antirotate: (size, rotation) => {
-      if (rotation === enums.rotations.NO_ROTATION) {
+      if (rotation === rotations.NO_ROTATION) {
         return point(x, y);
       }
       
       // Для квадратной доски размера size
-      if (rotation === enums.rotations.CLOCKWISE_90) {
+      if (rotation === rotations.CLOCKWISE_90) {
         return point(size - 1 - y, x);
-      } else if (rotation === enums.rotations.CLOCKWISE_180) {
+      } else if (rotation === rotations.CLOCKWISE_180) {
         return point(size - 1 - x, size - 1 - y);
-      } else if (rotation === enums.rotations.CLOCKWISE_270) {
+      } else if (rotation === rotations.CLOCKWISE_270) {
         return point(y, size - 1 - x);
       }
       
@@ -158,4 +172,32 @@ export const point = (x, y) => {
       return point(x, y);
     }
   };
+};
+
+/**
+ * Создает объект Point из SGF-координаты.
+ * 
+ * @param {string} sgfCoord - SGF-координата (например, 'ab')
+ * @return {Object} Точка
+ */
+export const pointFromSgfCoord = (sgfCoord) => {
+  if (!sgfCoord || sgfCoord.length !== 2) {
+    throw new Error(`Некорректная SGF-координата: ${sgfCoord}`);
+  }
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const x = letters.indexOf(sgfCoord.charAt(0));
+  const y = letters.indexOf(sgfCoord.charAt(1));
+  if (x < 0 || y < 0) {
+    throw new Error(`Не удалось создать точку из строки: ${sgfCoord}`);
+  }
+  return point(x, y);
+};
+
+// Экспортируем перечисления для использования в других модулях
+export const enums = {
+  states,
+  marks,
+  problemResults,
+  rotations,
+  boardRegions
 }; 

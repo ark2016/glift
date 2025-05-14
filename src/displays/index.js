@@ -7,11 +7,21 @@
 // Импортируем компоненты отображения
 import * as board from './board/index.js';
 import * as statusbar from './statusbar/index.js';
+import * as svg from './svg/index.js';
+import * as center from './center.js';
+import { environment } from './environment.js';
+import { cropbox } from './cropbox_wrapper.js';
+import * as commentbox from './commentbox/index.js';
 
 // Экспортируем все подмодули
 export {
   board,
-  statusbar
+  statusbar,
+  svg,
+  center,
+  environment,
+  cropbox,
+  commentbox
 };
 
 /**
@@ -29,6 +39,9 @@ export const DISPLAY_TYPE = Object.freeze({
   /** Только статусбар */
   STATUSBAR_ONLY: 'STATUSBAR_ONLY'
 });
+
+// Экспортируем функции из displays.js
+export * from './displays.js';
 
 /**
  * Создает комплексное отображение.

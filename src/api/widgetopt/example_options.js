@@ -1,29 +1,42 @@
 /**
- * Additional Options for EXAMPLEs
+ * Дополнительные опции для примеров.
+ * Используются в виджетах, которые показывают примеры позиций без интерактивности.
+ * @module api/widgetopt/example_options
  */
-glift.api.widgetopt[glift.WidgetType.EXAMPLE] = function () {
+
+/**
+ * Возвращает опции для виджета примеров.
+ * @return {Object} Объект с опциями виджета
+ */
+export function exampleOptions() {
   return {
-    markLastMove: undefined, // rely on defaults
-    keyMappings: undefined, // rely on defaults
-    enableMousewheel: undefined, // rely on defaults (false)
+    markLastMove: undefined, // полагаемся на значения по умолчанию
+    keyMappings: undefined, // полагаемся на значения по умолчанию
+    enableMousewheel: undefined, // полагаемся на значения по умолчанию (false)
 
     problemConditions: {},
 
-    controllerFunc: glift.controllers.gameViewer,
+    controllerFunc: null, // будет заменено на gameViewer при подключении контроллеров
 
     icons: [],
 
-    showVariations: glift.enums.showVariations.NEVER,
+    showVariations: null, // будет заменено на NEVER при использовании перечислений
 
     statusBarIcons: [
-      // 'game-info',
+      // 'game-info', - отключено
       'fullscreen',
     ],
 
+    /**
+     * Обработчик клика по камню на доске - пустая функция, так как пример не интерактивен
+     */
     stoneClick: function (event, widget, pt) {},
-    // We disable mouseover and mouseout to make it clear you can't interact with
-    // the example widget.
+    
+    /**
+     * Отключаем поведение при наведении и уведении мыши, чтобы было понятно,
+     * что с виджетом примера нельзя взаимодействовать.
+     */
     stoneMouseover: function () {},
     stoneMouseout: function () {},
   };
-};
+}

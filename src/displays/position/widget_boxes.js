@@ -1,45 +1,51 @@
-goog.provide('glift.displays.position.WidgetBoxes');
-goog.provide('glift.displays.position.WidgetColumn');
+/**
+ * Классы для хранения и управления блоками виджетов Glift.
+ * @module displays/position/widget_boxes
+ */
+
+import { orientation } from '../../orientation/orientation.js';
+import { util } from '../../util/util.js';
+import { BoardComponent } from '../../enums.js';
 
 /**
- * Container for the widget boxes. Everything starts undefined,
- *
- * @constructor @final @struct
+ * Контейнер для боксов виджета. Изначально все параметры не определены.
  */
-glift.displays.position.WidgetBoxes = function () {
-  /** @private {glift.displays.position.WidgetColumn} */
-  this._first = null;
-  /** @private {glift.displays.position.WidgetColumn} */
-  this._second = null;
-};
+class WidgetBoxes {
+  constructor() {
+    /** @private {WidgetColumn} */
+    this._first = null;
+    /** @private {WidgetColumn} */
+    this._second = null;
+  }
 
-glift.displays.position.WidgetBoxes.prototype = {
-  /** @param {!glift.displays.position.WidgetColumn} col */
-  setFirst: function (col) {
+  /** @param {!WidgetColumn} col */
+  setFirst(col) {
     this._first = col;
-  },
+    return this;
+  }
 
-  /** @param {!glift.displays.position.WidgetColumn} col */
-  setSecond: function (col) {
+  /** @param {!WidgetColumn} col */
+  setSecond(col) {
     this._second = col;
-  },
+    return this;
+  }
 
-  /** @return {glift.displays.position.WidgetColumn} First column */
-  first: function () {
+  /** @return {WidgetColumn} Первая колонка */
+  first() {
     return this._first;
-  },
+  }
 
-  /** @return {glift.displays.position.WidgetColumn} Second column */
-  second: function (col) {
+  /** @return {WidgetColumn} Вторая колонка */
+  second() {
     return this._second;
-  },
+  }
 
   /**
-   * Get a component by ID.
-   * @param {glift.BoardComponent} key Component key
-   * @return {?glift.orientation.BoundingBox} A bounding box or null.
+   * Получить компонент по ID.
+   * @param {BoardComponent} key Ключ компонента
+   * @return {?orientation.BoundingBox} Ограничивающий бокс или null.
    */
-  getBbox: function (key) {
+  getBbox(key) {
     if (this._first && this._first.mapping[key]) {
       return this._first.mapping[key];
     }
@@ -47,56 +53,56 @@ glift.displays.position.WidgetBoxes.prototype = {
       return this._second.mapping[key];
     }
     return null;
-  },
+  }
 
   /**
-   * Get the bbox of a component or throw an exception
+   * Получить ограничивающий бокс компонента или вызвать исключение
    *
-   * @param {glift.BoardComponent} key Component key
-   * @return {!glift.orientation.BoundingBox}.
+   * @param {BoardComponent} key Ключ компонента
+   * @return {!orientation.BoundingBox}.
    */
-  mustGetBbox: function (key) {
-    var bbox = this.getBbox(key);
+  mustGetBbox(key) {
+    const bbox = this.getBbox(key);
     if (bbox == null) {
       throw new Error('Column was null for component: ' + key);
     }
     return bbox;
-  },
+  }
 
   /**
-   * Iterate through all the bboxes.
+   * Перебрать все ограничивающие боксы.
    *
-   * This method passes both the component name and the relevant to the fn.
-   * Another way to say this is fn has the form:
+   * Этот метод передает как имя компонента, так и соответствующий бокс в функцию.
+   * Другими словами, функция имеет форму:
    *
    * fn(<component-name>, bbox>);
    */
-  forEach: function (fn) {
-    if (glift.util.typeOf(fn) !== 'function') {
+  forEach(fn) {
+    if (util.typeOf(fn) !== 'function') {
       return;
     }
-    var applyOrdering = function (col, inFn) {
-      var ordering = col.ordering;
-      for (var j = 0; j < ordering.length; j++) {
-        var key = ordering[j];
+    const applyOrdering = function (col, inFn) {
+      const ordering = col.ordering;
+      for (let j = 0; j < ordering.length; j++) {
+        const key = ordering[j];
         inFn(key, col.mapping[key]);
       }
     };
     this._first && applyOrdering(this._first, fn.bind(this));
     this._second && applyOrdering(this._second, fn.bind(this));
     return undefined;
-  },
+  }
 
   /**
-   * Get the bounding box for the whole widget. Useful for creating temporary
-   * divs.  Note: Returns a new bounding box everytime, since it's calculated
-   * based on the existing bboxes.
+   * Получить ограничивающий бокс для всего виджета. Полезно для создания временных
+   * div-элементов. Примечание: Возвращает новый ограничивающий бокс каждый раз, так как он
+   * рассчитывается на основе существующих боксов.
    */
-  fullWidgetBbox: function () {
-    var top = null;
-    var left = null;
-    var bottom = null;
-    var right = null;
+  fullWidgetBbox() {
+    let top = null;
+    let left = null;
+    let bottom = null;
+    let right = null;
     this.forEach(function (compName, bbox) {
       if (top === null) {
         top = bbox.top();
@@ -119,92 +125,92 @@ glift.displays.position.WidgetBoxes.prototype = {
       }
     });
     if (top !== null && left !== null && bottom !== null && right !== null) {
-      return glift.orientation.bbox.fromPts(
-        glift.util.point(left, top),
-        glift.util.point(right, bottom)
+      return orientation.bbox.fromPts(
+        util.point(left, top),
+        util.point(right, bottom)
       );
     } else {
       return null;
     }
-  },
-};
+  }
+}
 
 /**
- * Data container for information about how the widegt is positioned.
- *
- * @constructor @final @struct
+ * Контейнер данных для информации о том, как позиционирован виджет.
  */
-glift.displays.position.WidgetColumn = function () {
-  /** Mapping from component from map to box. */
-  this.mapping = {};
+class WidgetColumn {
+  constructor() {
+    /** Отображение от компонента к ограничивающему боксу. */
+    this.mapping = {};
 
-  /** This ordering of the components. */
-  this.ordering = [];
-};
+    /** Порядок компонентов. */
+    this.ordering = [];
+  }
 
-glift.displays.position.WidgetColumn.prototype = {
-  /** Set a mapping from from component to bounding box. */
-  setComponent: function (component, bbox) {
-    if (!glift.BoardComponent[component]) {
+  /** Установить отображение от компонента к ограничивающему боксу. */
+  setComponent(component, bbox) {
+    if (!BoardComponent[component]) {
       throw new Error('Unknown component: ' + component);
     }
     this.mapping[component] = bbox;
     return this;
-  },
+  }
 
   /**
-   * Get the bbox of a component or return null.
+   * Получить ограничивающий бокс компонента или вернуть null.
    *
-   * @param {glift.BoardComponent} component Component key
-   * @return {?glift.orientation.BoundingBox} A bounding box or null.
+   * @param {BoardComponent} component Ключ компонента
+   * @return {?orientation.BoundingBox} Ограничивающий бокс или null.
    */
-  getBbox: function (component) {
+  getBbox(component) {
     return this.mapping[component] || null;
-  },
+  }
 
   /**
-   * Get the bbox of a component or throw an exception.
+   * Получить ограничивающий бокс компонента или вызвать исключение.
    *
-   * @param {glift.BoardComponent} component Component key
-   * @return {!glift.orientation.BoundingBox}
+   * @param {BoardComponent} component Ключ компонента
+   * @return {!orientation.BoundingBox}
    */
-  mustGetBbox: function (component) {
-    var bbox = this.getBbox(component);
+  mustGetBbox(component) {
+    const bbox = this.getBbox(component);
     if (bbox == null) {
       throw new Error('Bbox was null for component: ' + component);
     }
     return bbox;
-  },
+  }
 
   /**
-   * Set the column from an ordering. Recall that ratio arrays have the
-   * following format:
+   * Установить колонку из упорядочения. Напомним, что массивы соотношений имеют
+   * следующий формат:
    * [
    *  { component: BOARD, ratio: 0.3}
    *  { component: COMMENT_BOX, ratio: 0.6}
    *  ...
    * ].
    *
-   * This is typically set before setting components.
+   * Обычно устанавливается перед установкой компонентов.
    */
-  setOrderingFromRatioArray: function (column) {
-    var ordering = [];
-    for (var i = 0; i < column.length; i++) {
-      var item = column[i];
+  setOrderingFromRatioArray(column) {
+    const ordering = [];
+    for (let i = 0; i < column.length; i++) {
+      const item = column[i];
       if (item && item.component) {
         ordering.push(item.component);
       }
     }
     this.ordering = ordering;
     return this;
-  },
+  }
 
   /**
-   * An ordering function. Expects the fn to take a component name.
+   * Функция упорядочения. Ожидает, что функция принимает имя компонента.
    */
-  orderFn: function (fn) {
-    for (var i = 0; i < this.ordering.length; i++) {
+  orderFn(fn) {
+    for (let i = 0; i < this.ordering.length; i++) {
       fn(this.ordering[i]);
     }
-  },
-};
+  }
+}
+
+export { WidgetBoxes, WidgetColumn };

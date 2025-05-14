@@ -1,76 +1,97 @@
-goog.provide('glift.displays.icons.IconSelector');
+/**
+ * Селектор иконок для отображения расширенных опций в пользовательском интерфейсе Glift.
+ * @module displays/icons/icon_selector
+ */
 
-glift.displays.icons.iconSelector = function (parentDivId, iconBarDivId, icon) {
-  return new glift.displays.icons.IconSelector(
+import { dom } from '../../dom/dom.js';
+import { displays } from '../../displays/displays.js';
+import { svg } from '../../svg/svg.js';
+import { columnCenterWrapped } from './icon_centering.js';
+
+/**
+ * Создаёт и отображает селектор иконок.
+ * 
+ * @param {string} parentDivId ID родительского div-элемента
+ * @param {string} iconBarDivId ID div-элемента для панели иконок
+ * @param {Object} icon Базовая иконка
+ * @return {IconSelector} Созданный селектор иконок
+ */
+export function iconSelector(parentDivId, iconBarDivId, icon) {
+  return new IconSelector(
     parentDivId,
     iconBarDivId,
     icon
   ).draw();
-};
+}
 
 /**
- * Icon Selector class.
- *
- * @constructor
- * @package
- * @final
+ * Класс селектора иконок.
  */
-glift.displays.icons.IconSelector = function (parentDivId, iconBarId, icon) {
-  // The assumption is currently that there can only be one IconSelector.  This
-  // may be incorrect, but it can easily be reevaluated later.
-  this.iconBarId = iconBarId;
-  this.parentDivId = parentDivId;
-  this.icon = icon; // base icon.
+export class IconSelector {
+  /**
+   * @param {string} parentDivId ID родительского div-элемента
+   * @param {string} iconBarId ID панели иконок
+   * @param {Object} icon Базовая иконка
+   */
+  constructor(parentDivId, iconBarId, icon) {
+    // Предполагается, что может быть только один IconSelector.
+    // Это может быть неверно, но может быть легко пересмотрено позже.
+    this.iconBarId = iconBarId;
+    this.parentDivId = parentDivId;
+    this.icon = icon; // базовая иконка
 
-  this.baseId = 'iconSelector_' + parentDivId;
-  this.wrapperDivId = this.baseId + '_wrapper';
+    this.baseId = 'iconSelector_' + parentDivId;
+    this.wrapperDivId = this.baseId + '_wrapper';
 
-  this.displayedIcons = undefined; // defined on draw.
+    this.displayedIcons = undefined; // определяется при отрисовке
 
-  // Div ids for the columns.
-  this.columnIdList = [];
-  // SVG data structures for each column.
-  this.svgColumnList = []; // defined on draw. Single array.
-  // list of columns rewraped icons.  Thus, a double array.
-  this.iconList = [];
-};
+    // ID для столбцов
+    this.columnIdList = [];
+    // SVG структуры данных для каждого столбца
+    this.svgColumnList = []; // определяется при отрисовке. Одиночный массив.
+    // список столбцов обёрнутых иконок. Двойной массив.
+    this.iconList = [];
+  }
 
-glift.displays.icons.IconSelector.prototype = {
-  draw: function () {
-    // TODO(kashomon): This needs to be cleaned up. It's currently quite the
-    // mess.
+  /**
+   * Отрисовывает селектор иконок и возвращает экземпляр.
+   * @return {IconSelector} this
+   */
+  draw() {
+    // TODO(kashomon): Это нуждается в очистке. В настоящее время это довольно 
+    // беспорядочно.
     this.destroy();
-    var parentBbox = glift.displays.bboxFromDiv(this.parentDivId);
+    const parentBbox = displays.bboxFromDiv(this.parentDivId);
 
-    var barElem = glift.dom.elem(this.iconBarId);
-    var barPosLeft = barElem.boundingClientRect().left;
+    const barElem = dom.elem(this.iconBarId);
+    const barPosLeft = barElem.boundingClientRect().left;
 
-    var iconBarBbox = glift.displays.bboxFromDiv(this.iconBarId);
-    var iconBbox = this.icon.bbox;
-    // This assumes that the iconbar is always on the bottom.
-    var columnHeight = parentBbox.height() - iconBarBbox.height();
-    var paddingPx = 5; // TODO(kashomon): Get from theme.
-    var rewrapped = [];
+    const iconBarBbox = displays.bboxFromDiv(this.iconBarId);
+    const iconBbox = this.icon.bbox;
+    // Предполагается, что панель иконок всегда внизу.
+    const columnHeight = parentBbox.height() - iconBarBbox.height();
+    const paddingPx = 5; // TODO(kashomon): Получить из темы.
+    const rewrapped = [];
 
-    for (var i = 0; i < this.icon.associatedIcons.length; i++) {
+    for (let i = 0; i < this.icon.associatedIcons.length; i++) {
       rewrapped.push(this.icon.associatedIcons[i].rewrapIcon());
     }
 
-    var newWrapperDiv = glift.dom.newDiv(this.wrapperDivId);
+    const newWrapperDiv = dom.newDiv(this.wrapperDivId);
     newWrapperDiv.css({
       position: 'absolute',
       height: parentBbox.height() + 'px',
       width: parentBbox.width() + 'px',
     });
-    glift.dom.elem(this.parentDivId).append(newWrapperDiv);
+    dom.elem(this.parentDivId).append(newWrapperDiv);
 
-    var columnIndex = 0;
-    while (rewrapped.length > 0) {
+    let columnIndex = 0;
+    while (rewritten.length > 0) {
       this.iconList.push([]);
-      var columnId = this.baseId + '_column_' + columnIndex;
+      const columnId = this.baseId + '_column_' + columnIndex;
       this.columnIdList.push(columnId);
 
-      var newColumnDiv = glift.dom.newDiv(columnId);
+      const newColumnDiv = dom.newDiv(columnId);
       newColumnDiv.css({
         bottom: iconBarBbox.height() + 'px',
         height: columnHeight + 'px',
@@ -80,106 +101,132 @@ glift.displays.icons.IconSelector.prototype = {
       });
       newWrapperDiv.append(newColumnDiv);
 
-      var columnBox = glift.displays.bboxFromDiv(columnId);
-      var transforms = glift.displays.icons.columnCenterWrapped(
+      const columnBox = displays.bboxFromDiv(columnId);
+      const transforms = columnCenterWrapped(
         columnBox,
         rewrapped,
         paddingPx,
         paddingPx
       );
 
-      var svgId = columnId + '_svg';
-      var svg = glift.svg
-        .svg()
+      const svgId = columnId + '_svg';
+      const svgObj = svg.svg()
         .setId(columnId + '_svg')
         .setAttr('height', '100%')
         .setAttr('width', '100%');
-      var idGen = glift.displays.svg.ids.gen(columnId);
-      var container = glift.svg.group().setId(idGen.iconGroup());
-      svg.append(container);
-      for (var j = 0, len = transforms.length; j < len; j++) {
-        var icon = rewrapped.shift(); // Use rewrapped here
-        var id = svgId + '_' + icon.iconName;
+      const idGen = displays.svg.ids.gen(columnId);
+      const container = svg.group().setId(idGen.iconGroup());
+      svgObj.append(container);
+      for (let j = 0, len = transforms.length; j < len; j++) {
+        const icon = rewrapped.shift(); // Используем rewrapped здесь
+        const id = svgId + '_' + icon.iconName;
         icon.setElementId(id);
         this.iconList[columnIndex].push(icon);
         container.append(
-          glift.svg
-            .path()
+          svg.path()
             .setId(icon.elementId)
             .setAttr('d', icon.iconStr)
-            .setAttr('fill', 'black') // replace with theme
+            .setAttr('fill', 'black') // заменить на тему
             .setAttr('transform', icon.transformString())
         );
       }
-      this.svgColumnList.push(svg);
+      this.svgColumnList.push(svgObj);
       columnIndex++;
     }
 
     this._createIconButtons();
     this._setBackgroundEvent();
-    for (var k = 0; k < this.svgColumnList.length; k++) {
-      glift.displays.svg.dom.attachToParent(
+    for (let k = 0; k < this.svgColumnList.length; k++) {
+      displays.svg.dom.attachToParent(
         this.svgColumnList[k],
         this.columnIdList[k]
       );
     }
     return this;
-  },
+  }
 
-  _createIconButtons: function () {
-    for (var i = 0; i < this.iconList.length; i++) {
-      var svg = this.svgColumnList[i];
-      var idGen = glift.displays.svg.ids.gen(this.columnIdList[i]);
-      var iconColumn = this.iconList[i];
-      var container = glift.svg.group().setId(idGen.buttonGroup());
-      svg.append(container);
-      for (var j = 0; j < iconColumn.length; j++) {
-        var icon = iconColumn[j];
+  /**
+   * Создаёт кнопки для иконок
+   * @private
+   */
+  _createIconButtons() {
+    for (let i = 0; i < this.iconList.length; i++) {
+      const svgObj = this.svgColumnList[i];
+      const idGen = displays.svg.ids.gen(this.columnIdList[i]);
+      const iconColumn = this.iconList[i];
+      const container = svg.group().setId(idGen.buttonGroup());
+      svgObj.append(container);
+      for (let j = 0; j < iconColumn.length; j++) {
+        const icon = iconColumn[j];
         container.append(
-          glift.svg
-            .rect()
+          svg.rect()
             .setData(icon.iconName)
             .setAttr('x', icon.bbox.topLeft().x())
             .setAttr('y', icon.bbox.topLeft().y())
             .setAttr('width', icon.bbox.width())
             .setAttr('height', icon.bbox.height())
-            .setAttr('fill', 'blue') // color doesn't matter, but need a fill
+            .setAttr('fill', 'blue') // цвет не имеет значения, но нужно заполнение
             .setAttr('opacity', 0)
             .setId(idGen.button(icon.iconName))
         );
       }
     }
-  },
+  }
 
-  _setBackgroundEvent: function () {
-    glift.dom.elem(this.wrapperDivId).on('click', function (e) {
-      this.remove(); // TODO(kashomon): This 'this' is incorrect.
+  /**
+   * Устанавливает обработчик событий для фона
+   * @private
+   * @return {IconSelector} this
+   */
+  _setBackgroundEvent() {
+    const self = this; // Сохраняем ссылку на this
+    dom.elem(this.wrapperDivId).on('click', function (e) {
+      self.destroy(); // Используем self вместо this
     });
     return this;
-  },
+  }
 
-  setIconEvents: function (eventName, func) {
-    for (var i = 0; i < this.iconList.length; i++) {
-      var idGen = glift.displays.svg.ids.gen(this.columnIdList[i]);
-      for (var j = 0; j < this.iconList[i].length; j++) {
-        var icon = this.iconList[i][j];
-        var buttonId = idGen.button(icon.iconName);
+  /**
+   * Устанавливает обработчики событий для иконок
+   * @param {string} eventName Имя события
+   * @param {Function} func Функция-обработчик
+   * @return {IconSelector} this
+   */
+  setIconEvents(eventName, func) {
+    for (let i = 0; i < this.iconList.length; i++) {
+      const idGen = displays.svg.ids.gen(this.columnIdList[i]);
+      for (let j = 0; j < this.iconList[i].length; j++) {
+        const icon = this.iconList[i][j];
+        const buttonId = idGen.button(icon.iconName);
         this._setOneEvent(eventName, buttonId, icon, func);
       }
     }
     return this;
-  },
+  }
 
-  _setOneEvent: function (eventName, buttonId, icon, func) {
-    glift.dom.elem(buttonId).on(eventName, function (event) {
+  /**
+   * Устанавливает один обработчик события
+   * @private
+   * @param {string} eventName Имя события
+   * @param {string} buttonId ID кнопки
+   * @param {Object} icon Иконка
+   * @param {Function} func Функция-обработчик
+   * @return {IconSelector} this
+   */
+  _setOneEvent(eventName, buttonId, icon, func) {
+    dom.elem(buttonId).on(eventName, function (event) {
       func(event, icon);
     });
     return this;
-  },
+  }
 
-  destroy: function () {
-    glift.dom.elem(this.wrapperDivId) &&
-      glift.dom.elem(this.wrapperDivId).remove();
+  /**
+   * Уничтожает селектор иконок
+   * @return {IconSelector} this
+   */
+  destroy() {
+    dom.elem(this.wrapperDivId) &&
+      dom.elem(this.wrapperDivId).remove();
     return this;
-  },
-};
+  }
+}

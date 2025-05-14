@@ -1,7 +1,12 @@
 /**
- * The bounding boxes are precalculated by running BboxFinder.html
+ * SVG данные для иконок.
+ * @module displays/icons/svg
  */
-glift.displays.icons.svg = {
+
+// Это просто заглушка для реэкспорта SVG-иконок
+// Предполагается, что иконки загружаются из другого модуля и
+// инициализируются при загрузке основного приложения
+export const svg = {
   // http://raphaeljs.com/icons/#cross
   // Used for problem correctness
   cross: {

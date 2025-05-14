@@ -1,191 +1,202 @@
-goog.provide('glift.controllers.BaseController');
-goog.provide('glift.controllers.ControllerFunc');
-
 /**
- * A controller function which indicates how to consturct a BaseController.
- *
- * @typedef {function(!glift.api.SgfOptions):!glift.controllers.BaseController}
+ * Базовый контроллер для всех типов игровых контроллеров.
+ * 
+ * Этот контроллер обеспечивает базовые механизмы для взаимодействия с SGF файлами.
+ * 
+ * @module controllers/base
  */
 
+import { rules } from '../rules/index.js';
+import { parse } from '../parse/index.js';
+import { flattener } from '../flattener/index.js';
+import { enums } from '../util/enums.js';
+import { Point } from '../util/point.js';
+import { HookOptions } from '../api/hooks.js';
+import { orientation } from '../orientation/index.js';
+import { Controller, CONTROLLER_TYPE } from './controllers.js';
+
 /**
- * Creates a base controller implementation.
- *
- * @return {!glift.controllers.BaseController}
+ * Типы контроллеров
+ * @enum {string}
  */
-glift.controllers.base = function () {
-  return new glift.controllers.BaseController();
+export const CONTROLLER_TYPES = CONTROLLER_TYPE;
+
+/**
+ * Создает базовый контроллер.
+ * @return {!BaseController} Экземпляр базового контроллера
+ */
+export const createBaseController = () => {
+  return new BaseController();
 };
 
 /**
- * The BaseConstructor provides, in classical-ish inheritance style, an abstract
- * base implementation for interacting with SGFs.  Typically, those objects
- * extending this base class will implement addStone and [optionally]
- * extraOptions.
- *
- * @constructor
+ * Базовый контроллер предоставляет основную функциональность для 
+ * взаимодействия с SGF файлами. Типично, объекты, расширяющие этот базовый
+ * класс, будут переопределять метод addStone и [опционально] extraOptions.
+ * @implements {Controller}
  */
-glift.controllers.BaseController = function () {
-  //
-  // Variables set during initialization but const afterwards
-  //
-
+export class BaseController {
   /**
-   * The initial SGF String.
-   * @package {string}
+   * Создает экземпляр базового контроллера.
    */
-  this.sgfString = '';
+  constructor() {
+    //
+    // Переменные, установленные во время инициализации, но константные после этого
+    //
+
+    /**
+     * Исходная SGF строка.
+     * @type {string}
+     */
+    this.sgfString = '';
+
+    /**
+     * Исходная начальная позиция.
+     * @type {string|Array<number>}
+     */
+    this.rawInitialPosition = [];
+
+    /**
+     * Используется только для проблемного типа.
+     * @type {Object}
+     */
+    this.problemConditions = {};
+
+    /**
+     * Тип парсера
+     * @type {string}
+     */
+    this.parseType = parse.parseType.SGF;
+
+    /**
+     * Путь для следующих ходов. Используется только для примеров.
+     * Указывает, как создавать номера ходов.
+     * @private {Array<number>|undefined}
+     */
+    this.nextMovesPath_ = undefined;
+
+    /**
+     * Перечисление, указывающее предпочтение показа вариаций
+     * @private {string|undefined}
+     */
+    this.showVariations_ = undefined;
+
+    /**
+     * Булево значение, указывающее, нужно ли отмечать последний ход.
+     * @private {boolean}
+     */
+    this.markLastMove_ = false;
+
+    /**
+     * Булево значение, указывающее, нужно ли отмечать ко.
+     * @private {boolean}
+     */
+    this.markKo_ = true;
+
+    //
+    // Переменные, устанавливаемые во время инициализации
+    //
+
+    /**
+     * Путь дерева, представляющий путь к текущей позиции.
+     * @type {Array<number>}
+     */
+    this.treepath = [];
+
+    /**
+     * Полное дерево ходов, построенное из SGF.
+     * @type {Object}
+     */
+    // Создаем фиктивное дерево ходов, чтобы убедиться, что оно
+    // всегда инициализировано.
+    this.movetree = rules.movetree.getInstance();
+
+    /**
+     * Goban, представляющий текущее состояние доски. Здесь мы конструируем
+     * фиктивный Goban, чтобы убедиться, что goban ненулевой.
+     * @type {Object}
+     */
+    this.goban = rules.goban.getInstance(1);
+
+    /**
+     * Инициализируем фиктивный экземпляр hooks и переопределяем его во время initOptions.
+     * @type {HookOptions}
+     */
+    this.hooks = new HookOptions();
+
+    /**
+     * История захватов, чтобы мы могли вернуться назад во времени.
+     * @type {Array<Object>}
+     */
+    this.captureHistory = [];
+
+    /**
+     * История точек очищенных локаций (т.е. свойство AE). Нам нужно
+     * хранить полную историю, чтобы вернуть изменения назад.
+     * @type {Array<Array<Object>>}
+     */
+    this.clearHistory = [];
+
+    /**
+     * Массив ко-истории, чтобы когда мы идем назад, мы могли правильно
+     * сбросить ко.
+     * @type {Array<Point|null>}
+     */
+    this.koHistory = [];
+  }
 
   /**
-   * The raw initial position.
+   * Инициализирует опции и структуры данных дочерних элементов контроллера.
    *
-   * @package {string|!Array<number>}
-   */
-  this.rawInitialPosition = [];
-
-  /**
-   * Used only for problem-types.
+   * Обратите внимание, что эти опции должны быть защищены парсингом опций
+   * (см. options.js в этом же каталоге). Таким образом, здесь не делаются
+   * специальные проверки.
    *
-   * @package {!glift.rules.ProblemConditions}
+   * @param {!Object} sgfOptions Объект, содержащий SGF опции.
+   * @return {!BaseController} this
    */
-  this.problemConditions = {};
-
-  /**
-   * @package {glift.parse.parseType}
-   */
-  this.parseType = glift.parse.parseType.SGF;
-
-  /**
-   * The raw next moves path. Used only for examples (see the Game Figure).
-   * Indicates how to create move numbers.
-   *
-   * @private {glift.rules.Treepath|undefined}
-   */
-  this.nextMovesPath_ = undefined;
-
-  /**
-   * Enum indicating the show-variations preference
-   * @private {glift.enums.showVariations|undefined}
-   */
-  this.showVariations_ = undefined;
-
-  /**
-   * Boolean indicating whether or not to mark the last move.
-   * @private {boolean}
-   */
-  this.markLastMove_ = false;
-
-  /**
-   * Boolean indicating whether or not to mark the ko.
-   * @private {boolean}
-   */
-  this.markKo_ = true;
-
-  //
-  // Variables set during initialization
-  //
-
-  /**
-   * The treepath representing the pth to the current position.
-   * @package {glift.rules.Treepath}
-   */
-  this.treepath = [];
-
-  /**
-   * The full tree of moves constructed from the SGF.
-   * @package {!glift.rules.MoveTree}
-   */
-  // Here we create a dummy movetree to ensure that the movetree is always
-  // initialized.
-  this.movetree = glift.rules.movetree.getInstance();
-
-  /**
-   * The Goban representing the current state of the board. Here, we construct a
-   * dummy Goban to ensure that the goban is non-nullable.
-   *
-   * @package {!glift.rules.Goban} goban
-   */
-  this.goban = glift.rules.goban.getInstance(1);
-
-  /**
-   * Initialize a dummy hooks instance and override during initOptions.
-   *
-   * @package {!glift.api.HookOptions}
-   */
-  this.hooks = new glift.api.HookOptions();
-
-  /**
-   * The history of the captures so we can go backwards in time.
-   * @package {!Array<!glift.rules.CaptureResult>}
-   */
-  this.captureHistory = [];
-
-  /**
-   * The history of cleared-location-points (i.e., the AE property). We need to
-   * keep a full history to back-out the changes.
-   * @package {!Array<!Array<!glift.rules.Move>>}
-   */
-  this.clearHistory = [];
-
-  /**
-   * Array of ko-history so that when we go backwards, we can reset the ko
-   * correctly.
-   * @package {!Array<?glift.Point>}
-   */
-  this.koHistory = [];
-};
-
-glift.controllers.BaseController.prototype = {
-  /**
-   * Initialize both the options and the controller's children data structures.
-   *
-   * Note that these options should be protected by the options parsing (see
-   * options.js in this same directory).  Thus, no special checks are made here.
-   *
-   * @param {!glift.api.SgfOptions} sgfOptions Object containing SGF options.
-   */
-  initOptions: function (sgfOptions) {
+  initOptions(sgfOptions) {
     this.sgfString = sgfOptions.sgfString || '';
 
     if (sgfOptions.nextMovesPath) {
-      this.nextMovesPath_ = glift.rules.treepath.parseFragment(
+      this.nextMovesPath_ = rules.treepath.parseFragment(
         sgfOptions.nextMovesPath
       );
     }
 
     this.rawInitialPosition = sgfOptions.initialPosition || [];
-    this.parseType = sgfOptions.parseType || glift.parse.parseType.SGF;
+    this.parseType = sgfOptions.parseType || parse.parseType.SGF;
     this.problemConditions = sgfOptions.problemConditions || {};
     this.hooks = sgfOptions.hooks || this.hooks;
 
-    // A controller may not be the best place for these next few, since they're
-    // display only; However, this is currenly the best place to put these since
-    // the controller is in charge of creating the flattened representation.
+    // Контроллер может быть не лучшим местом для следующих нескольких опций,
+    // так как они только для отображения; Однако, это сейчас лучшее место для них,
+    // так как контроллер отвечает за создание уплощенного представления.
     this.showVariations_ = sgfOptions.showVariations || undefined;
     this.markLastMove_ = sgfOptions.markLastMove;
     this.markKo_ = sgfOptions.markKo;
 
     this.initialize();
     return this;
-  },
+  }
 
   /**
-   * Initialize the:
-   *  - initPosition -- Description of where to start.
-   *  - treepath -- The path to the current position.  An array of variaton
-   *    numbers.
-   *  - movetree -- Tree of move nodes from the SGF.
-   *  - goban -- Data structure describing the go board.  Really, the goban is
-   *    useful for telling you where stones can be placed, and (after placing)
-   *    what stones were captured.
-   *  - capture history -- The history of the captures.
+   * Инициализирует:
+   *  - initPosition -- Описание начальной позиции.
+   *  - treepath -- Путь к текущей позиции. Массив номеров вариаций.
+   *  - movetree -- Дерево узлов ходов из SGF.
+   *  - goban -- Структура данных, описывающая доску Го. На самом деле, goban
+   *    полезен для того, чтобы сказать вам, где могут быть размещены камни, и
+   *    (после размещения) какие камни были захвачены.
+   *  - capture history -- История захватов.
    *
-   * @param {string=} opt_treepath Because we may want to reinitialize the
-   *    GoBoard, we optionally pass in the treepath from the beginning and use
-   *    that instead of the initialPosition treepath.
+   * @param {string=} opt_treepath Поскольку мы можем захотеть переинициализировать
+   *    GoBoard, мы опционально передаем treepath с самого начала и используем
+   *    его вместо treepath начальной позиции.
+   * @return {!BaseController} this
    */
-  initialize: function (opt_treepath) {
-    var rules = glift.rules;
-    var initTreepath = opt_treepath || this.rawInitialPosition;
+  initialize(opt_treepath) {
+    const initTreepath = opt_treepath || this.rawInitialPosition;
     this.treepath = rules.treepath.parseInitialPath(initTreepath);
 
     this.movetree = rules.movetree.getFromSgf(
@@ -193,44 +204,44 @@ glift.controllers.BaseController.prototype = {
       this.treepath,
       this.parseType
     );
-    var gobanData = rules.goban.getFromMoveTree(
-      /** @type {!glift.rules.MoveTree} */ (this.movetree),
+    const gobanData = rules.goban.getFromMoveTree(
+      this.movetree,
       this.treepath
     );
 
     this.goban = gobanData.goban;
     this.captureHistory = gobanData.captures;
     this.clearHistory = gobanData.clearHistory;
-    this.extraOptions(); // Overridden by implementers
+    this.extraOptions(); // Переопределено реализациями
     return this;
-  },
+  }
 
   /**
-   * It's expected that this will be implemented by those extending this base
-   * class.  This is called during initOptions above.
-   * @param {glift.api.SgfOptions=} opt_options
+   * Ожидается, что это будет реализовано теми, кто расширяет этот базовый
+   * класс. Это вызывается во время initOptions выше.
+   * @param {Object=} opt_options
    */
-  extraOptions: function (opt_options) {
-    /* Implemented by other controllers. */
-  },
+  extraOptions(opt_options) {
+    /* Реализовано другими контроллерами. */
+  }
 
   /**
-   * Add a stone.  This is intended to be overwritten.
+   * Добавляет камень. Предполагается, что это будет переопределено.
    *
-   * @param {!glift.Point} point
-   * @param {!glift.enums.states} color
-   * @return {?glift.flattener.Flattened} The flattened representation.
+   * @param {!Point} point
+   * @param {!enums.states} color
+   * @return {?Object} Уплощенное представление.
    */
-  addStone: function (point, color) {
-    throw new Error('Not Implemented');
-  },
+  addStone(point, color) {
+    throw new Error('Не реализовано');
+  }
 
   /**
-   * Creates a flattener state.
-   * @return {!glift.flattener.Flattened}
+   * Создает уплощенное состояние.
+   * @return {!Object}
    */
-  flattenedState: function () {
-    var newFlat = glift.flattener.flatten(this.movetree, {
+  flattenedState() {
+    const newFlat = flattener.flatten(this.movetree, {
       goban: this.goban,
       showNextVariationsType: this.showVariations_,
       markLastMove: this.markLastMove_,
@@ -240,242 +251,240 @@ glift.controllers.BaseController.prototype = {
       selectedNextMove: this.selectedNextMove(),
     });
     return newFlat;
-  },
+  }
 
   /**
-   * Get the current move number.
+   * Получает текущий номер хода.
    * @return {number}
    */
-  currentMoveNumber: function () {
+  currentMoveNumber() {
     return this.movetree.node().getNodeNum();
-  },
+  }
 
   /**
-   * Gets the variation number of the next move. This will be something different
-   * if we've used setNextVariation or if we've already played into a variation.
-   * Otherwise, it will be 0.
+   * Получает номер вариации следующего хода. Это будет что-то другое,
+   * если мы использовали setNextVariation или если мы уже сыграли в вариацию.
+   * Иначе, это будет 0.
    *
    * @return {number}
    */
-  nextVariationNumber: function () {
+  nextVariationNumber() {
     return this.treepath[this.currentMoveNumber()] || 0;
-  },
+  }
 
   /**
-   * Return the next 'selected' move equivalent to the using the next variation
-   * number correlated with the next moves in the movetree.
-   * @return {?glift.rules.Move}
+   * Возвращает следующий 'выбранный' ход, эквивалентный использованию
+   * следующего номера вариации, коррелирующего со следующими ходами в дереве ходов.
+   * @return {?Object}
    */
-  selectedNextMove: function () {
-    var nextVar = this.nextVariationNumber();
-    var nextMoves = this.movetree.nextMoves();
+  selectedNextMove() {
+    const nextVar = this.nextVariationNumber();
+    const nextMoves = this.movetree.nextMoves();
     if (nextMoves.length) {
       return nextMoves[nextVar] || null;
     }
     return null;
-  },
+  }
 
   /**
-   * Sets what the next variation will be.  The number is applied modulo the
-   * number of possible variations.
+   * Устанавливает, какой будет следующая вариация. Число применяется
+   * по модулю количества возможных вариаций.
    *
    * @param {number} num
-   * @return {!glift.controllers.BaseController} this
+   * @return {!BaseController} this
    */
-  setNextVariation: function (num) {
-    // Recall that currentMoveNumber  s the same as the depth number ==
-    // this.treepath.length (if at the end).  Thus, if the old treepath was
-    // [0,1,2,0] and the currentMoveNumber was 2, we'll have [0, 1, num].
+  setNextVariation(num) {
+    // Напомним, что currentMoveNumber такой же, как номер глубины ==
+    // this.treepath.length (если в конце). Таким образом, если старый treepath был
+    // [0,1,2,0] и currentMoveNumber был 2, у нас будет [0, 1, num].
     this.treepath = this.treepath.slice(0, this.currentMoveNumber());
     this.treepath.push(num % this.movetree.node().numChildren());
     return this;
-  },
+  }
 
   /**
-   * Gets the treepath to the current position.
-   * @return {!glift.rules.Treepath}.
+   * Получает treepath к текущей позиции.
+   * @return {!Array<number>}.
    */
-  pathToCurrentPosition: function () {
+  pathToCurrentPosition() {
     return this.movetree.treepathToHere();
-  },
+  }
 
   /**
-   * Gets the game info key-value pairs. This consists of global data about the
-   * game, such as the names of the players, the result of the game, the
-   * name of the tournament, etc.
-   * @return {!Array<!glift.rules.PropDescriptor>}
+   * Получает пары ключ-значение с информацией об игре. Это состоит из глобальных
+   * данных об игре, таких как имена игроков, результат игры,
+   * название турнира и т.д.
+   * @return {!Array<!Object>}
    */
-  getGameInfo: function () {
+  getGameInfo() {
     return this.movetree.getGameInfo();
-  },
+  }
 
   /**
-   * Get the captures that occured for the current move.
+   * Получает захваты, которые произошли для текущего хода.
    *
-   * @return {!glift.rules.CaptureResult}
+   * @return {!Object}
    */
-  getCaptures: function () {
+  getCaptures() {
     if (this.captureHistory.length === 0) {
       return { BLACK: [], WHITE: [] };
     }
     return this.captureHistory[this.currentMoveNumber() - 1];
-  },
+  }
 
   /**
-   * Get the captures count. Returns an object of the form
+   * Получает количество захватов.
    * @return {{
    *  BLACK: number,
    *  WHITE: number
    * }}
    */
-  getCaptureCount: function () {
-    var countObj = { BLACK: 0, WHITE: 0 };
-    for (var i = 0; i < this.captureHistory.length; i++) {
-      var obj = this.captureHistory[i];
-      for (var color in obj) {
+  getCaptureCount() {
+    const countObj = { BLACK: 0, WHITE: 0 };
+    for (let i = 0; i < this.captureHistory.length; i++) {
+      const obj = this.captureHistory[i];
+      for (const color in obj) {
         countObj[color] += obj[color].length;
       }
     }
     return countObj;
-  },
+  }
 
   /**
-   * Return true if a Stone can (probably) be added to the board and false
-   * otherwise.
+   * Возвращает true, если камень (вероятно) может быть добавлен на доску, и false
+   * в противном случае.
    *
-   * Note, this method isn't always totally accurate. This method must be very
-   * fast since it's expected that this will be used for hover events.
+   * Обратите внимание, что этот метод не всегда полностью точен. Этот метод должен быть
+   * очень быстрым, так как ожидается, что он будет использоваться для событий наведения.
    *
-   * @param {!glift.Point} point
-   * @param {!glift.enums.states} color
+   * @param {!Point} point
+   * @param {!enums.states} color
    * @return {boolean}
    */
-  canAddStone: function (point, color) {
+  canAddStone(point, color) {
     return this.goban.placeable(point);
-  },
+  }
 
   /**
-   * Returns a State (either BLACK or WHITE). Needs to be fast since it's used
-   * to display the hover-color in the display.
+   * Возвращает состояние (либо BLACK, либо WHITE). Должен быть быстрым, так как
+   * используется для отображения цвета при наведении в дисплее.
    *
-   * This will be undefined until initialize is called, so the clients of the
-   * controller must make sure to always initialize the board position
-   * first.
+   * Это будет undefined, пока не будет вызван initialize, поэтому клиенты
+   * контроллера должны убедиться, что всегда инициализируют позицию доски
+   * в первую очередь.
    *
-   * @return {!glift.enums.states}
+   * @return {!enums.states}
    */
-  getCurrentPlayer: function () {
+  getCurrentPlayer() {
     return this.movetree.getCurrentPlayer();
-  },
+  }
 
-  /** @return {string} The current SGF string. */
-  currentSgf: function () {
+  /** @return {string} Текущая SGF строка. */
+  currentSgf() {
     return this.movetree.toSgf();
-  },
+  }
 
-  /** @return {string} The original SGF string. */
-  originalSgf: function () {
+  /** @return {string} Оригинальная SGF строка. */
+  originalSgf() {
     return this.sgfString;
-  },
+  }
 
-  /** @return {number} Returns the number of intersections. */
-  getIntersections: function () {
+  /** @return {number} Возвращает количество пересечений. */
+  getIntersections() {
     return this.movetree.getIntersections();
-  },
+  }
 
   /**
-   * Get the recommended quad-cropping for the bove tree. This is a display
-   * consideration, but the knowledge of how to crop is dependent on the
-   * movetree, so this method needs to live on the controller.
+   * Получает рекомендуемую обрезку квадранта для дерева ходов. Это
+   * соображение отображения, но знание о том, как обрезать, зависит от
+   * дерева ходов, поэтому этот метод должен жить в контроллере.
    *
-   * @return {glift.enums.boardRegions} The recommend board region to use.
+   * @return {string} Рекомендуемый регион доски для использования.
    */
-  getQuadCropFromBeginning: function () {
-    return glift.orientation.getQuadCropFromMovetree(
-      /** @type {!glift.rules.MoveTree} */ (this.movetree)
-    );
-  },
+  getQuadCropFromBeginning() {
+    return orientation.getQuadCropFromMovetree(this.movetree);
+  }
 
   /**
-   * Gets the set of correct next moves. This should only apply to problem-based
-   * widgets
+   * Получает набор правильных следующих ходов. Это должно применяться только к
+   * виджетам на основе задач.
    *
-   * @return {!Array<!glift.rules.Move>}
+   * @return {!Array<!Object>}
    */
-  getCorrectNextMoves: function () {
-    return glift.rules.problems.correctNextMoves(
-      /** @type {!glift.rules.MoveTree} */ (this.movetree),
+  getCorrectNextMoves() {
+    return rules.problems.correctNextMoves(
+      this.movetree,
       this.problemConditions
     );
-  },
+  }
 
   /**
-   * Get the Next move in the game.  If the player has already traversed a path,
-   * then we follow this previous path.
+   * Получает следующий ход в игре. Если игрок уже прошел путь,
+   * то мы следуем этому предыдущему пути.
    *
-   * If varNum is undefined, we try to 'guess' the next move based on the
-   * contents of the treepath.
+   * Если varNum не определен, мы пытаемся 'угадать' следующий ход на основе
+   * содержимого treepath.
    *
-   * Proceed to the next move.  This is slightly trickier than you might
-   * imagine:
-   *   - We need to either add to the Movetree or, if the movetree is readonly,
-   *     we need to make sure the move/node exists.
-   *   - We need to update the Goban.
-   *   - We need to store the captures.
-   *   - We need to update the current move number.
+   * Переходит к следующему ходу. Это немного сложнее, чем вы могли бы
+   * представить:
+   *   - Нам нужно либо добавить к Movetree, либо, если movetree только для чтения,
+   *     нам нужно убедиться, что ход/узел существует.
+   *   - Нам нужно обновить Goban.
+   *   - Нам нужно сохранить захваты.
+   *   - Нам нужно обновить текущий номер хода.
    *
    * @param {number=} opt_varNum
    *
-   * @return {?glift.flattener.Flattened} The flattened representation or null
-   *    if there is no next move.
+   * @return {?Object} Уплощенное представление или null,
+   *    если нет следующего хода.
    */
-  nextMove: function (opt_varNum) {
+  nextMove(opt_varNum) {
     if (
       this.treepath[this.currentMoveNumber()] !== undefined &&
       (opt_varNum === undefined || this.nextVariationNumber() === opt_varNum)
     ) {
-      // If possible, we prefer taking the route defined by a previously
-      // traversed treepath. In otherwords, don't mess with the treepath, if
-      // we're 'on variation'.
+      // Если возможно, мы предпочитаем идти по маршруту, определенному ранее
+      // пройденным treepath. Другими словами, не трогайте treepath, если
+      // мы 'на вариации'.
       this.movetree.moveDown(this.nextVariationNumber());
     } else {
-      // There is no existing treepath.
-      var varNum = opt_varNum === undefined ? 0 : opt_varNum;
+      // Нет существующего treepath.
+      const varNum = opt_varNum === undefined ? 0 : opt_varNum;
       if (varNum >= 0 && varNum <= this.movetree.nextMoves().length - 1) {
-        // We prefer taking 'move' nodes over nonmove nodes.
+        // Мы предпочитаем брать узлы 'хода' вместо узлов не-хода.
         this.setNextVariation(varNum);
         this.movetree.moveDown(varNum);
       } else {
-        // There were no 'moves' available. However, it's possible there is some
-        // node next that doesn't have a move.
+        // Не было доступных 'ходов'. Однако, возможно, есть
+        // следующий узел, который не имеет хода.
         if (this.movetree.node().numChildren() > 0) {
           this.setNextVariation(varNum);
           this.movetree.moveDown(varNum);
         } else {
-          return null; // No moves available
+          return null; // Нет доступных ходов
         }
       }
     }
-    var clears = this.goban.applyClearLocationsFromMovetree(this.movetree);
-    var captures = this.goban.loadStonesFromMovetree(this.movetree);
+    const clears = this.goban.applyClearLocationsFromMovetree(this.movetree);
+    const captures = this.goban.loadStonesFromMovetree(this.movetree);
     this.koHistory.push(this.goban.getKo());
     this.captureHistory.push(captures);
     this.clearHistory.push(clears);
     return this.flattenedState();
-  },
+  }
 
   /**
-   * Go back a move.
-   * @return {?glift.flattener.Flattened} The flattened representation or null
-   *    if there is no previous move.
+   * Возвращается на ход назад.
+   * @return {?Object} Уплощенное представление или null,
+   *    если нет предыдущего хода.
    */
-  prevMove: function () {
+  prevMove() {
     if (this.currentMoveNumber() === 0) {
       return null;
     }
-    var captures = this.getCaptures();
-    var clears = this.clearHistory[this.clearHistory.length - 1] || [];
-    var allCurrentStones = this.movetree.properties().getAllStones();
+    const captures = this.getCaptures();
+    const clears = this.clearHistory[this.clearHistory.length - 1] || [];
+    const allCurrentStones = this.movetree.properties().getAllStones();
     this.captureHistory = this.captureHistory.slice(
       0,
       this.captureHistory.length - 1
@@ -485,11 +494,11 @@ glift.controllers.BaseController.prototype = {
       this.clearHistory.length - 1
     );
     this.unloadStonesFromGoban_(allCurrentStones, captures);
-    for (var i = 0; i < clears.length; i++) {
-      var move = clears[i];
+    for (let i = 0; i < clears.length; i++) {
+      const move = clears[i];
       if (move.point === undefined) {
         throw new Error(
-          'Unexpected error! Clear history moves must have points.'
+          'Неожиданная ошибка! Ходы истории очистки должны иметь точки.'
         );
       }
       this.goban.setColor(move.point, move.color);
@@ -498,67 +507,84 @@ glift.controllers.BaseController.prototype = {
     this.movetree.moveUp();
     this.koHistory.pop();
     if (this.koHistory.length) {
-      var ko = this.koHistory[this.koHistory.length - 1];
+      const ko = this.koHistory[this.koHistory.length - 1];
       if (ko) {
         this.goban.setKo(ko);
       }
     }
     return this.flattenedState();
-  },
+  }
 
   /**
-   * Go back to the beginning.
-   * @return {!glift.flattener.Flattened} The flattened representation.
+   * Возвращается к началу.
+   * @return {!Object} Уплощенное представление.
    */
-  toBeginning: function () {
+  toBeginning() {
     this.movetree = this.movetree.getTreeFromRoot();
-    this.goban = glift.rules.goban.getFromMoveTree(this.movetree, []).goban;
+    this.goban = rules.goban.getFromMoveTree(this.movetree, []).goban;
     this.captureHistory = [];
     this.clearHistory = [];
     this.koHistory = [];
     return this.flattenedState();
-  },
+  }
 
   /**
-   * Go to the end.
-   * @return {!glift.flattener.Flattened} The flattened representation
+   * Переходит к концу.
+   * @return {!Object} Уплощенное представление
    */
-  toEnd: function () {
+  toEnd() {
     while (this.nextMove()) {
-      // All the action happens in nextMoveNoState.
+      // Все действия происходят в nextMoveNoState.
     }
     return this.flattenedState();
-  },
+  }
+
+  /**
+   * Обрабатывает клик на точку доски.
+   * @param {!Object} pt - Точка на доске
+   * @return {boolean} Успешность обработки
+   */
+  handleClick(pt) {
+    return false;
+  }
+
+  /**
+   * Обновляет отображение игровой доски.
+   * @return {!BaseController}
+   */
+  updateBoard() {
+    return this;
+  }
 
   /// //////////////////
-  // Private Methods //
+  // Приватные методы //
   /// //////////////////
 
   /**
-   * Back out a movetree addition (used for going back a move).
+   * Отменяет добавление дерева ходов (используется для возврата на ход назад).
    *
-   * @param {!glift.rules.MoveCollection} stones
-   * @param {!glift.rules.CaptureResult} captures
+   * @param {!Object} stones
+   * @param {!Object} captures
    *
    * @private
    */
-  unloadStonesFromGoban_: function (stones, captures) {
-    for (var color in stones) {
-      var c = /** @type {glift.enums.states} */ (color);
-      var arr = /** @type {!Array<!glift.rules.Move>} */ (stones[c]);
-      for (var j = 0; j < arr.length; j++) {
-        var move = arr[j];
+  unloadStonesFromGoban_(stones, captures) {
+    for (const color in stones) {
+      const c = color;
+      const arr = stones[c];
+      for (let j = 0; j < arr.length; j++) {
+        const move = arr[j];
         if (move.point) {
           this.goban.clearStone(move.point);
         }
       }
     }
-    for (var captureColor in captures) {
-      var captureC = /** @type {glift.enums.states} */ (captureColor);
-      var captureArr = /** @type {!Array<!glift.Point>} */ (captures[captureC]);
-      for (var i = 0; i < captureArr.length; i++) {
+    for (const captureColor in captures) {
+      const captureC = captureColor;
+      const captureArr = captures[captureC];
+      for (let i = 0; i < captureArr.length; i++) {
         this.goban.addStone(captureArr[i], captureC);
       }
     }
-  },
-};
+  }
+}

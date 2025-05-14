@@ -1,25 +1,39 @@
-goog.provide('glift.displays.statusbar.InfoWindow');
+/**
+ * Модуль информационного окна для статусбара.
+ * @module displays/statusbar/info_window
+ */
+
+import { selectId, absBboxDiv, newDiv } from '../../dom/index.js';
+import { mergeObjects } from '../../util/index.js';
+import { platform } from '../../platform.js';
+import { keyMappings } from '../../key_mappings.js';
 
 /**
- * Creates an info window.  This isn't super useful on its own -- it's meant to
- * be populated with data.
+ * Создает информационное окно. Само по себе оно не очень полезно - 
+ * оно предназначено для заполнения данными.
+ * 
+ * @param {string} wrapperDivId ID обертывающего div-элемента
+ * @param {Object} bbox Ограничивающий прямоугольник
+ * @param {Object} theme Тема оформления
+ * @param {string} instanceId ID экземпляра
+ * @return {InfoWindow} Созданное информационное окно
  */
-glift.displays.statusbar.infoWindow = function (
+export function createInfoWindow(
   wrapperDivId,
   bbox,
   theme,
   instanceId
 ) {
-  var suffix = '_info_window',
-    newDivId = wrapperDivId + suffix + '_wrapper',
-    wrapperDivEl = glift.dom.elem(wrapperDivId),
-    fullBox = bbox;
+  const suffix = '_info_window';
+  const newDivId = wrapperDivId + suffix + '_wrapper';
+  const wrapperDivEl = selectId(wrapperDivId);
+  const fullBox = bbox;
 
-  var newDiv = glift.dom.absBboxDiv(fullBox, newDivId);
-  newDiv.css({ 'z-index': 100 }); // ensure on top.
+  const baseDiv = absBboxDiv(fullBox, newDivId);
+  baseDiv.css({ 'z-index': 100 }); // убедиться, что окно отображается поверх
 
-  var textDiv = glift.dom.newDiv(wrapperDivId + suffix + '_textdiv');
-  var textDivCss = glift.util.obj.flatMerge(
+  const textDiv = newDiv(wrapperDivId + suffix + '_textdiv');
+  const textDivCss = mergeObjects(
     {
       position: 'relative',
       margin: '0px',
@@ -34,57 +48,61 @@ glift.displays.statusbar.infoWindow = function (
   );
   textDiv.css(textDivCss);
 
-  var exitScreen = function () {
-    newDiv.remove();
+  const exitScreen = function () {
+    baseDiv.remove();
   };
 
-  if (glift.platform.isMobile()) {
+  if (platform.isMobile()) {
     textDiv.on('touchend', exitScreen);
   } else {
     textDiv.on('click', exitScreen);
   }
 
-  var oldEscAction = glift.keyMappings.getFuncOrIcon(instanceId, 'ESCAPE');
-  glift.keyMappings.registerKeyAction(instanceId, 'ESCAPE', function () {
+  const oldEscAction = keyMappings.getFuncOrIcon(instanceId, 'ESCAPE');
+  keyMappings.registerKeyAction(instanceId, 'ESCAPE', function () {
     exitScreen();
     if (oldEscAction) {
-      glift.keyMappings.registerKeyAction(instanceId, 'ESCAPE', oldEscAction);
+      keyMappings.registerKeyAction(instanceId, 'ESCAPE', oldEscAction);
     }
   });
-  return new glift.displays.statusbar.InfoWindow(wrapperDivEl, newDiv, textDiv);
-};
+  return new InfoWindow(wrapperDivEl, baseDiv, textDiv);
+}
 
 /**
- * Info Window wrapper class.
- *
- * @package
- * @constructor @final @struct
+ * Класс обертки информационного окна.
  */
-glift.displays.statusbar.InfoWindow = function (
-  wrapperDiv,
-  baseStatusDiv,
-  textDiv
-) {
+export class InfoWindow {
   /**
-   * Div that wraps both the baseDiv and the Text Div
+   * @param {Object} wrapperDiv Div-элемент, который оборачивает как baseDiv, так и textDiv
+   * @param {Object} baseStatusDiv Div-элемент, который определяет все размеры и z-index
+   * @param {Object} textDiv Div-элемент, в котором пользователи размещают контент
    */
-  this.wrapperDiv_ = wrapperDiv;
+  constructor(wrapperDiv, baseStatusDiv, textDiv) {
+    /**
+     * Div-элемент, который оборачивает как baseDiv, так и textDiv
+     * @private
+     */
+    this.wrapperDiv_ = wrapperDiv;
 
-  /**
-   * Div that defines all the dimensions and z-index
+    /**
+     * Div-элемент, который определяет все размеры и z-index
+     * @private
+     */
+    this.baseStatusDiv_ = baseStatusDiv;
+
+    /**
+     * Div-элемент, в котором пользователи размещают контент
+     */
+    this.textDiv = textDiv;
+  }
+
+  /** 
+   * Завершает информационное окно, присоединяя все элементы. 
+   * @return {InfoWindow} this
    */
-  this.baseStatusDiv_ = baseStatusDiv;
-
-  /**
-   * Div where users are expected to put centent.
-   */
-  this.textDiv = textDiv;
-};
-
-glift.displays.statusbar.InfoWindow.prototype = {
-  /** Finishes the Info Window by attaching all the elements. */
-  finish: function () {
+  finish() {
     this.baseStatusDiv_.append(this.textDiv);
     this.wrapperDiv_.prepend(this.baseStatusDiv_);
-  },
-};
+    return this;
+  }
+}

@@ -1,90 +1,95 @@
-goog.provide('glift.api.IconActions');
-goog.provide('glift.api.IconDef');
-goog.provide('glift.api.IconFn');
+/**
+ * Модуль действий с иконками для библиотеки Glift.
+ * @module api/icon_actions
+ */
 
 /**
- * A typedef representing an action performed on the Go Board itself (clicking,
- * hovering, etc.)
+ * Определение типа для функции обработки действий с иконками.
+ * Представляет действие, которое может быть выполнено при взаимодействии с иконкой.
  *
  * @typedef {function(
  *  !Event,
- *  !glift.widgets.BaseWidget,
- *  !glift.displays.icons.WrappedIcon,
- *  !glift.displays.icons.IconBar)
- * }
+ *  !Object,
+ *  !Object,
+ *  !Object
+ * )} IconFn
  */
+export const IconFn = {}; // Только для документации, не используется
 
 /**
- * An icon definition.
+ * Определение иконки.
+ * 
  * @typedef {{
- *  click: (!glift.api.IconFn|undefined),
+ *  click: (IconFn|undefined),
  *  tooltip: (string|undefined)
- * }}
+ * }} IconDef
  */
+export const IconDef = {}; // Только для документации, не используется
 
 /**
- * A collection of Icon Actions.
- * @typedef {!Object<string, glift.api.IconDef>}
+ * Коллекция действий иконок.
+ * @typedef {!Object<string, IconDef>} IconActions
  */
+export const IconActions = {}; // Только для документации, не используется
 
 /**
- * The actions for the icons (see glift.displays.svg.icons).
- * @type {!glift.api.IconActions}
+ * Действия для иконок (см. displays/icons/).
+ * @type {!IconActions}
  */
-glift.api.iconActionDefaults = {
+export const iconActionDefaults = {
   start: {
     click: function (event, widget, icon, iconBar) {
       widget.applyBoardData(widget.controller.toBeginning());
     },
-    tooltip: 'Go to the beginning',
+    tooltip: 'В начало',
   },
 
   end: {
     click: function (event, widget, icon, iconBar) {
       widget.applyBoardData(widget.controller.toEnd());
     },
-    tooltip: 'Go to the end',
+    tooltip: 'В конец',
   },
 
   arrowright: {
     click: function (event, widget, icon, iconBar) {
       widget.applyBoardData(widget.controller.nextMove());
     },
-    tooltip: 'Next move',
+    tooltip: 'Следующий ход',
   },
 
   arrowleft: {
     click: function (event, widget, icon, iconBar) {
       widget.applyBoardData(widget.controller.prevMove());
     },
-    tooltip: 'Previous move',
+    tooltip: 'Предыдущий ход',
   },
 
-  // Get next problem.
+  // Перейти к следующей задаче
   'chevron-right': {
     click: function (event, widget, icon, iconBar) {
       widget.manager.nextSgf();
     },
-    tooltip: 'Next panel',
+    tooltip: 'Следующая панель',
   },
 
-  // Get the previous problem.
+  // Перейти к предыдущей задаче
   'chevron-left': {
     click: function (event, widget, icon, iconBar) {
       widget.manager.prevSgf();
     },
-    tooltip: 'Previous panel',
+    tooltip: 'Предыдущая панель',
   },
 
-  // Try again
+  // Попробовать снова
   refresh: {
     click: function (event, widget, icon, iconBar) {
       widget.reload();
     },
-    tooltip: 'Try the problem again',
+    tooltip: 'Попробовать задачу снова',
   },
 
-  // Undo for just problems (i.e., back one move).
+  // Отменить только для задач (т.е. вернуться на один ход назад)
   'undo-problem-move': {
     click: function (event, widget, icon, iconBar) {
       if (
@@ -95,8 +100,8 @@ glift.api.iconActionDefaults = {
       }
 
       if (widget.initialPlayerColor === widget.controller.getCurrentPlayer()) {
-        // If it's our move, then the last move was by the opponent -- we need
-        // an extra move backwards.
+        // Если сейчас наш ход, то последний ход был сделан противником -- нам нужно
+        // сделать дополнительный ход назад.
         widget.applyBoardData(widget.controller.prevMove());
       }
 
@@ -105,12 +110,15 @@ glift.api.iconActionDefaults = {
         widget.initialMoveNumber ===
         widget.controller.movetree.node().getNodeNum()
       ) {
-        // We're at the root.  We can assume correctness, so reset the widget.
+        // Мы в корне. Можем считать решение верным, поэтому перезагружаем виджет.
         widget.reload();
       } else {
-        var problemResults = glift.enums.problemResults;
-        var correctness = widget.controller.correctnessStatus();
-        widget.iconBar.destroyTempIcons();
+        const problemResults = widget.sgfOptions.problemResults || {
+          CORRECT: 'CORRECT',
+          INCORRECT: 'INCORRECT'
+        };
+        const correctness = widget.controller.correctnessStatus();
+        widget.iconBar.clearTempIcons();
         if (correctness === problemResults.CORRECT) {
           widget.iconBar.setCenteredTempIcon(
             'multiopen-boxonly',
@@ -119,7 +127,7 @@ glift.api.iconActionDefaults = {
           );
           widget.correctness = problemResults.CORRECT;
         } else if (correctness === problemResults.INCORRECT) {
-          widget.iconBar.destroyTempIcons();
+          widget.iconBar.clearTempIcons();
           widget.iconBar.setCenteredTempIcon(
             'multiopen-boxonly',
             'cross',
@@ -129,47 +137,48 @@ glift.api.iconActionDefaults = {
         }
       }
     },
-    tooltip: 'Undo last move attempt',
+    tooltip: 'Отменить последнюю попытку хода',
   },
 
   undo: {
     click: function (event, widget, icon, iconBar) {
       widget.manager.returnToOriginalWidget();
     },
-    tooltip: 'Return to the parent widget',
+    tooltip: 'Вернуться к родительскому виджету',
   },
 
   'jump-left-arrow': {
     click: function (event, widget, icon, iconBar) {
-      var maxMoves = 20;
+      const maxMoves = 20;
       widget.applyBoardData(
         widget.controller.previousCommentOrBranch(maxMoves)
       );
     },
-    tooltip: 'Previous branch or comment',
+    tooltip: 'Предыдущая ветка или комментарий',
   },
 
   'jump-right-arrow': {
     click: function (event, widget, icon, iconBar) {
-      var maxMoves = 20;
+      const maxMoves = 20;
       widget.applyBoardData(widget.controller.nextCommentOrBranch(maxMoves));
     },
-    tooltip: 'Previous branch or comment',
+    tooltip: 'Следующая ветка или комментарий',
   },
 
-  // Go to the explain-board for a problem.
-  // (was roadmap)
+  // Перейти к объяснению задачи
   'problem-explanation': {
     click: function (event, widget, icon, iconBar) {
-      var manager = widget.manager;
-      var sgfObj = {
-        widgetType: glift.WidgetType.GAME_VIEWER,
+      const manager = widget.manager;
+      const showVariations = widget.sgfOptions.showVariations || {
+        ALWAYS: 'ALWAYS'
+      };
+      const sgfObj = {
+        widgetType: 'GAME_VIEWER',
         initialPosition: widget.controller.initialPosition,
         sgfString: widget.controller.originalSgf(),
-        showVariations: glift.enums.showVariations.ALWAYS,
-        problemConditions: glift.util.simpleClone(
-          widget.sgfOptions.problemConditions
-        ),
+        showVariations: showVariations.ALWAYS,
+        problemConditions: widget.sgfOptions.problemConditions ?
+            JSON.parse(JSON.stringify(widget.sgfOptions.problemConditions)) : undefined,
         icons: [
           'jump-left-arrow',
           'jump-right-arrow',
@@ -182,22 +191,23 @@ glift.api.iconActionDefaults = {
       };
       manager.createTemporaryWidget(sgfObj);
     },
-    tooltip: 'Explore the solution',
+    tooltip: 'Изучить решение',
   },
 
   multiopen: {
     click: function (event, widget, icon, iconBar) {
-      var ic = glift.displays.icons.iconSelector(
+      const ic = widget.display.createIconSelector(
         widget.wrapperDivId,
         iconBar.divId,
         icon
       );
       ic.setIconEvents('click', function (event, wrappedIcon) {
-        var multi = iconBar.getIcon('multiopen');
+        const multi = iconBar.getIcon('multiopen');
         multi.setActive(wrappedIcon.iconName);
         iconBar.setCenteredTempIcon('multiopen', multi.getActive(), 'black');
       });
     },
+    tooltip: 'Открыть меню опций',
   },
 
   'multiopen-boxonly': {
@@ -231,24 +241,35 @@ glift.api.iconActionDefaults = {
 
   fullscreen: {
     click: function (event, widget, icon, iconBar) {
-      widget.statusBar && widget.statusBar.fullscreen();
+      widget.manager.enableFullscreen();
     },
-    tooltip: 'Expand display to fill entire screen.',
+    tooltip: 'Включить полноэкранный режим',
   },
 
   unfullscreen: {
     click: function (event, widget, icon, iconBar) {
-      // We need to stop event propagation because often the un-fullscreen
-      // button will be over some other clickable element.
-      event.preventDefault && event.preventDefault();
-      event.stopPropagation && event.stopPropagation();
-      widget.statusBar && widget.statusBar.unfullscreen();
+      widget.manager.disableFullscreen();
     },
-    tooltip: 'Return display original size.',
+    tooltip: 'Выйти из полноэкранного режима',
   },
 
   'settings-wrench': {
     click: function () {},
     tooltip: 'Show Glift Settings',
+  },
+
+  // Rotation arrows
+  'twistleft-boxonly': {
+    click: function (event, widget, icon, iconBar) {
+      widget.manager.rotation((widget.sgfOptions.rotation || 0) + 90);
+    },
+    tooltip: 'Повернуть доску против часовой стрелки',
+  },
+
+  'twistright-boxonly': {
+    click: function (event, widget, icon, iconBar) {
+      widget.manager.rotation((widget.sgfOptions.rotation || 0) - 90);
+    },
+    tooltip: 'Повернуть доску по часовой стрелке',
   },
 };

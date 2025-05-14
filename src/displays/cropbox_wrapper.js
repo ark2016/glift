@@ -1,143 +1,150 @@
-goog.provide('glift.displays.cropbox');
-goog.provide('glift.displays.DisplayCropBox');
+/**
+ * Модуль для работы с областью обрезки (кропбоксом) доски.
+ * @module displays/cropbox
+ */
 
-glift.displays.cropbox = {
-  /** @const */
-  OVERFLOW: 0.5, // The line spacing that goes around the edge.
+import { orientation } from '../orientation/index.js';
+import { point } from '../util/index.js';
 
-  /** @const */
-  CROP_PAD: 0.5, // The extra padding for the cropped-edges.
+/** @const */
+export const OVERFLOW = 0.5; // Расстояние между линиями, которое окружает край.
 
-  /**
-   * Creates a cropbox based on a region, the number of intersections, and a
-   * true/false flag for drawing the board coordinates.
-   *
-   * @param {glift.enums.boardRegions} region
-   * @param {number} intersects Number of intersections for the Go board.
-   * @param {boolean=} opt_drawBoardCoords Whether or not to draw board coordinates.
-   *    Optional: Defaults to false.
-   */
-  getFromRegion: function (region, intersects, opt_drawBoardCoords) {
-    var cropbox = glift.orientation.cropbox.get(region, intersects);
-    var drawBoardCoords = opt_drawBoardCoords || false;
-    var maxIntersects = drawBoardCoords ? intersects + 2 : intersects;
-
-    var top = cropbox.bbox.top(),
-      bottom = cropbox.bbox.bottom(),
-      left = cropbox.bbox.left(),
-      right = cropbox.bbox.right();
-    if (drawBoardCoords) {
-      bottom += 2;
-      right += 2;
-    }
-
-    var cx = new glift.orientation.Cropbox(
-      glift.orientation.bbox.fromPts(
-        glift.util.point(left, top),
-        glift.util.point(right, bottom)
-      ),
-      maxIntersects
-    );
-    return new glift.displays.DisplayCropBox(cx, cropbox, drawBoardCoords);
-  },
-};
+/** @const */
+export const CROP_PAD = 0.5; // Дополнительный отступ для обрезанных краев.
 
 /**
- * A cropbox is similar to a bounding box, but instead of a box based on pixels,
- * it's a box based on points.
+ * Создает кропбокс на основе региона, количества пересечений 
+ * и флага для отображения координат доски.
  *
- * @param {!glift.orientation.Cropbox} cbox The wrapped Cropbox.
- * @param {!glift.orientation.Cropbox} cboxNoCoords The cropbox without the
- *    coordinate-labels.
- * @param {boolean} drawBoardCoords
- *
- * @constructor
+ * @param {string} region Регион доски
+ * @param {number} intersects Количество пересечений для доски Го.
+ * @param {boolean=} opt_drawBoardCoords Отображать ли координаты доски.
+ *    Опционально: По умолчанию false.
+ * @return {!DisplayCropBox} Объект области обрезки с настройками отображения
  */
-glift.displays.DisplayCropBox = function (cbox, cboxNoCoords, drawBoardCoords) {
-  /** @private {!glift.orientation.Cropbox} */
-  this.cbox_ = cbox;
+export function getFromRegion(region, intersects, opt_drawBoardCoords) {
+  const cropbox = orientation.cropbox.get(region, intersects);
+  const drawBoardCoords = opt_drawBoardCoords || false;
+  const maxIntersects = drawBoardCoords ? intersects + 2 : intersects;
 
-  /** @private {!glift.orientation.Cropbox} */
-  this.cboxNoCoords_ = cboxNoCoords;
+  let top = cropbox.bbox.top(),
+    bottom = cropbox.bbox.bottom(),
+    left = cropbox.bbox.left(),
+    right = cropbox.bbox.right();
+    
+  if (drawBoardCoords) {
+    bottom += 2;
+    right += 2;
+  }
 
-  /** @private {boolean} */
-  this.drawCoords_ = drawBoardCoords;
-};
+  const cx = new orientation.Cropbox(
+    orientation.bbox.fromPts(
+      point(left, top),
+      point(right, bottom)
+    ),
+    maxIntersects
+  );
+  
+  return new DisplayCropBox(cx, cropbox, drawBoardCoords);
+}
 
-glift.displays.DisplayCropBox.prototype = {
+/**
+ * Кропбокс аналогичен ограничивающему прямоугольнику, но вместо прямоугольника, 
+ * основанного на пикселях, это прямоугольник, основанный на точках.
+ */
+export class DisplayCropBox {
   /**
-   * Returns the cbox, which may include coordinate labels. The cbox is a
-   * bounding box that describes what points on the go board should be
-   * displayed. Generally, both the width and height of the cbox must be
-   * between 0 (exclusive) and maxIntersects (inclusive), but could be +2 on
-   * each side if there are labels.
-   *
-   * @return {!glift.orientation.Cropbox}
+   * @param {!Object} cbox Обернутый кропбокс.
+   * @param {!Object} cboxNoCoords Кропбокс без меток координат.
+   * @param {boolean} drawBoardCoords Отображать ли координаты доски.
    */
-  cbox: function () {
+  constructor(cbox, cboxNoCoords, drawBoardCoords) {
+    /** @private {!Object} */
+    this.cbox_ = cbox;
+
+    /** @private {!Object} */
+    this.cboxNoCoords_ = cboxNoCoords;
+
+    /** @private {boolean} */
+    this.drawCoords_ = drawBoardCoords;
+  }
+
+  /**
+   * Возвращает cbox, который может включать метки координат. Cbox - это
+   * ограничивающий прямоугольник, описывающий, какие точки на доске го должны быть
+   * отображены. Обычно и ширина, и высота кропбокса должны быть
+   * между 0 (исключительно) и maxIntersects (включительно), но могут быть +2 с
+   * каждой стороны, если есть метки.
+   *
+   * @return {!Object}
+   */
+  cbox() {
     return this.cbox_;
-  },
+  }
 
   /**
-   * Returns the bounding box without the coordinate labels.
-   * @return {!glift.orientation.BoundingBox}
+   * Возвращает ограничивающий прямоугольник без меток координат.
+   * @return {!Object}
    */
-  bboxWithoutCoords: function () {
+  bboxWithoutCoords() {
     return this.cboxNoCoords_.bbox;
-  },
+  }
 
   /**
-   * Returns the bbox for the cropbox.
-   * @return {!glift.orientation.BoundingBox}
+   * Возвращает bbox для кропбокса.
+   * @return {!Object}
    */
-  bbox: function () {
+  bbox() {
     return this.cbox_.bbox;
-  },
+  }
 
   /**
-   * The extra padding is a special modification for cropped boards. It makes
-   * cropped boards look a little nicer to have consistent whitespace around
-   * the edge of the board. This adds a lot of complexity, but the result is
-   * much nicer-looking.
+   * Дополнительный отступ - это специальная модификация для обрезанных досок. Он делает
+   * обрезанные доски немного красивее, обеспечивая постоянное пустое пространство вокруг
+   * края доски. Это добавляет много сложности, но результат выглядит
+   * намного лучше.
    *
    * @return {number}
    * @private
    */
-  topPad_: function () {
+  topPad_() {
     return this.cbox_.hasRaggedTop() ? this.croppedEdgePadding() : 0;
-  },
+  }
+  
   /**
    * @return {number}
    * @private
    */
-  botPad_: function () {
+  botPad_() {
     return this.cbox_.hasRaggedBottom() ? this.croppedEdgePadding() : 0;
-  },
+  }
+  
   /**
    * @return {number}
    * @private
    */
-  leftPad_: function () {
+  leftPad_() {
     return this.cbox_.hasRaggedLeft() ? this.croppedEdgePadding() : 0;
-  },
+  }
+  
   /**
    * @return {number}
    * @private
    */
-  rightPad_: function () {
+  rightPad_() {
     return this.cbox_.hasRaggedRight() ? this.croppedEdgePadding() : 0;
-  },
+  }
 
   /**
-   * Returns the number of 'intersections' we need to allocate for the height.
-   * This includes the intersections for the board, the extra 2 intersections
-   * (possibly) for the board coordinates, and any intersections (perhaps
-   * fractional) needed for padding.
+   * Возвращает количество 'пересечений', которые нам нужно выделить для высоты.
+   * Это включает пересечения для доски, дополнительные 2 пересечения
+   * (возможно) для координат доски и любые пересечения (возможно
+   * дробные), необходимые для отступов.
    *
    * @return {number}
    */
-  widthIntersections: function () {
-    // We need to add 1 since the bbox is 0-indexed, ranging from 0 to 18
+  widthIntersections() {
+    // Нам нужно добавить 1, так как bbox начинается с 0, в диапазоне от 0 до 18
     return (
       this.cbox().bbox.width() +
       1 +
@@ -145,11 +152,11 @@ glift.displays.DisplayCropBox.prototype = {
       this.leftPad_() +
       this.rightPad_()
     );
-  },
+  }
 
   /** @return {number} */
-  heightIntersections: function () {
-    // We need to add 1 since the bbox is 0-indexed, ranging from 0 to 18
+  heightIntersections() {
+    // Нам нужно добавить 1, так как bbox начинается с 0, в диапазоне от 0 до 18
     return (
       this.cbox().bbox.height() +
       1 +
@@ -157,15 +164,74 @@ glift.displays.DisplayCropBox.prototype = {
       this.topPad_() +
       this.botPad_()
     );
-  },
+  }
 
   /** @return {number} */
-  basePadding: function () {
-    return glift.displays.cropbox.OVERFLOW / 2;
-  },
+  basePadding() {
+    return OVERFLOW / 2;
+  }
 
   /** @return {number} */
-  croppedEdgePadding: function () {
-    return glift.displays.cropbox.CROP_PAD;
-  },
+  croppedEdgePadding() {
+    return CROP_PAD;
+  }
+  
+  /**
+   * Изменяет размер ограничивающего прямоугольника с учетом кропбокса.
+   * @param {!Object} bbox Ограничивающий прямоугольник
+   * @return {!Object} Измененный ограничивающий прямоугольник
+   */
+  resizedBox(bbox) {
+    // Реализация метода для изменения размера ограничивающего прямоугольника
+    const bWidth = bbox.width();
+    const bHeight = bbox.height();
+    const xAspect = this.widthIntersections();
+    const yAspect = this.heightIntersections();
+    
+    // Определяем соотношение сторон
+    let newWidth = bWidth;
+    let newHeight = bHeight;
+    const xScale = newWidth / xAspect;
+    const yScale = newHeight / yAspect;
+    
+    // Выбираем наименьший масштаб для сохранения пропорций
+    const minScale = Math.min(xScale, yScale);
+    newWidth = xAspect * minScale;
+    newHeight = yAspect * minScale;
+    
+    // Вычисляем отступы для центрирования
+    const leftOffset = (bWidth - newWidth) / 2;
+    const topOffset = (bHeight - newHeight) / 2;
+    
+    // Создаем новый ограничивающий прямоугольник
+    return orientation.bbox.fromPts(
+      point(bbox.topLeft().x() + leftOffset, bbox.topLeft().y() + topOffset),
+      point(
+        bbox.topLeft().x() + leftOffset + newWidth,
+        bbox.topLeft().y() + topOffset + newHeight
+      )
+    );
+  }
+  
+  /**
+   * Возвращает расстояние между пересечениями.
+   * @param {!Object} bbox Ограничивающий прямоугольник
+   * @return {number} Расстояние между пересечениями
+   */
+  getSpacing(bbox) {
+    const width = bbox.width();
+    const fracWidth = width / this.widthIntersections();
+    const height = bbox.height();
+    const fracHeight = height / this.heightIntersections();
+    
+    // Выбираем наименьшее значение для согласованного отображения
+    return Math.min(fracWidth, fracHeight);
+  }
+}
+
+export const cropbox = {
+  OVERFLOW,
+  CROP_PAD,
+  getFromRegion,
+  DisplayCropBox
 };

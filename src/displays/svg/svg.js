@@ -1,4 +1,9 @@
-goog.provide('glift.displays.svg');
+/**
+ * Утилиты SVG для Glift.
+ * Пустой файл-оболочка для совместимости. 
+ * Функциональность перемещена в отдельные модули.
+ * @module displays/svg
+ */
 
-/** SVG utilities. */
-glift.displays.svg = {};
+// Экспорты будут из других файлов
+export {};

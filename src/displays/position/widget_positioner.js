@@ -1,22 +1,28 @@
-goog.provide('glift.displays.position.WidgetPositioner');
+/**
+ * Модуль для позиционирования виджетов в интерфейсе Glift.
+ * @module displays/position/widget_positioner
+ */
 
-goog.require('glift.displays.position.WidgetBoxes');
-goog.require('glift.displays.position.WidgetColumn');
+import { displays } from '../../displays/displays.js';
+import { enums } from '../../enums.js';
+import { orientation } from '../../orientation/orientation.js';
+import { util } from '../../util/util.js';
+import { BoardComponent } from '../../enums.js';
+import { WidgetBoxes, WidgetColumn } from './widget_boxes.js';
 
 /**
- * Find the optimal positioning of the widget. Returns the calculated div
- * boxes.
+ * Найти оптимальное позиционирование виджета. Возвращает рассчитанные div-боксы.
  *
- * divBox: The cropbox for the div.
- * boardRegion: The region of the go board that will be displayed.
- * intersections: The number of intersections (9-19, typically);
- * compsToUse: The board components requseted by the user
- * oneColSplits: The split percentages for a one-column format
- * twoColSplits: The split percentages for a two-column format
+ * divBox: Область обрезки для div.
+ * boardRegion: Регион доски Го, который будет отображаться.
+ * intersections: Количество пересечений (обычно 9-19);
+ * compsToUse: Компоненты доски, запрошенные пользователем
+ * oneColSplits: Проценты разделения для одноколоночного формата
+ * twoColSplits: Проценты разделения для двухколоночного формата
  *
- * @return {!glift.displays.position.WidgetPositioner} The widget positioner
+ * @return {!WidgetPositioner} Позиционер виджета
  */
-glift.displays.position.positioner = function (
+export function positioner(
   divBox,
   boardRegion,
   intersections,
@@ -27,7 +33,7 @@ glift.displays.position.positioner = function (
   if (!divBox) {
     throw new Error('No Div box. [' + divBox + ']');
   }
-  if (!boardRegion || !glift.enums.boardRegions[boardRegion]) {
+  if (!boardRegion || !enums.boardRegions[boardRegion]) {
     throw new Error('Invalid Board Region. [' + boardRegion + ']');
   }
   if (!intersections) {
@@ -39,7 +45,7 @@ glift.displays.position.positioner = function (
   if (!twoColSplits) {
     throw new Error('No two col splits. [' + twoColSplits + ']');
   }
-  return new glift.displays.position.WidgetPositioner(
+  return new WidgetPositioner(
     divBox,
     boardRegion,
     intersections,
@@ -47,117 +53,108 @@ glift.displays.position.positioner = function (
     oneColSplits,
     twoColSplits
   );
-};
+}
 
 /**
- * Internal widget positioner object
- *
- * @constructor @final @struct
+ * Внутренний объект позиционирования виджета
  */
-glift.displays.position.WidgetPositioner = function (
-  divBox,
-  boardRegion,
-  ints,
-  compsToUse,
-  oneColSplits,
-  twoColSplits
-) {
-  this.divBox = divBox;
-  this.boardRegion = boardRegion;
-  this.ints = ints;
-  this.compsToUse = compsToUse;
-  this.oneColSplits = oneColSplits;
-  this.twoColSplits = twoColSplits;
+export class WidgetPositioner {
+  constructor(divBox, boardRegion, ints, compsToUse, oneColSplits, twoColSplits) {
+    this.divBox = divBox;
+    this.boardRegion = boardRegion;
+    this.ints = ints;
+    this.compsToUse = compsToUse;
+    this.oneColSplits = oneColSplits;
+    this.twoColSplits = twoColSplits;
 
-  // Calculated values;
-  this.componentSet = this._getComponentSet();
-  this.cropbox = glift.displays.cropbox.getFromRegion(boardRegion, ints);
-};
+    // Вычисляемые значения
+    this.componentSet = this._getComponentSet();
+    this.cropbox = displays.cropbox.getFromRegion(boardRegion, ints);
+  }
 
-/** Methods for the Widget Positioner */
-glift.displays.position.WidgetPositioner.prototype = {
   /**
-   * Calculate the Widget Positioning.  This uses heuristics to determine if the
-   * orientation should be horizontally oriented or vertically oriented.
+   * Вычислить позиционирование виджета. Использует эвристику для определения,
+   * должна ли ориентация быть горизонтальной или вертикальной.
    *
-   * @return {!glift.displays.position.WidgetBoxes}
+   * @return {!WidgetBoxes}
    */
-  calcWidgetPositioning: function () {
+  calcWidgetPositioning() {
     if (this.useHorzOrientation()) {
       return this.calcHorzPositioning();
     } else {
       return this.calcVertPositioning();
     }
-  },
+  }
 
   /**
-   * Determines whether or not to use a horizontal orientation or vertical
-   * orientation.
-   * Returns: True or False
+   * Определяет, использовать ли горизонтальную ориентацию или вертикальную
+   * ориентацию.
+   * Возвращает: True или False
    */
-  useHorzOrientation: function () {
-    var divBox = this.divBox,
-      boardRegion = this.boardRegion,
-      componentSet = this.componentSet,
-      comps = glift.BoardComponent,
-      hwRatio = divBox.height() / divBox.width(),
-      longBoxRegions = { TOP: true, BOTTOM: true };
+  useHorzOrientation() {
+    const divBox = this.divBox;
+    const boardRegion = this.boardRegion;
+    const componentSet = this.componentSet;
+    const comps = BoardComponent;
+    const hwRatio = divBox.height() / divBox.width();
+    const longBoxRegions = { TOP: true, BOTTOM: true };
+    
     if (!componentSet[comps.COMMENT_BOX] || !componentSet[comps.BOARD]) {
-      return false; // Force vertical if no comment box or board.
+      return false; // Принудительно вертикально, если нет блока комментариев или доски
     } else if (hwRatio < 0.45 && longBoxRegions[boardRegion]) {
       return true;
     } else if (hwRatio < 0.8 && !longBoxRegions[boardRegion]) {
       return true;
     } else {
-      return false; // Default to vertical orientation
+      return false; // По умолчанию вертикальная ориентация
     }
-  },
+  }
 
   /**
-   * Calculates the Widget Positioning for a vertical orientation. returns a
-   * Widget Boxes
+   * Вычисляет позиционирование виджета для вертикальной ориентации.
+   * Возвращает Widget Boxes.
    *
-   * @return {!glift.displays.position.WidgetBoxes}
+   * @return {!WidgetBoxes}
    */
-  calcVertPositioning: function () {
-    var recalCol = this.recalcSplits(this.oneColSplits).first;
-    var boxes = new glift.displays.position.WidgetBoxes();
+  calcVertPositioning() {
+    const recalCol = this.recalcSplits(this.oneColSplits).first;
+    const boxes = new WidgetBoxes();
     boxes.setFirst(
       this.calculateColumn(
         recalCol,
         this.divBox,
-        glift.enums.boardAlignments.TOP,
+        enums.boardAlignments.TOP,
         0 /* startTop */
       )
     );
     return boxes;
-  },
+  }
 
   /**
-   * Position a widget horizontally, i.e.,
+   * Позиционировать виджет горизонтально, т.е.,
    * |   X   X   |
    *
-   * Since a resizedBox is designed to fill up either the h or w dimension. There
-   * are only three scenarios:
-   *  1. The GoBoardBox naturally touches the top & bottom
-   *  2. The GoBoardBox naturally touches the left & right
-   *  2. The GoBoardBox fits perfectly.
+   * Поскольку resizedBox предназначен для заполнения либо h, либо w размерности.
+   * Существуют только три сценария:
+   *  1. GoBoardBox естественно касается верха и низа
+   *  2. GoBoardBox естественно касается левой и правой стороны
+   *  3. GoBoardBox идеально подходит.
    *
-   * Note, we should never position horizontally for TOP and BOTTOM board regions.
+   * Примечание: мы никогда не должны позиционировать горизонтально для регионов доски TOP и BOTTOM.
    *
-   * returns: WidgetBoxes instance.
+   * возвращает: экземпляр WidgetBoxes.
    *
-   * @return {!glift.displays.position.WidgetBoxes}
+   * @return {!WidgetBoxes}
    */
-  calcHorzPositioning: function () {
-    var splits = this.recalcSplits(this.twoColSplits);
-    var horzSplits = this.splitDivBoxHoriz();
-    var boxes = new glift.displays.position.WidgetBoxes();
+  calcHorzPositioning() {
+    const splits = this.recalcSplits(this.twoColSplits);
+    const horzSplits = this.splitDivBoxHoriz();
+    const boxes = new WidgetBoxes();
     boxes.setFirst(
       this.calculateColumn(
         splits.first,
         horzSplits[0],
-        glift.enums.boardAlignments.RIGHT,
+        enums.boardAlignments.RIGHT,
         0 /* startTop */
       )
     );
@@ -170,41 +167,42 @@ glift.displays.position.WidgetPositioner.prototype = {
       )
     );
     return boxes;
-  },
+  }
 
   /**
-   * Calculate the a widget column.  General enough that it's used for vertical
-   * or horizontal positioning.
+   * Вычисляет столбец виджета. Достаточно общая функция, чтобы использовать ее
+   * для вертикального или горизонтального позиционирования.
    *
-   * Returns the completed WidgetColumn.
+   * Возвращает завершенный WidgetColumn.
    */
-  calculateColumn: function (recalCol, wrapperDiv, alignment, startTop) {
-    var top = startTop || 0;
-    var column = new glift.displays.position.WidgetColumn();
-    var components = glift.BoardComponent;
-    var divBoxSplits = [wrapperDiv];
-    var ratios = this._extractRatios(recalCol);
+  calculateColumn(recalCol, wrapperDiv, alignment, startTop) {
+    let top = startTop || 0;
+    const column = new WidgetColumn();
+    const components = BoardComponent;
+    let divBoxSplits = [wrapperDiv];
+    const ratios = this._extractRatios(recalCol);
     column.setOrderingFromRatioArray(recalCol);
+    
     if (ratios.length > 1) {
-      // We remove the last ratio, so we can be exact about the last component
-      // ratio because we assume that:
+      // Мы удаляем последнее соотношение, чтобы быть точными с последним компонентом
+      // соотношение, потому что мы предполагаем, что:
       // splitN.ratio = 1 - split1.ratio + split2.ratio + ... splitN-1.ratio.
       //
-      // This splits a div box into rows.
+      // Это разделяет div-бокс на строки.
       divBoxSplits = wrapperDiv.hSplit(ratios.slice(0, ratios.length - 1));
     }
 
-    // Map from component to split.
-    var splitMap = {};
-    for (var i = 0; i < recalCol.length; i++) {
+    // Сопоставление от компонента к разделению.
+    const splitMap = {};
+    for (let i = 0; i < recalCol.length; i++) {
       splitMap[recalCol[i].component] = divBoxSplits[i];
     }
 
-    var board = null;
-    // Reuse the environment calculations, if we have a board available.
+    let board = null;
+    // Повторно используем вычисления окружения, если у нас есть доступная доска.
     if (splitMap.BOARD) {
-      // We defer to the display calculations that come from the environment.
-      board = glift.displays.getResizedBox(
+      // Мы полагаемся на вычисления дисплея, которые приходят из окружения.
+      board = displays.getResizedBox(
         splitMap.BOARD,
         this.cropbox,
         alignment
@@ -212,16 +210,16 @@ glift.displays.position.WidgetPositioner.prototype = {
       column.setComponent(components.BOARD, board);
     }
 
-    var colWidth = board ? board.width() : wrapperDiv.width();
-    var colLeft = board ? board.left() : wrapperDiv.left();
+    const colWidth = board ? board.width() : wrapperDiv.width();
+    const colLeft = board ? board.left() : wrapperDiv.left();
     column.orderFn(function (comp) {
       if (comp === components.BOARD) {
         top += board.height();
         return;
       }
-      var split = splitMap[comp];
-      var bbox = glift.orientation.bbox.fromSides(
-        glift.util.point(colLeft, top),
+      const split = splitMap[comp];
+      const bbox = orientation.bbox.fromSides(
+        util.point(colLeft, top),
         colWidth,
         split.height()
       );
@@ -229,17 +227,16 @@ glift.displays.position.WidgetPositioner.prototype = {
       top += bbox.height();
     });
     return column;
-  },
+  }
 
   /**
-   * Recalculates the split percentages based on the components to use.  This
-   * works by figuring out the left over area (when pieces are disabled), and
-   * then apportioning it out based on the relative size of the other
-   * components.
+   * Пересчитывает проценты разделения на основе используемых компонентов.
+   * Это работает путем определения оставшейся области (когда части отключены)
+   * и затем распределяя ее на основе относительного размера других компонентов.
    *
-   * This is design to work with both one-column splits or two column splits.
+   * Это предназначено для работы как с одноколоночными, так и с двухколоночными разделениями.
    *
-   * Returns a recalculated splits mapping. Has the form:
+   * Возвращает пересчитанное отображение разделений. Имеет форму:
    * {
    *  first: [
    *    { component: BOARD, ratio: 0.3 },
@@ -248,23 +245,23 @@ glift.displays.position.WidgetPositioner.prototype = {
    *  second: [...]
    * }
    */
-  recalcSplits: function (columnSplits) {
-    var out = {};
-    var compsToUseSet = this.componentSet;
-    // Note: this is designed with the outer loop in this way to work with
-    // the one-col-split and two-col-split styles.
-    for (var colKey in columnSplits) {
-      // Grab array of component-ratio objs.
-      var col = columnSplits[colKey];
-      var colOut = [];
+  recalcSplits(columnSplits) {
+    const out = {};
+    const compsToUseSet = this.componentSet;
+    // Примечание: это разработано с внешним циклом таким образом, чтобы работать
+    // с one-col-split и two-col-split стилями.
+    for (const colKey in columnSplits) {
+      // Берем массив объектов component-ratio.
+      const col = columnSplits[colKey];
+      const colOut = [];
 
-      // Add up the unused pieces.
-      var total = 0;
-      for (var i = 0; i < col.length; i++) {
-        var part = col[i];
+      // Суммируем неиспользуемые части.
+      let total = 0;
+      for (let i = 0; i < col.length; i++) {
+        const part = col[i];
         if (compsToUseSet[part.component]) {
           colOut.push({
-            // perform a copy.
+            // выполняем копирование.
             component: part.component,
             ratio: part.ratio,
           });
@@ -272,69 +269,69 @@ glift.displays.position.WidgetPositioner.prototype = {
         }
       }
 
-      // Apportion the total amount so that the relative ratios are preserved.
-      for (var j = 0; j < colOut.length; j++) {
-        var outPart = colOut[j];
+      // Распределяем общую сумму так, чтобы относительные соотношения сохранялись.
+      for (let j = 0; j < colOut.length; j++) {
+        const outPart = colOut[j];
         outPart.ratio = outPart.ratio / total;
       }
       out[colKey] = colOut;
     }
     return out;
-  },
+  }
 
   /**
-   * Split the enclosing divbox horizontally.
+   * Разделить окружающий divbox по горизонтали.
    *
-   * Returns: [
+   * Возвращает: [
    *    Column 1 BBox,
    *    Column 2 Bbox
    * ]
    */
-  splitDivBoxHoriz: function () {
-    // Tentatively createa board box to see how much space it takes up.
-    var boardBox = glift.displays.getResizedBox(
+  splitDivBoxHoriz() {
+    // Предварительно создаем бокс доски, чтобы увидеть, сколько места он занимает.
+    const boardBox = displays.getResizedBox(
       this.divBox,
       this.cropbox,
-      glift.enums.boardAlignments.RIGHT
+      enums.boardAlignments.RIGHT
     );
 
-    // These are precentages of boardWidth.  We require that the right column be
-    // at last 1/2 go board width and at most 3/4 the go board width.
-    // TODO(kashomon): Make this configurable.
-    var minColPercent = 0.5;
-    var minColBoxSize = boardBox.width() * minColPercent;
-    var maxColPercent = 0.75;
-    var maxColBoxSize = boardBox.width() * maxColPercent;
-    var widthDiff = this.divBox.width() - boardBox.width();
+    // Это проценты от ширины доски. Мы требуем, чтобы правая колонка была
+    // не менее 1/2 ширины доски и не более 3/4 ширины доски.
+    // TODO(kashomon): Сделать это настраиваемым.
+    const minColPercent = 0.5;
+    const minColBoxSize = boardBox.width() * minColPercent;
+    const maxColPercent = 0.75;
+    const maxColBoxSize = boardBox.width() * maxColPercent;
+    const widthDiff = this.divBox.width() - boardBox.width();
 
-    // The boxPercentage is percentage of the width of the goboard that
-    // we want the right-side box to be.
-    var boxPercentage = maxColPercent;
+    // boxPercentage - это процент от ширины доски go, который
+    // мы хотим, чтобы правая сторона бокса была.
+    let boxPercentage = maxColPercent;
     if (widthDiff < minColBoxSize) {
       boxPercentage = minColPercent;
     } else if (widthDiff >= minColBoxSize && widthDiff < maxColBoxSize) {
       boxPercentage = widthDiff / boardBox.width();
     }
-    // Split percentage is how much we want to split the boxes by.
-    var desiredWidth = boxPercentage * boardBox.width();
-    var splitPercentage = boardBox.width() / (desiredWidth + boardBox.width());
-    var splits = this.divBox.vSplit([splitPercentage]);
+    // splitPercentage - это то, насколько мы хотим разделить боксы.
+    const desiredWidth = boxPercentage * boardBox.width();
+    const splitPercentage = boardBox.width() / (desiredWidth + boardBox.width());
+    const splits = this.divBox.vSplit([splitPercentage]);
 
-    // TODO(kashomon): This assumes a BOARD is the only element in the left
-    // column.
-    var resizedBox = glift.displays.getResizedBox(
+    // TODO(kashomon): Это предполагает, что BOARD - единственный элемент
+    // в левой колонке.
+    const resizedBox = displays.getResizedBox(
       splits[0],
       this.cropbox,
-      glift.enums.boardAlignments.RIGHT
+      enums.boardAlignments.RIGHT
     );
 
-    // Defer to the Go board height calculations.
-    var baseRightCol = glift.orientation.bbox.fromPts(
-      glift.util.point(splits[1].topLeft().x(), resizedBox.topLeft().y()),
-      glift.util.point(splits[1].botRight().x(), resizedBox.botRight().y())
+    // Опираемся на расчеты высоты доски Go.
+    let baseRightCol = orientation.bbox.fromPts(
+      util.point(splits[1].topLeft().x(), resizedBox.topLeft().y()),
+      util.point(splits[1].botRight().x(), resizedBox.botRight().y())
     );
 
-    // TODO(kashomon): Make max right col size configurable.
+    // TODO(kashomon): Сделать максимальный размер правой колонки настраиваемым.
     if (splits[1].width() > 0.75 * resizedBox.width()) {
       baseRightCol = baseRightCol.vSplit([
         (0.75 * resizedBox.width()) / baseRightCol.width(),
@@ -342,27 +339,27 @@ glift.displays.position.WidgetPositioner.prototype = {
     }
     splits[1] = baseRightCol;
     return splits;
-  },
+  }
 
   /// /////////////////////////
-  // Private helper methods //
+  // Приватные вспомогательные методы //
   /// /////////////////////////
 
-  /** Converts the components to use array into a set (object=>true/false). */
-  _getComponentSet: function () {
-    var out = {};
-    for (var i = 0; i < this.compsToUse.length; i++) {
+  /** Преобразует массив компонентов для использования в набор (объект=>true/false). */
+  _getComponentSet() {
+    const out = {};
+    for (let i = 0; i < this.compsToUse.length; i++) {
       out[this.compsToUse[i]] = true;
     }
     return out;
-  },
+  }
 
-  /** Extracts ratios from either the one-col splits or two col-splits. */
-  _extractRatios: function (column) {
-    var out = [];
-    for (var i = 0; i < column.length; i++) {
+  /** Извлекает соотношения из одноколоночных или двухколоночных разделений. */
+  _extractRatios(column) {
+    const out = [];
+    for (let i = 0; i < column.length; i++) {
       out.push(column[i].ratio);
     }
     return out;
-  },
-};
+  }
+}

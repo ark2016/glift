@@ -1,30 +1,36 @@
-goog.provide('glift.themes.registered.COLORFUL');
+/**
+ * Тема оформления "Colorful" для Glift.
+ * Красочная тема, используемая для отладки.
+ * 
+ * @module themes/colorful
+ */
+
+import { baseTheme } from './base_theme.js';
 
 /**
- * A colorful theme used for debugging.
- *
- * @extends {glift.themes.base}
+ * Настройки темы Colorful
  */
-glift.themes.registered.COLORFUL = {
+export const COLORFUL = {
+  ...baseTheme,
   board: {
-    fill: '#f5be7e',
+    ...baseTheme.board,
+    fill: '#f5be7e'
   },
-
   commentBox: {
+    ...baseTheme.comment,
     css: {
       background: '#CCF',
-      border: '1px solid',
-    },
+      border: '1px solid'
+    }
   },
-
   icons: {
     DEFAULT: {
       fill: 'blue',
-      stroke: 'none',
+      stroke: 'none'
     },
     DEFAULT_HOVER: {
       fill: 'red',
-      stroke: 'none',
-    },
-  },
+      stroke: 'none'
+    }
+  }
 };

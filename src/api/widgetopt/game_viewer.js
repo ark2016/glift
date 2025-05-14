@@ -1,11 +1,20 @@
 /**
- * Additional Options for the GameViewers
+ * Дополнительные опции для просмотрщика игр.
+ * @module api/widgetopt/game_viewer
  */
-glift.api.widgetopt[glift.WidgetType.GAME_VIEWER] = function () {
+
+/**
+ * Возвращает опции для виджета просмотрщика игр.
+ * @return {Object} Объект с опциями виджета
+ */
+export function gameViewerOptions() {
   return {
     markLastMove: true,
     enableMousewheel: true,
 
+    /**
+     * Привязки клавиш к действиям
+     */
     keyMappings: {
       ARROW_LEFT: 'iconActions.arrowleft.click',
       ARROW_RIGHT: 'iconActions.arrowright.click',
@@ -13,34 +22,40 @@ glift.api.widgetopt[glift.WidgetType.GAME_VIEWER] = function () {
       '.': 'iconActions.arrowright.click',
       '<': 'iconActions.jump-left-arrow.click',
       '>': 'iconActions.jump-right-arrow.click',
-      /** Toggle the selected variation. */
+      /** Переключить выбранную вариацию вверх. */
       ']': function (widget) {
         widget.controller.moveUpVariations();
         widget.applyBoardData(widget.controller.flattenedState());
       },
-      /** Toggle the selected variation. */
+      /** Переключить выбранную вариацию вниз. */
       '[': function (widget) {
         widget.controller.moveDownVariations();
         widget.applyBoardData(widget.controller.flattenedState());
       },
     },
 
-    problemConditions: {}, // Disable problem evaluations
+    problemConditions: {}, // Отключить оценку задач
 
-    controllerFunc: glift.controllers.gameViewer,
+    controllerFunc: null, // будет заменено на gameViewer при подключении контроллеров
 
     icons: ['jump-left-arrow', 'jump-right-arrow', 'arrowleft', 'arrowright'],
 
-    showVariations: glift.enums.showVariations.MORE_THAN_ONE,
+    showVariations: null, // будет заменено на MORE_THAN_ONE при использовании перечислений
 
     statusBarIcons: ['game-info', 'move-indicator', 'fullscreen'],
 
+    /**
+     * Обработчик клика по камню на доске
+     * @param {Event} event - Событие клика
+     * @param {Object} widget - Объект виджета
+     * @param {Object} pt - Точка на доске
+     */
     stoneClick: function (event, widget, pt) {
-      var currentPlayer = widget.controller.getCurrentPlayer();
-      var partialData = widget.controller.addStone(pt, currentPlayer);
+      const currentPlayer = widget.controller.getCurrentPlayer();
+      const partialData = widget.controller.addStone(pt, currentPlayer);
       widget.applyBoardData(partialData);
     },
-    stoneMouseover: undefined, // rely on defaults
-    stoneMouseout: undefined, // rely on defaults
+    stoneMouseover: undefined, // полагаемся на значения по умолчанию
+    stoneMouseout: undefined, // полагаемся на значения по умолчанию
   };
-};
+}

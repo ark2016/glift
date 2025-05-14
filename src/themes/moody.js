@@ -1,29 +1,42 @@
-goog.provide('glift.themes.registered.MOODY');
+/**
+ * Тема оформления "Moody" для Glift.
+ * Темная тема для игры Го.
+ * 
+ * @module themes/moody
+ */
+
+import { baseTheme } from './base_theme.js';
 
 /**
- * @extends {glift.themes.base}
+ * Настройки темы Moody
  */
-glift.themes.registered.MOODY = {
-  board: {
-    fill: '#777',
-  },
-
+export const MOODY = {
+  ...baseTheme,
   stones: {
-    WHITE: {
-      stroke: 'white',
-      fill: 'white',
-    },
+    ...baseTheme.stones,
+    BLACK: { fill: '#222', stroke: 'none' },
+    WHITE: { fill: '#eee', stroke: 'none' },
     WHITE_HOVER: {
       fill: 'white',
       stroke: 'white',
       opacity: 0.5,
-    },
+    }
   },
-
+  board: {
+    ...baseTheme.board,
+    fill: '#777',
+    borderColor: '#555',
+    lineColor: '#555'
+  },
+  lines: {
+    ...baseTheme.lines,
+    stroke: '#888'
+  },
   commentBox: {
+    ...baseTheme.comment,
     css: {
       background: 'none',
-      border: '',
-    },
-  },
+      border: ''
+    }
+  }
 };

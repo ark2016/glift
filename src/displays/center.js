@@ -1,88 +1,92 @@
-goog.provide('glift.displays.MultiCenter');
-goog.provide('glift.displays.SingleCenter');
-goog.provide('glift.displays.Transform');
+/**
+ * Модуль для центрирования элементов интерфейса.
+ * @module displays/center
+ */
+
+import { orientation } from '../orientation/index.js';
 
 /**
- * Transform object. Note that that the scale is set immediately, while the
- * xMove and yMove are often set later.
- *
- * @param {number} scale Scaling factor. Not that 1 means that the object should
- *    not be scaled.
- * @param {number=} opt_xMove Defaults to zero if not set.
- * @param {number=} opt_yMove Defaults to zero if not set
- * @constructor @final @struct
+ * Объект трансформации. Обратите внимание, что масштаб устанавливается немедленно,
+ * в то время как xMove и yMove часто устанавливаются позже.
  */
-glift.displays.Transform = function (scale, opt_xMove, opt_yMove) {
+export class Transform {
   /**
-   * How much to scale the object by.
-   * @type {number}
+   * @param {number} scale Коэффициент масштабирования. 1 означает, что объект
+   *    не должен масштабироваться.
+   * @param {number=} opt_xMove По умолчанию равен нулю, если не установлен.
+   * @param {number=} opt_yMove По умолчанию равен нулю, если не установлен.
    */
-  this.scale = scale;
+  constructor(scale, opt_xMove, opt_yMove) {
+    /**
+     * Насколько масштабировать объект.
+     * @type {number}
+     */
+    this.scale = scale;
+    /**
+     * Насколько смещать объект по оси x.
+     * @type {number}
+     */
+    this.xMove = opt_xMove || 0;
+    /**
+     * Насколько смещать объект по оси y.
+     * @type {number}
+     */
+    this.yMove = opt_yMove || 0;
+  }
+}
+
+/**
+ * Результат операции центрирования группы элементов (строки или столбца)
+ */
+export class MultiCenter {
   /**
-   * How much to translate the object along the x-axis.
-   * @type {number}
+   * @param {!Array<!Transform>} transforms Трансформации для выполнения.
+   * @param {!Array<!Object>} bboxes Трансформированные ограничивающие прямоугольники.
+   * @param {!Array<!Object>} unfit Ограничивающие прямоугольники, которые
+   *    не поместились с учетом заданных параметров.
    */
-  this.xMove = opt_xMove || 0;
+  constructor(transforms, bboxes, unfit) {
+    this.transforms = transforms;
+    this.bboxes = bboxes;
+    this.unfit = unfit;
+  }
+}
+
+/**
+ * Результат центрирования одиночного элемента.
+ */
+export class SingleCenter {
   /**
-   * How much to translate the object along the y-axis.
-   * @type {number}
+   * @param {!Transform} transform Трансформация для выполнения.
+   * @param {!Object} bbox Трансформированный ограничивающий прямоугольник.
    */
-  this.yMove = opt_yMove || 0;
-};
+  constructor(transform, bbox) {
+    this.transform = transform;
+    this.bbox = bbox;
+  }
+}
 
 /**
- * Result of either row-centering or column centering operation
+ * Центрирует набор иконок (точнее, ограничивающих прямоугольников) внутри другого
+ * ограничивающего прямоугольника. Примечание: Возвращаемые элементы гарантированно 
+ * будут в том же порядке, в котором они были переданы в качестве входных данных.
  *
- * @param {!Array<!glift.displays.Transform>} transforms The transformations
- *    to perform.
- * @param {!Array<!glift.orientation.BoundingBox>} bboxes The transformed bounding
- *    boxes.
- * @param {!Array<!glift.orientation.BoundingBox>} unfit Bounding boxes that
- *    didn't fit given the parameters.
- * @constructor @final @struct
+ * @param {!Object} outerBox Внешний ограничивающий прямоугольник
+ * @param {!Array<!Object>} inBboxes Массив ограничивающих прямоугольников для центрирования
+ * @param {number} vertMargin Вертикальный отступ
+ * @param {number} horzMargin Горизонтальный отступ
+ * @param {number} minSpacing Минимальное расстояние между элементами
+ *
+ * @return {!MultiCenter} Результат центрирования
  */
-glift.displays.MultiCenter = function (transforms, bboxes, unfit) {
-  this.transforms = transforms;
-  this.bboxes = bboxes;
-  this.unfit = unfit;
-};
-
-/**
- * Result of either single-element centering.
- *
- * @param {!glift.displays.Transform} transform The transformation
- *    to perform.
- * @param {!glift.orientation.BoundingBox} bbox The transformed bounding
- *    boxes.
- *
- * @constructor @final @struct
- */
-glift.displays.SingleCenter = function (transform, bbox) {
-  this.transform = transform;
-  this.bbox = bbox;
-};
-
-/**
- * Centers a bunch of icons (really, bounding boxes) within another bounding
- * box. Note: The returned items are guaranteed to be in the order they
- * appeared as inputs.
- *
- * @param {!glift.orientation.BoundingBox} outerBox
- * @param {!Array<!glift.orientation.BoundingBox>} inBboxes
- * @param {number} vertMargin
- * @param {number} horzMargin
- * @param {number} minSpacing
- *
- * @return {!glift.displays.MultiCenter}
- */
-glift.displays.rowCenterSimple = function (
+export function rowCenterSimple(
   outerBox,
   inBboxes,
   vertMargin,
   horzMargin,
   minSpacing
 ) {
-  return glift.displays.linearCentering_(
+  return linearCentering_(
     outerBox,
     inBboxes,
     vertMargin,
@@ -91,25 +95,27 @@ glift.displays.rowCenterSimple = function (
     0,
     'h'
   );
-};
+}
 
 /**
- * @param {!glift.orientation.BoundingBox} outerBox
- * @param {!Array<!glift.orientation.BoundingBox>} inBboxes
- * @param {number} vertMargin
- * @param {number} horzMargin
- * @param {number} minSpacing
+ * Центрирует элементы в столбец внутри ограничивающего прямоугольника.
+ * 
+ * @param {!Object} outerBox Внешний ограничивающий прямоугольник
+ * @param {!Array<!Object>} inBboxes Массив ограничивающих прямоугольников для центрирования
+ * @param {number} vertMargin Вертикальный отступ
+ * @param {number} horzMargin Горизонтальный отступ
+ * @param {number} minSpacing Минимальное расстояние между элементами
  *
- * @return {!glift.displays.MultiCenter}
+ * @return {!MultiCenter} Результат центрирования
  */
-glift.displays.columnCenterSimple = function (
+export function columnCenterSimple(
   outerBox,
   inBboxes,
   vertMargin,
   horzMargin,
   minSpacing
 ) {
-  return glift.displays.linearCentering_(
+  return linearCentering_(
     outerBox,
     inBboxes,
     vertMargin,
@@ -118,24 +124,24 @@ glift.displays.columnCenterSimple = function (
     0,
     'v'
   );
-};
+}
 
 /**
- * Perform linearCentering either vertically or horizontally.
+ * Выполняет линейное центрирование по вертикали или горизонтали.
  *
  * @private
  *
- * @param {!glift.orientation.BoundingBox} outerBox
- * @param {!Array<!glift.orientation.BoundingBox>} inBboxes
- * @param {number} vertMargin
- * @param {number} horzMargin
- * @param {number} minSpacing
- * @param {number} maxSpacing Zero indicates no max spacing
- * @param {string} dir Dir must be either 'v' or 'h'.
+ * @param {!Object} outerBox Внешний ограничивающий прямоугольник
+ * @param {!Array<!Object>} inBboxes Массив ограничивающих прямоугольников для центрирования
+ * @param {number} vertMargin Вертикальный отступ
+ * @param {number} horzMargin Горизонтальный отступ
+ * @param {number} minSpacing Минимальное расстояние между элементами
+ * @param {number} maxSpacing Максимальное расстояние между элементами. Ноль означает отсутствие ограничения
+ * @param {string} dir Направление ('v' - вертикальное, 'h' - горизонтальное)
  *
- * @return {!glift.displays.MultiCenter}
+ * @return {!MultiCenter} Результат центрирования
  */
-glift.displays.linearCentering_ = function (
+function linearCentering_(
   outerBox,
   inBboxes,
   vertMargin,
@@ -144,38 +150,39 @@ glift.displays.linearCentering_ = function (
   maxSpacing,
   dir
 ) {
-  var outerWidth = outerBox.width(),
+  const outerWidth = outerBox.width(),
     innerWidth = outerWidth - 2 * horzMargin,
     outerHeight = outerBox.height(),
-    innerHeight = outerHeight - 2 * vertMargin,
-    transforms = [],
-    newBboxes = [];
-  var scale, partialTransform, newBbox, extraSpace;
-
-  // TODO(kashomon): Min spacing is totally broken and has no tests.
-  // Probably should just remove it.
+    innerHeight = outerHeight - 2 * vertMargin;
+  const transforms = [];
+  const newBboxes = [];
+  
+  // TODO: Минимальное расстояние полностью сломано и не имеет тестов.
+  // Вероятно, следует просто удалить его.
   minSpacing = minSpacing || 0;
   maxSpacing = maxSpacing || 0;
   dir = dir === 'v' || dir === 'h' ? dir : 'h';
-  var getLongSide = function (bbox, dir) {
+  
+  const getLongSide = function(bbox, dir) {
     return dir === 'h' ? bbox.width() : bbox.height();
   };
 
-  var outsideLongSide = getLongSide(outerBox, dir);
-  // Use some arbitrarily large number as an upper bound default
+  const outsideLongSide = getLongSide(outerBox, dir);
+  // Используем некоторое произвольно большое число в качестве верхней границы по умолчанию
   maxSpacing = maxSpacing <= 0 ? 10000000 : maxSpacing;
   minSpacing = minSpacing <= 0 ? 0 : minSpacing;
 
-  // Adjust all the bboxes so that they are the right scale.
-  var totalElemLength = 0;
-  for (var i = 0; i < inBboxes.length; i++) {
+  // Корректируем все ограничивающие прямоугольники, чтобы они имели правильный масштаб
+  let totalElemLength = 0;
+  for (let i = 0; i < inBboxes.length; i++) {
+    let scale;
     if (innerHeight > innerWidth) {
       scale = innerWidth / inBboxes[i].width();
     } else {
       scale = innerHeight / inBboxes[i].height();
     }
-    partialTransform = new glift.displays.Transform(scale);
-    newBbox = inBboxes[i].scale(scale);
+    const partialTransform = new Transform(scale);
+    const newBbox = inBboxes[i].scale(scale);
     transforms.push(partialTransform);
     newBboxes.push(newBbox);
     totalElemLength += getLongSide(newBbox, dir);
@@ -184,46 +191,49 @@ glift.displays.linearCentering_ = function (
     }
   }
 
-  // Pop off elements that don't fit.
-  var unfitBoxes = [];
+  // Убираем элементы, которые не помещаются
+  const unfitBoxes = [];
   while (outsideLongSide < totalElemLength) {
-    newBbox = newBboxes.pop();
+    const newBbox = newBboxes.pop();
     transforms.pop();
     totalElemLength -= getLongSide(newBbox, dir);
     totalElemLength -= minSpacing;
     unfitBoxes.push(newBbox);
   }
 
-  // Find how much space to use for the parts
+  // Находим, сколько места использовать для элементов
+  let extraSpace;
   if (dir === 'h') {
     extraSpace = innerWidth - totalElemLength;
   } else {
     extraSpace = innerHeight - totalElemLength;
   }
-  var extraSpacing = extraSpace / (transforms.length + 1);
-  var elemSpacing = extraSpacing;
-  var extraMargin = extraSpacing;
+  
+  let extraSpacing = extraSpace / (transforms.length + 1);
+  let elemSpacing = extraSpacing;
+  let extraMargin = extraSpacing;
+  
   if (extraSpacing > maxSpacing) {
     elemSpacing = maxSpacing;
-    var totalExtraMargin = extraSpace - elemSpacing * (transforms.length - 1);
+    const totalExtraMargin = extraSpace - elemSpacing * (transforms.length - 1);
     extraMargin = totalExtraMargin / 2;
   }
 
-  var left = outerBox.left() + horzMargin;
-  var top = outerBox.top() + vertMargin;
+  let left = outerBox.left() + horzMargin;
+  let top = outerBox.top() + vertMargin;
   if (dir === 'h') {
     left += extraMargin;
   } else {
     top += extraMargin;
   }
 
-  // Find the x and y translates.
-  var finishedBoxes = [];
-  for (var j = 0; j < newBboxes.length; j++) {
-    newBbox = newBboxes[j];
-    partialTransform = transforms[j];
-    var yTranslate = top - newBbox.top();
-    var xTranslate = left - newBbox.left();
+  // Находим x и y смещения
+  const finishedBoxes = [];
+  for (let j = 0; j < newBboxes.length; j++) {
+    const newBbox = newBboxes[j];
+    const partialTransform = transforms[j];
+    const yTranslate = top - newBbox.top();
+    const xTranslate = left - newBbox.left();
     partialTransform.xMove = xTranslate;
     partialTransform.yMove = yTranslate;
     finishedBoxes.push(newBbox.translate(xTranslate, yTranslate));
@@ -234,53 +244,51 @@ glift.displays.linearCentering_ = function (
     }
   }
 
-  return new glift.displays.MultiCenter(transforms, finishedBoxes, unfitBoxes);
-};
+  return new MultiCenter(transforms, finishedBoxes, unfitBoxes);
+}
 
 /**
- * Center an bounding box within another bounding box.
+ * Центрирует ограничивающий прямоугольник внутри другого ограничивающего прямоугольника.
  *
- * @param {!glift.orientation.BoundingBox} outerBbox
- * @param {!glift.orientation.BoundingBox} bbox The bbox to center within the
- *    outerBbox.
- * @param {number} vertMargin
- * @param {number} horzMargin
+ * @param {!Object} outerBbox Внешний ограничивающий прямоугольник
+ * @param {!Object} bbox Ограничивающий прямоугольник для центрирования внутри outerBbox
+ * @param {number} vertMargin Вертикальный отступ
+ * @param {number} horzMargin Горизонтальный отступ
  *
- * @return {!glift.displays.SingleCenter}
+ * @return {!SingleCenter} Результат центрирования
  */
-glift.displays.centerWithin = function (
-  outerBbox,
-  bbox,
-  vertMargin,
-  horzMargin
-) {
-  var outerWidth = outerBbox.width(),
-    innerWidth = outerWidth - 2 * horzMargin,
-    outerHeight = outerBbox.height(),
-    innerHeight = outerHeight - 2 * vertMargin;
+export function centerWithin(outerBbox, bbox, vertMargin, horzMargin) {
+  const outerWidth = outerBbox.width();
+  const innerWidth = outerWidth - 2 * horzMargin;
+  const outerHeight = outerBbox.height();
+  const innerHeight = outerHeight - 2 * vertMargin;
 
-  var scale = 1; // i.e., no scaling;
+  let scale;
   if (innerHeight / innerWidth > bbox.height() / bbox.width()) {
-    // Outer box is a 'more-tall' box than the inner-box.  So, we scale the
-    // inner box by width (since the height has more wiggle room).
     scale = innerWidth / bbox.width();
   } else {
-    scale = innerHeight / bbox.width();
+    scale = innerHeight / bbox.height();
   }
-  var newBbox = bbox.scale(scale);
-  var left = outerBbox.left() + horzMargin;
-  if (newBbox.width() < innerWidth) {
-    left = left + (innerWidth - newBbox.width()) / 2; // Center horz.
-  }
-  var top = outerBbox.top() + vertMargin;
-  if (newBbox.height() < innerHeight) {
-    top = top + (innerHeight - newBbox.height()) / 2;
-  }
-  var transform = new glift.displays.Transform(
-    scale,
-    left - newBbox.left(),
-    top - newBbox.top()
-  );
-  newBbox = newBbox.translate(transform.xMove, transform.yMove);
-  return new glift.displays.SingleCenter(transform, newBbox);
+
+  const partialTransform = new Transform(scale);
+  const newBbox = bbox.scale(scale);
+  
+  const left = outerBbox.left() + (outerBbox.width() - newBbox.width()) / 2;
+  const top = outerBbox.top() + (outerBbox.height() - newBbox.height()) / 2;
+  
+  partialTransform.xMove = left - newBbox.left();
+  partialTransform.yMove = top - newBbox.top();
+  
+  const outBbox = newBbox.translate(partialTransform.xMove, partialTransform.yMove);
+  
+  return new SingleCenter(partialTransform, outBbox);
+}
+
+export const center = {
+  Transform,
+  MultiCenter,
+  SingleCenter,
+  rowCenterSimple,
+  columnCenterSimple,
+  centerWithin
 };

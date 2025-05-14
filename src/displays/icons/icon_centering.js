@@ -1,82 +1,90 @@
-goog.require('glift.displays.icons');
+/**
+ * Модуль для центрирования иконок в пользовательском интерфейсе.
+ * @module displays/icons/icon_centering
+ */
+
+import { displays } from '../../displays/displays.js';
 
 /**
- * Row center Direcotry
+ * Направление центрирования строки
  * @enum {string}
  * @private
  */
-glift.displays.icons.CenterDir = {
+const CenterDir = {
   H: 'h',
   V: 'v',
 };
 
 /**
- * Row-Center an array of wrapped icons.
+ * Центрирование массива обёрнутых иконок по строке.
  *
- * @param {!glift.orientation.BoundingBox} divBbox
- * @param {!Array<!glift.displays.icons.WrappedIcon>} wrappedIcons
- * @param {number} vMargin
- * @param {number} hMargin
- * @param {number=} opt_minSpacing
+ * @param {!Object} divBbox Ограничивающий прямоугольник div-элемента
+ * @param {!Array<!Object>} wrappedIcons Массив обёрнутых иконок
+ * @param {number} vMargin Вертикальный отступ
+ * @param {number} hMargin Горизонтальный отступ
+ * @param {number=} opt_minSpacing Минимальный интервал
+ * @return {Array<Object>} Массив трансформаций
  */
-glift.displays.icons.rowCenterWrapped = function (
+export function rowCenterWrapped(
   divBbox,
   wrappedIcons,
   vMargin,
   hMargin,
   opt_minSpacing
 ) {
-  var minSpacing = opt_minSpacing || 0;
-  return glift.displays.icons._centerWrapped(
+  const minSpacing = opt_minSpacing || 0;
+  return _centerWrapped(
     divBbox,
     wrappedIcons,
     vMargin,
     hMargin,
     minSpacing,
-    glift.displays.icons.CenterDir.H
+    CenterDir.H
   );
-};
+}
 
 /**
- * Column-Center an array of wrapped icons.
+ * Центрирование массива обёрнутых иконок по столбцу.
  *
- * @param {!glift.orientation.BoundingBox} divBbox
- * @param {!Array<!glift.displays.icons.WrappedIcon>} wrappedIcons
- * @param {number} vMargin
- * @param {number} hMargin
- * @param {number=} opt_minSpacing
+ * @param {!Object} divBbox Ограничивающий прямоугольник div-элемента
+ * @param {!Array<!Object>} wrappedIcons Массив обёрнутых иконок
+ * @param {number} vMargin Вертикальный отступ
+ * @param {number} hMargin Горизонтальный отступ
+ * @param {number=} opt_minSpacing Минимальный интервал
+ * @return {Array<Object>} Массив трансформаций
  */
-glift.displays.icons.columnCenterWrapped = function (
+export function columnCenterWrapped(
   divBbox,
   wrappedIcons,
   vMargin,
   hMargin,
   opt_minSpacing
 ) {
-  var minSpacing = opt_minSpacing || 0;
-  return glift.displays.icons._centerWrapped(
+  const minSpacing = opt_minSpacing || 0;
+  return _centerWrapped(
     divBbox,
     wrappedIcons,
     vMargin,
     hMargin,
     minSpacing,
-    glift.displays.icons.CenterDir.V
+    CenterDir.V
   );
-};
+}
 
 /**
- * Center wrapped icons
+ * Центрирование обёрнутых иконок
  *
  * @private
  *
- * @param {!glift.orientation.BoundingBox} divBbox
- * @param {!Array<!glift.displays.icons.WrappedIcon>} wrappedIcons
- * @param {number} vMargin
- * @param {number} hMargin
- * @param {number} minSpacing
- * @param {glift.displays.icons.CenterDir} direction
+ * @param {!Object} divBbox Ограничивающий прямоугольник div-элемента
+ * @param {!Array<!Object>} wrappedIcons Массив обёрнутых иконок
+ * @param {number} vMargin Вертикальный отступ
+ * @param {number} hMargin Горизонтальный отступ
+ * @param {number} minSpacing Минимальный интервал
+ * @param {string} direction Направление центрирования
+ * @return {Array<Object>} Массив трансформаций
  */
-glift.displays.icons._centerWrapped = function (
+function _centerWrapped(
   divBbox,
   wrappedIcons,
   vMargin,
@@ -84,21 +92,21 @@ glift.displays.icons._centerWrapped = function (
   minSpacing,
   direction
 ) {
-  var bboxes = [];
-  var centeringData;
+  const bboxes = [];
+  let centeringData;
   if (
-    direction !== glift.displays.icons.CenterDir.H &&
-    direction !== glift.displays.icons.CenterDir.V
+    direction !== CenterDir.H &&
+    direction !== CenterDir.V
   ) {
-    direction = glift.displays.icons.CenterDir.H;
+    direction = CenterDir.H;
   }
-  for (var i = 0; i < wrappedIcons.length; i++) {
+  for (let i = 0; i < wrappedIcons.length; i++) {
     bboxes.push(wrappedIcons[i].bbox);
   }
 
   // Row center returns: { transforms: [...], bboxes: [...] }
-  if (direction === glift.displays.icons.CenterDir.H) {
-    centeringData = glift.displays.rowCenterSimple(
+  if (direction === CenterDir.H) {
+    centeringData = displays.rowCenterSimple(
       divBbox,
       bboxes,
       vMargin,
@@ -106,7 +114,7 @@ glift.displays.icons._centerWrapped = function (
       minSpacing
     );
   } else {
-    centeringData = glift.displays.columnCenterSimple(
+    centeringData = displays.columnCenterSimple(
       divBbox,
       bboxes,
       vMargin,
@@ -114,12 +122,21 @@ glift.displays.icons._centerWrapped = function (
       minSpacing
     );
   }
-  var transforms = centeringData.transforms;
+  const transforms = centeringData.transforms;
 
-  // TODO(kashomon): Can the transforms be less than the centerede icons? I
-  // think so.  In any case, this case probably needs to be handled.
-  for (var j = 0; j < transforms.length && j < wrappedIcons.length; j++) {
+  // TODO(kashomon): Могут ли трансформации быть меньше центрированных иконок? 
+  // Думаю, да. В любом случае, этот случай, вероятно, нужно обработать.
+  for (let j = 0; j < transforms.length && j < wrappedIcons.length; j++) {
     wrappedIcons[j].performTransform(transforms[j]);
   }
   return transforms;
+}
+
+/**
+ * Объединение функций модуля для обратной совместимости
+ */
+export const iconCentering = {
+  rowCenterWrapped,
+  columnCenterWrapped,
+  _centerWrapped
 };

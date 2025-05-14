@@ -1,74 +1,77 @@
-goog.provide('glift.themes.cssBaseTheme');
-goog.provide('glift.themes.CssDef');
+/**
+ * Базовая CSS-тема для компонентов Glift.
+ * 
+ * Этот модуль содержит определения CSS для основных элементов UI.
+ * 
+ * @module themes/css_base_theme
+ */
+
+import { CLASSES } from './classes.js';
 
 /**
- * CSS Definition class for storing CSS properties and extra metadata.
+ * Класс определения CSS для хранения свойств CSS и дополнительных метаданных.
  */
-class CssDef {
+export class CssDef {
   /**
-   * @param {!Object<string, string>} css Core CSS properties
-   * @param {!Object<string, (string|number)>=} extra Optional extra properties
+   * @param {!Object<string, string>} css Основные CSS-свойства
+   * @param {!Object<string, (string|number)>=} extra Опциональные дополнительные свойства
    */
   constructor(css, extra = {}) {
     /**
-     * Base CSS Properties (stroke, fill, etc.)
+     * Базовые CSS-свойства (stroke, fill и т.д.)
      * @type {!Object<string, string>}
      */
     this.css = css;
     
     /**
-     * Extra properties sometimes necessary for construction
+     * Дополнительные свойства, иногда необходимые для конструирования
      * @type {!Object<string, (string|number)>}
      */
     this.extra = extra;
   }
 }
 
-// Export class to namespace
-glift.themes.CssDef = CssDef;
-
 /**
- * Base CSS theme for Glift components.
- * @type {!Object<glift.themes.classes, !glift.themes.CssDef>}
+ * Базовая CSS-тема для компонентов Glift.
+ * @type {!Object<string, !CssDef>}
  */
-glift.themes.cssBaseTheme = (() => {
+export const cssBaseTheme = (() => {
   const theme = {};
-  const classes = glift.themes.classes;
   
   /**
-   * Helper for creating CSS definitions
-   * @param {!Object<string, string>} css CSS properties
-   * @param {!Object<string, (string|number)>=} extra Optional extra properties
-   * @return {!glift.themes.CssDef} The created CSS definition
+   * Помощник для создания определений CSS
+   * @param {!Object<string, string>} css CSS-свойства
+   * @param {!Object<string, (string|number)>=} extra Опциональные дополнительные свойства
+   * @return {!CssDef} Созданное определение CSS
    */
   const cssDef = (css, extra) => new CssDef(css, extra);
   
-  // Board styling
-  theme[classes.BOARD] = cssDef({
+  // Стилизация доски
+  theme[CLASSES.BOARD] = cssDef({
     fill: '#f5be7e',
     stroke: '#000000',
     'stroke-width': '1',
   });
   
-  // Star points
-  theme[classes.STARPOINTS] = cssDef(
+  // Звездные точки (хоси)
+  theme[CLASSES.STARPOINTS] = cssDef(
     {
       fill: 'black',
     },
     {
-      // Settings for star point rendering
-      sizeFraction: 0.15, // As a fraction of spacing
+      // Настройки для отрисовки звездных точек
+      sizeFraction: 0.15, // Как доля от расстояния между линиями
     }
   );
   
-  // Board lines
-  theme[classes.BOARD_LINES] = cssDef({
+  // Линии доски
+  theme[CLASSES.BOARD_LINES] = cssDef({
     stroke: 'black',
     'stroke-width': 0.5,
   });
   
-  // Coordinate labels
-  theme[classes.BOARD_COORD_LABELS] = cssDef({
+  // Метки координат
+  theme[CLASSES.BOARD_COORD_LABELS] = cssDef({
     fill: 'black',
     stroke: 'black',
     opacity: '0.6',
