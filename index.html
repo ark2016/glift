@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+      <title>Glift - Пример Игры Го</title>
+      <!-- <link rel="stylesheet" type="text/css" href="src/css/glift.css"> Удаляем, т.к. файл не найден -->
+      <script src="compiled/glift.js"></script>
+      <style>
+        body { font-family: sans-serif; margin: 20px; }
+        #glift_display {
+          width: 600px;
+          height: 550px; /* Немного больше для элементов управления */
+          position: relative; /* Необходимо для корректного отображения */
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Пример Работы Glift</h1>
+      <p>Отображение SGF-файла с комментариями игры.</p>
+      <div id="glift_display"></div>
+      <script>
+        glift.create({
+          divId: 'glift_display',
+          sgf: 'test/testdata/PandanetFF3Example.sgf', // Используем существующий SGF файл
+          display: {
+            theme: 'DEPTH', // Попробуйте другие темы: 'BLACK_WHITE', 'TRANSPARENT'
+            goBoardBackground: 'src/themes/assets/bambootile.png', // Используем существующий фон
+            drawBoardCoords: true // Отображать координаты
+          },
+          sgfDefaults: {
+            widgetType: 'GAME_VIEWER' // Тип виджета
+            // Для задач можно использовать:
+            // widgetType: 'PROBLEM_VIEWER',
+            // problemConditions: { GB: [] } // Условия для правильного решения (если это задача)
+          }
+        });
+      </script>
+    </body>
+    </html> 
