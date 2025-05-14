@@ -1,6 +1,5 @@
 goog.provide('glift.themes.clasess');
 
-
 /**
  * Built-in classes used to style Glift.
  *

@@ -11,7 +11,7 @@ goog.provide('glift.rules.CaptureResult');
  *   WHITE: !Array<!glift.Point>,
  *   BLACK: !Array<!glift.Point>
  * }}
-*/
+ */
 glift.rules.CaptureResult;
 
 glift.rules.goban = {
@@ -20,7 +20,7 @@ glift.rules.goban = {
    * @param {number=} opt_intersections
    * @return {!glift.rules.Goban}
    */
-  getInstance: function(opt_intersections) {
+  getInstance: function (opt_intersections) {
     var ints = opt_intersections || 19;
     return new glift.rules.Goban(ints);
   },
@@ -43,19 +43,21 @@ glift.rules.goban = {
    *   clearHistory: !Array<!Array<!glift.rules.Move>>
    * }}
    */
-  getFromMoveTree: function(mt, opt_treepath) {
+  getFromMoveTree: function (mt, opt_treepath) {
     var treepath = opt_treepath || mt.treepathToHere();
     var goban = new glift.rules.Goban(mt.getIntersections()),
-        movetree = mt.getTreeFromRoot(),
-        clearHistory = [],
-        captures = []; // array of captures.
+      movetree = mt.getTreeFromRoot(),
+      clearHistory = [],
+      captures = []; // array of captures.
     goban.loadStonesFromMovetree(movetree); // Load root placements.
     // We don't consider clear-locations (AE) properties at the root because why
     // the heck would you do that?
 
-    for (var i = 0;
-        i < treepath.length && movetree.node().numChildren() > 0;
-        i++) {
+    for (
+      var i = 0;
+      i < treepath.length && movetree.node().numChildren() > 0;
+      i++
+    ) {
       movetree.moveDown(treepath[i]);
       clearHistory.push(goban.applyClearLocationsFromMovetree(movetree));
       captures.push(goban.loadStonesFromMovetree(movetree));
@@ -65,7 +67,7 @@ glift.rules.goban = {
       captures: captures,
       clearHistory: clearHistory,
     };
-  }
+  },
 };
 
 /**
@@ -98,9 +100,9 @@ glift.rules.goban = {
  *
  * @constructor @final @struct
  */
-glift.rules.Goban = function(ints) {
+glift.rules.Goban = function (ints) {
   if (!ints || ints <= 0) {
-    throw new Error("Invalid Intersections. Was: " + ints)
+    throw new Error('Invalid Intersections. Was: ' + ints);
   }
 
   /** @private {number} */
@@ -118,7 +120,7 @@ glift.rules.Goban = function(ints) {
 
 glift.rules.Goban.prototype = {
   /** @return {number} The number of intersections. */
-  intersections: function() {
+  intersections: function () {
     return this.ints_;
   },
 
@@ -127,7 +129,7 @@ glift.rules.Goban.prototype = {
    * may want to set this when going backwards through a game.
    * @param {!glift.Point} pt
    */
-  setKo: function(pt) {
+  setKo: function (pt) {
     if (pt && this.inBounds_(pt)) {
       this.koPoint_ = pt;
     }
@@ -137,20 +139,26 @@ glift.rules.Goban.prototype = {
    * Clears the Ko point. Note that the Ko point is cleared automatically by
    * some operations (clearStone, addStone).
    */
-  clearKo: function() { this.koPoint_ = null; },
+  clearKo: function () {
+    this.koPoint_ = null;
+  },
 
   /** @return {?glift.Point} The ko point or null if it doesn't exist. */
-  getKo: function() { return this.koPoint_; },
+  getKo: function () {
+    return this.koPoint_;
+  },
 
   /**
    * @param {!glift.Point} point
    * @return {boolean} True if the board is empty at particular point and the
    *    point is within the bounds of the board.
    */
-  placeable: function(point) {
-    return this.inBounds_(point)
-        && !point.equals(this.koPoint_)
-        && this.getStone(point) === glift.enums.states.EMPTY;
+  placeable: function (point) {
+    return (
+      this.inBounds_(point) &&
+      !point.equals(this.koPoint_) &&
+      this.getStone(point) === glift.enums.states.EMPTY
+    );
   },
 
   /**
@@ -166,7 +174,7 @@ glift.rules.Goban.prototype = {
    * @param {!glift.Point} pt
    * @return {!glift.enums.states} the state of the intersection
    */
-  getStone: function(pt) {
+  getStone: function (pt) {
     return this.stones_[pt.y()][pt.x()];
   },
 
@@ -174,14 +182,16 @@ glift.rules.Goban.prototype = {
    * Get all the placed stones on the board (BLACK or WHITE)
    * @return {!Array<!glift.rules.Move>}
    */
-  getAllPlacedStones: function() {
+  getAllPlacedStones: function () {
     var out = [];
     for (var i = 0; i < this.intersections(); i++) {
       for (var j = 0; j < this.intersections(); j++) {
         var color = this.getStone(glift.util.point(j, i));
-        if (color === glift.enums.states.BLACK ||
-            color === glift.enums.states.WHITE) {
-          out.push({point: glift.util.point(j, i), color:color});
+        if (
+          color === glift.enums.states.BLACK ||
+          color === glift.enums.states.WHITE
+        ) {
+          out.push({ point: glift.util.point(j, i), color: color });
         }
       }
     }
@@ -193,7 +203,7 @@ glift.rules.Goban.prototype = {
    * @param {!glift.Point} point
    * @return {glift.enums.states} color of the location cleared
    */
-  clearStone: function(point) {
+  clearStone: function (point) {
     this.clearKo();
     var color = this.getStone(point);
     this.setColor(point, glift.enums.states.EMPTY);
@@ -205,7 +215,7 @@ glift.rules.Goban.prototype = {
    * clearStone).
    * @param {!Array<!glift.Point>} points
    */
-  clearSome: function(points) {
+  clearSome: function (points) {
     for (var i = 0; i < points.length; i++) {
       this.clearStone(points[i]);
     }
@@ -218,10 +228,10 @@ glift.rules.Goban.prototype = {
    * @param {glift.enums.states} color
    * @return {boolean} true / false depending on whether the 'add' was successful.
    */
-  testAddStone: function(point, color) {
+  testAddStone: function (point, color) {
     var ko = this.getKo();
     var addStoneResult = this.addStone(point, color);
-    if (ko !== null ) {
+    if (ko !== null) {
       this.setKo(ko);
     }
 
@@ -250,11 +260,15 @@ glift.rules.Goban.prototype = {
    * @return {!glift.rules.StoneResult} The result of the placement, and whether
    *    the placement was successful.
    */
-  addStone: function(pt, color) {
-    if (!(color === glift.enums.states.BLACK ||
+  addStone: function (pt, color) {
+    if (
+      !(
+        color === glift.enums.states.BLACK ||
         color === glift.enums.states.WHITE ||
-        color === glift.enums.states.EMPTY)) {
-      throw "Unknown color: " + color;
+        color === glift.enums.states.EMPTY
+      )
+    ) {
+      throw 'Unknown color: ' + color;
     }
 
     // Add stone fail.  Return a failed StoneResult.
@@ -332,15 +346,15 @@ glift.rules.Goban.prototype = {
    * @param {!glift.rules.MoveTree} movetree
    * @return {!glift.rules.CaptureResult} The black and white captures.
    */
-  loadStonesFromMovetree: function(movetree) {
+  loadStonesFromMovetree: function (movetree) {
     /** @type {!Array<glift.enums.states>} */
-    var colors = [ glift.enums.states.BLACK, glift.enums.states.WHITE ];
-    var captures = { BLACK : [], WHITE : [] };
+    var colors = [glift.enums.states.BLACK, glift.enums.states.WHITE];
+    var captures = { BLACK: [], WHITE: [] };
     for (var i = 0; i < colors.length; i++) {
       var color = colors[i];
       var placements = movetree.properties().getPlacementsAsPoints(color);
       for (var j = 0, len = placements.length; j < len; j++) {
-        this.loadStone_({point: placements[j], color: color}, captures);
+        this.loadStone_({ point: placements[j], color: color }, captures);
       }
     }
     this.loadStone_(movetree.properties().getMove(), captures);
@@ -355,14 +369,14 @@ glift.rules.Goban.prototype = {
    * @param {!glift.rules.MoveTree} movetree
    * @return {!Array<!glift.rules.Move>} the cleared stones.
    */
-  applyClearLocationsFromMovetree: function(movetree) {
+  applyClearLocationsFromMovetree: function (movetree) {
     var clearLocations = movetree.properties().getClearLocationsAsPoints();
     var outMoves = [];
     for (var i = 0; i < clearLocations.length; i++) {
       var pt = clearLocations[i];
       var color = this.clearStone(pt);
       if (color !== glift.enums.states.EMPTY) {
-        outMoves.push({point: pt, color: color});
+        outMoves.push({ point: pt, color: color });
       }
     }
     return outMoves;
@@ -378,7 +392,7 @@ glift.rules.Goban.prototype = {
    * @param {glift.enums.states} color
    * @param {!glift.Point} pt
    */
-  setColor: function(pt, color) {
+  setColor: function (pt, color) {
     this.stones_[pt.y()][pt.x()] = color;
   },
 
@@ -387,9 +401,11 @@ glift.rules.Goban.prototype = {
    * @return {boolean} True if the point is out-of-bounds.
    * @private
    */
-  outBounds_: function(point) {
-    return glift.util.outBounds(point.x(), this.intersections())
-        || glift.util.outBounds(point.y(), this.intersections());
+  outBounds_: function (point) {
+    return (
+      glift.util.outBounds(point.x(), this.intersections()) ||
+      glift.util.outBounds(point.y(), this.intersections())
+    );
   },
 
   /**
@@ -397,20 +413,22 @@ glift.rules.Goban.prototype = {
    * @return {boolean} True if the point is in-bounds.
    * @private
    */
-  inBounds_: function(point) {
-    return glift.util.inBounds(point.x(), this.intersections())
-        && glift.util.inBounds(point.y(), this.intersections());
+  inBounds_: function (point) {
+    return (
+      glift.util.inBounds(point.x(), this.intersections()) &&
+      glift.util.inBounds(point.y(), this.intersections())
+    );
   },
 
   /**
    * Cardinal points. Because arrays are indexed from upper left.
    * @private {!Object<string, !glift.Point>}
    */
-  cardinals_:  {
+  cardinals_: {
     left: glift.util.point(-1, 0),
     right: glift.util.point(1, 0),
     up: glift.util.point(0, -1),
-    down: glift.util.point(0, 1)
+    down: glift.util.point(0, 1),
   },
 
   /**
@@ -420,7 +438,7 @@ glift.rules.Goban.prototype = {
    * @return {!Array<!glift.Point>}
    * @private
    */
-  neighbors_: function(pt) {
+  neighbors_: function (pt) {
     var newpt = glift.util.point;
     var out = [];
     for (var ckey in this.cardinals_) {
@@ -442,7 +460,7 @@ glift.rules.Goban.prototype = {
    *    associated number of liberties.
    * @private
    */
-  findConnected_: function(inPoint, color) {
+  findConnected_: function (inPoint, color) {
     var group = new glift.rules.ConnectedGroup(color);
     var stack = [inPoint];
     while (stack.length > 0) {
@@ -474,7 +492,7 @@ glift.rules.Goban.prototype = {
    * @return {!Array<glift.rules.ConnectedGroup>} The groups that have been
    *    captured.
    */
-  findCapturedGroups_: function(pt, color) {
+  findCapturedGroups_: function (pt, color) {
     var oppColor = glift.util.colors.oppositeColor(color);
     /** @type {!Array<!glift.rules.ConnectedGroup>} */
     var groups = [];
@@ -515,7 +533,7 @@ glift.rules.Goban.prototype = {
    * @param {!glift.rules.CaptureResult} captures
    * @private
    */
-  loadStone_: function(mv, captures) {
+  loadStone_: function (mv, captures) {
     // note: if mv is defined, but mv.point is undefined, this is a PASS.
     if (mv && mv.point !== undefined) {
       var result = this.addStone(mv.point, mv.color);
@@ -536,18 +554,17 @@ glift.rules.Goban.prototype = {
  * @return {!Array<glift.enums.states>} The board, as an array of states.
  * @private
  */
-glift.rules.initStones_ = function(ints) {
+glift.rules.initStones_ = function (ints) {
   var stones = [];
   for (var i = 0; i < ints; i++) {
     var newRow = [];
     for (var j = 0; j < ints; j++) {
       newRow[j] = glift.enums.states.EMPTY;
     }
-    stones[i] = newRow
+    stones[i] = newRow;
   }
   return stones;
 };
-
 
 /**
  * A connected group
@@ -555,7 +572,7 @@ glift.rules.initStones_ = function(ints) {
  *
  * @constructor @final @struct
  */
-glift.rules.ConnectedGroup = function(color) {
+glift.rules.ConnectedGroup = function (color) {
   /** @private {glift.enums.states} */
   this.color = color;
   /** @private {number} */
@@ -572,7 +589,7 @@ glift.rules.ConnectedGroup.prototype = {
    * @param {!glift.Point} pt
    * @return {boolean} Whether the point has been seen
    */
-  hasSeen: function(pt) {
+  hasSeen: function (pt) {
     return this.seen[pt.toString()];
   },
 
@@ -584,12 +601,12 @@ glift.rules.ConnectedGroup.prototype = {
    * @param {glift.enums.states} color
    * @return {!glift.rules.ConnectedGroup} this
    */
-  addStone: function(pt, color) {
+  addStone: function (pt, color) {
     if (!this.seen[pt.toString()] && this.color === color) {
       this.seen[pt.toString()] = true;
       this.group.push({
         point: pt,
-        color: color
+        color: color,
       });
     }
     return this;
@@ -599,7 +616,7 @@ glift.rules.ConnectedGroup.prototype = {
    * Add some liberties to the group.
    * @return {!glift.rules.ConnectedGroup} this
    */
-  addLiberty: function() {
+  addLiberty: function () {
     this.liberties += 1;
     return this;
   },
@@ -615,7 +632,7 @@ glift.rules.ConnectedGroup.prototype = {
  * @param {!glift.Point=} opt_koPt A ko point.
  * @constructor @final @struct
  */
-glift.rules.StoneResult = function(success, opt_captures, opt_koPt) {
+glift.rules.StoneResult = function (success, opt_captures, opt_koPt) {
   /**
    * Whether or not the place was successful.
    * @type {boolean}

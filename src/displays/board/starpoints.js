@@ -7,7 +7,7 @@
  * @param {!glift.flattener.BoardPoints} boardPoints Board points object.
  * @param {!glift.themes.base} theme The theme object
  */
-glift.displays.board.starpoints = function(svg, idGen, boardPoints, theme) {
+glift.displays.board.starpoints = function (svg, idGen, boardPoints, theme) {
   var container = glift.svg.group().setId(idGen.starpointGroup());
   svg.append(container);
 
@@ -16,12 +16,15 @@ glift.displays.board.starpoints = function(svg, idGen, boardPoints, theme) {
   for (var i = 0, ii = starPointData.length; i < ii; i++) {
     var pt = starPointData[i];
     var coordPt = boardPoints.getCoord(pt).coordPt;
-    container.append(glift.svg.circle()
-      .setAttr('cx', coordPt.x())
-      .setAttr('cy', coordPt.y())
-      .setAttr('r', size)
-      .setAttr('fill', theme.starPoints.fill)
-      .setAttr('opacity', 1)
-      .setId(idGen.starpoint(pt)));
+    container.append(
+      glift.svg
+        .circle()
+        .setAttr('cx', coordPt.x())
+        .setAttr('cy', coordPt.y())
+        .setAttr('r', size)
+        .setAttr('fill', theme.starPoints.fill)
+        .setAttr('opacity', 1)
+        .setId(idGen.starpoint(pt))
+    );
   }
 };

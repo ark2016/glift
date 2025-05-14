@@ -5,25 +5,25 @@ goog.provide('glift.themes.registered.MOODY');
  */
 glift.themes.registered.MOODY = {
   board: {
-    fill: '#777'
+    fill: '#777',
   },
 
   stones: {
-    'WHITE' : {
+    WHITE: {
       stroke: 'white',
-      fill: 'white'
+      fill: 'white',
     },
-    'WHITE_HOVER' : {
+    WHITE_HOVER: {
       fill: 'white',
       stroke: 'white',
-      opacity: 0.5
-    }
+      opacity: 0.5,
+    },
   },
 
   commentBox: {
     css: {
       background: 'none',
-      border: ''
-    }
-  }
-}
+      border: '',
+    },
+  },
+};

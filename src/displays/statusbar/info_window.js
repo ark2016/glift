@@ -4,18 +4,23 @@ goog.provide('glift.displays.statusbar.InfoWindow');
  * Creates an info window.  This isn't super useful on its own -- it's meant to
  * be populated with data.
  */
-glift.displays.statusbar.infoWindow = function(
-    wrapperDivId, bbox, theme, instanceId) {
+glift.displays.statusbar.infoWindow = function (
+  wrapperDivId,
+  bbox,
+  theme,
+  instanceId
+) {
   var suffix = '_info_window',
-      newDivId = wrapperDivId + suffix + '_wrapper',
-      wrapperDivEl = glift.dom.elem(wrapperDivId),
-      fullBox = bbox;
+    newDivId = wrapperDivId + suffix + '_wrapper',
+    wrapperDivEl = glift.dom.elem(wrapperDivId),
+    fullBox = bbox;
 
   var newDiv = glift.dom.absBboxDiv(fullBox, newDivId);
-  newDiv.css({'z-index': 100}); // ensure on top.
+  newDiv.css({ 'z-index': 100 }); // ensure on top.
 
   var textDiv = glift.dom.newDiv(wrapperDivId + suffix + '_textdiv');
-  var textDivCss = glift.util.obj.flatMerge({
+  var textDivCss = glift.util.obj.flatMerge(
+    {
       position: 'relative',
       margin: '0px',
       padding: '0px',
@@ -23,11 +28,13 @@ glift.displays.statusbar.infoWindow = function(
       height: fullBox.height() + 'px',
       width: fullBox.width() + 'px',
       MozBoxSizing: 'border-box',
-      boxSizing: 'border-box'
-    }, theme.textDiv);
+      boxSizing: 'border-box',
+    },
+    theme.textDiv
+  );
   textDiv.css(textDivCss);
 
-  var exitScreen = function() {
+  var exitScreen = function () {
     newDiv.remove();
   };
 
@@ -38,7 +45,7 @@ glift.displays.statusbar.infoWindow = function(
   }
 
   var oldEscAction = glift.keyMappings.getFuncOrIcon(instanceId, 'ESCAPE');
-  glift.keyMappings.registerKeyAction(instanceId, 'ESCAPE', function() {
+  glift.keyMappings.registerKeyAction(instanceId, 'ESCAPE', function () {
     exitScreen();
     if (oldEscAction) {
       glift.keyMappings.registerKeyAction(instanceId, 'ESCAPE', oldEscAction);
@@ -53,8 +60,11 @@ glift.displays.statusbar.infoWindow = function(
  * @package
  * @constructor @final @struct
  */
-glift.displays.statusbar.InfoWindow = function(
-    wrapperDiv, baseStatusDiv, textDiv) {
+glift.displays.statusbar.InfoWindow = function (
+  wrapperDiv,
+  baseStatusDiv,
+  textDiv
+) {
   /**
    * Div that wraps both the baseDiv and the Text Div
    */
@@ -73,10 +83,8 @@ glift.displays.statusbar.InfoWindow = function(
 
 glift.displays.statusbar.InfoWindow.prototype = {
   /** Finishes the Info Window by attaching all the elements. */
-  finish: function() {
+  finish: function () {
     this.baseStatusDiv_.append(this.textDiv);
     this.wrapperDiv_.prepend(this.baseStatusDiv_);
-  }
+  },
 };
-
-

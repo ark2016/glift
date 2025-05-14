@@ -8,10 +8,10 @@
  * @retutrn {!glift.rules.MoveTree}
  * @package
  */
-glift.parse.tygem = function(gibString) {
+glift.parse.tygem = function (gibString) {
   var states = {
     HEADER: 1,
-    BODY: 2
+    BODY: 2,
   };
   var colorToToken = { 1: 'B', 2: 'W' };
 
@@ -22,9 +22,11 @@ glift.parse.tygem = function(gibString) {
   var movetree = glift.rules.movetree.getInstance();
   var lines = gibString.split('\n');
 
-  var grabHeaderProp = function(name, line, prop, mt) {
+  var grabHeaderProp = function (name, line, prop, mt) {
     line = line.substring(
-        line.indexOf(name) + name.length + 1, line.length - 2);
+      line.indexOf(name) + name.length + 1,
+      line.length - 2
+    );
     if (/\\$/.test(line)) {
       // This is a horrible hack. Sometimes \ appears as the last character
       line = line.substring(0, line.length - 1);
@@ -35,7 +37,7 @@ glift.parse.tygem = function(gibString) {
   var curstate = states.HEADER;
   for (var i = 0, len = lines.length; i < len; i++) {
     var str = lines[i];
-    var firstTwo = str.substring(0,2);
+    var firstTwo = str.substring(0, 2);
     if (firstTwo === '\\[') {
       // We're in the header.
       var eqIdx = str.indexOf('=');
@@ -48,7 +50,7 @@ glift.parse.tygem = function(gibString) {
     } else if (firstTwo === 'ST') {
       if (curstate !== states.BODY) {
         // We're in stone-placing land and out of the header.
-        curstate = states.BODY
+        curstate = states.BODY;
       }
 
       // Stone lines look like:
@@ -57,12 +59,14 @@ glift.parse.tygem = function(gibString) {
       //
       // Note that the board is indexed from the bottom left rather than from
       // the upper left, as with SGFs. Also, the intersections are 0-indexed.
-      var splat = str.split(" ");
+      var splat = str.split(' ');
       var colorToken = colorToToken[splat[3]];
       var x = parseInt(splat[4], 10);
       var y = parseInt(splat[5], 10);
-      movetree.addNode().properties().add(
-          colorToken, glift.util.point(x, y).toSgfCoord());
+      movetree
+        .addNode()
+        .properties()
+        .add(colorToken, glift.util.point(x, y).toSgfCoord());
     }
   }
   return movetree.getTreeFromRoot();

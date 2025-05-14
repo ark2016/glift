@@ -1,6 +1,6 @@
-goog.provide('glift.displays.MultiCenter')
-goog.provide('glift.displays.SingleCenter')
-goog.provide('glift.displays.Transform')
+goog.provide('glift.displays.MultiCenter');
+goog.provide('glift.displays.SingleCenter');
+goog.provide('glift.displays.Transform');
 
 /**
  * Transform object. Note that that the scale is set immediately, while the
@@ -12,7 +12,7 @@ goog.provide('glift.displays.Transform')
  * @param {number=} opt_yMove Defaults to zero if not set
  * @constructor @final @struct
  */
-glift.displays.Transform = function(scale, opt_xMove, opt_yMove) {
+glift.displays.Transform = function (scale, opt_xMove, opt_yMove) {
   /**
    * How much to scale the object by.
    * @type {number}
@@ -41,7 +41,7 @@ glift.displays.Transform = function(scale, opt_xMove, opt_yMove) {
  *    didn't fit given the parameters.
  * @constructor @final @struct
  */
-glift.displays.MultiCenter = function(transforms, bboxes, unfit) {
+glift.displays.MultiCenter = function (transforms, bboxes, unfit) {
   this.transforms = transforms;
   this.bboxes = bboxes;
   this.unfit = unfit;
@@ -57,7 +57,7 @@ glift.displays.MultiCenter = function(transforms, bboxes, unfit) {
  *
  * @constructor @final @struct
  */
-glift.displays.SingleCenter = function(transform, bbox) {
+glift.displays.SingleCenter = function (transform, bbox) {
   this.transform = transform;
   this.bbox = bbox;
 };
@@ -75,10 +75,22 @@ glift.displays.SingleCenter = function(transform, bbox) {
  *
  * @return {!glift.displays.MultiCenter}
  */
-glift.displays.rowCenterSimple = function(
-    outerBox, inBboxes, vertMargin, horzMargin, minSpacing) {
+glift.displays.rowCenterSimple = function (
+  outerBox,
+  inBboxes,
+  vertMargin,
+  horzMargin,
+  minSpacing
+) {
   return glift.displays.linearCentering_(
-      outerBox, inBboxes, vertMargin, horzMargin, minSpacing, 0, 'h');
+    outerBox,
+    inBboxes,
+    vertMargin,
+    horzMargin,
+    minSpacing,
+    0,
+    'h'
+  );
 };
 
 /**
@@ -90,10 +102,22 @@ glift.displays.rowCenterSimple = function(
  *
  * @return {!glift.displays.MultiCenter}
  */
-glift.displays.columnCenterSimple = function(
-    outerBox, inBboxes, vertMargin, horzMargin, minSpacing) {
+glift.displays.columnCenterSimple = function (
+  outerBox,
+  inBboxes,
+  vertMargin,
+  horzMargin,
+  minSpacing
+) {
   return glift.displays.linearCentering_(
-      outerBox, inBboxes, vertMargin, horzMargin, minSpacing, 0, 'v');
+    outerBox,
+    inBboxes,
+    vertMargin,
+    horzMargin,
+    minSpacing,
+    0,
+    'v'
+  );
 };
 
 /**
@@ -111,20 +135,27 @@ glift.displays.columnCenterSimple = function(
  *
  * @return {!glift.displays.MultiCenter}
  */
-glift.displays.linearCentering_ = function(
-    outerBox, inBboxes, vertMargin, horzMargin, minSpacing, maxSpacing, dir) {
+glift.displays.linearCentering_ = function (
+  outerBox,
+  inBboxes,
+  vertMargin,
+  horzMargin,
+  minSpacing,
+  maxSpacing,
+  dir
+) {
   var outerWidth = outerBox.width(),
-      innerWidth = outerWidth - 2 * horzMargin,
-      outerHeight = outerBox.height(),
-      innerHeight = outerHeight - 2 * vertMargin,
-      transforms = [],
-      newBboxes = [];
+    innerWidth = outerWidth - 2 * horzMargin,
+    outerHeight = outerBox.height(),
+    innerHeight = outerHeight - 2 * vertMargin,
+    transforms = [],
+    newBboxes = [];
   // TODO(kashomon): Min spacing is totally broken and has no tests.
   // Probably should just remove it.
   minSpacing = minSpacing || 0;
   maxSpacing = maxSpacing || 0;
-  dir = (dir === 'v' || dir === 'h') ? dir : 'h';
-  var getLongSide = function(bbox, dir) {
+  dir = dir === 'v' || dir === 'h' ? dir : 'h';
+  var getLongSide = function (bbox, dir) {
     return dir === 'h' ? bbox.width() : bbox.height();
   };
 
@@ -185,7 +216,7 @@ glift.displays.linearCentering_ = function(
   }
 
   // Find the x and y translates.
-  var finishedBoxes = []
+  var finishedBoxes = [];
   for (var i = 0; i < newBboxes.length; i++) {
     var newBbox = newBboxes[i];
     var partialTransform = transforms[i];
@@ -201,8 +232,7 @@ glift.displays.linearCentering_ = function(
     }
   }
 
-  return new glift.displays.MultiCenter(
-      transforms, finishedBoxes, unfitBoxes);
+  return new glift.displays.MultiCenter(transforms, finishedBoxes, unfitBoxes);
 };
 
 /**
@@ -216,19 +246,22 @@ glift.displays.linearCentering_ = function(
  *
  * @return {!glift.displays.SingleCenter}
  */
-glift.displays.centerWithin = function(
-    outerBbox, bbox, vertMargin, horzMargin) {
+glift.displays.centerWithin = function (
+  outerBbox,
+  bbox,
+  vertMargin,
+  horzMargin
+) {
   var outerWidth = outerBbox.width(),
-      innerWidth = outerWidth - 2 * horzMargin,
-      outerHeight = outerBbox.height(),
-      innerHeight = outerHeight - 2 * vertMargin,
-      transforms = undefined,
-      newBboxes = undefined,
-      elemWidth = 0;
+    innerWidth = outerWidth - 2 * horzMargin,
+    outerHeight = outerBbox.height(),
+    innerHeight = outerHeight - 2 * vertMargin,
+    transforms = undefined,
+    newBboxes = undefined,
+    elemWidth = 0;
 
   var scale = 1; // i.e., no scaling;
-  if (innerHeight / innerWidth >
-      bbox.height() / bbox.width()) {
+  if (innerHeight / innerWidth > bbox.height() / bbox.width()) {
     // Outer box is a 'more-tall' box than the inner-box.  So, we scale the
     // inner box by width (since the height has more wiggle room).
     scale = innerWidth / bbox.width();
@@ -242,12 +275,13 @@ glift.displays.centerWithin = function(
   }
   var top = outerBbox.top() + vertMargin;
   if (newBbox.height() < innerHeight) {
-    top = top + (innerHeight -  newBbox.height()) / 2;
+    top = top + (innerHeight - newBbox.height()) / 2;
   }
   var transform = new glift.displays.Transform(
     scale,
     left - newBbox.left(),
-    top - newBbox.top());
+    top - newBbox.top()
+  );
   newBbox = newBbox.translate(transform.xMove, transform.yMove);
   return new glift.displays.SingleCenter(transform, newBbox);
 };

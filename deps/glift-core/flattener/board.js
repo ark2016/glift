@@ -15,7 +15,7 @@ glift.flattener.board = {
    *
    * @return {!glift.flattener.Board<Intersection>}
    */
-  create: function(cropping, stoneMap, markMap) {
+  create: function (cropping, stoneMap, markMap) {
     var point = glift.util.point;
     var board = [];
     var bbox = cropping.bbox;
@@ -27,9 +27,16 @@ glift.flattener.board = {
         var stone = stoneMap[ptStr];
         var stoneColor = stone ? stone.color : glift.enums.states.EMPTY;
         var mark = markMap.marks[ptStr];
-        var label = markMap.labels[ptStr]
-        row.push(glift.flattener.intersection.create(
-            pt, stoneColor, mark, label, cropping.size));
+        var label = markMap.labels[ptStr];
+        row.push(
+          glift.flattener.intersection.create(
+            pt,
+            stoneColor,
+            mark,
+            label,
+            cropping.size
+          )
+        );
       }
       board.push(row);
     }
@@ -45,7 +52,7 @@ glift.flattener.board = {
    * @param {!glift.flattener.Intersection} newPoint
    * @return {boolean} Whether or not these points are different
    */
-  displayDiff:  function(oldPoint, newPoint) {
+  displayDiff: function (oldPoint, newPoint) {
     if (newPoint.mark()) {
       // Any time there's a mark, we want to display it, so consider this point
       // as being different.
@@ -69,7 +76,7 @@ glift.flattener.board = {
  *
  * @constructor @final @struct
  */
-glift.flattener.Board = function(boardArray, bbox, maxBoardSize) {
+glift.flattener.Board = function (boardArray, bbox, maxBoardSize) {
   /**
    * 2D Array of intersections. Generally, this is an array of intersections,
    * but could be backed by a different underlying objects based on a
@@ -99,7 +106,7 @@ glift.flattener.Board.prototype = {
    * Returns the size of the board. Usually 9, 13 or 19.
    * @return {number}
    */
-  maxBoardSize: function() {
+  maxBoardSize: function () {
     return this.maxBoardSize_;
   },
 
@@ -107,15 +114,15 @@ glift.flattener.Board.prototype = {
    * Gets the go-intersection at the top left, respecting cropping.
    * @return {!glift.Point}
    */
-  topLeft: function() {
-    return this.ptToBoardPt(new glift.Point(0,0));
+  topLeft: function () {
+    return this.ptToBoardPt(new glift.Point(0, 0));
   },
 
   /**
    * Gets the go-intersection at the bottom right, respecting cropping.
    * @return {!glift.Point}
    */
-  botRight: function() {
+  botRight: function () {
     return this.topLeft().translate(this.width() - 1, this.height() - 1);
   },
 
@@ -123,14 +130,16 @@ glift.flattener.Board.prototype = {
    * Returns the bounding box (in intersections) of the board.
    * @return {!glift.orientation.BoundingBox}
    */
-  boundingBox: function() {
+  boundingBox: function () {
     return new glift.orientation.BoundingBox(this.topLeft(), this.botRight());
   },
 
   /** @return {boolean} Returns whether the board is cropped. */
-  isCropped: function() {
-    return this.width() !== this.maxBoardSize() ||
-        this.height() !== this.maxBoardSize();
+  isCropped: function () {
+    return (
+      this.width() !== this.maxBoardSize() ||
+      this.height() !== this.maxBoardSize()
+    );
   },
 
   /**
@@ -138,7 +147,7 @@ glift.flattener.Board.prototype = {
    * necessarily be the length of the board - 1 due to cropping.
    * @return {number}
    */
-  height: function() {
+  height: function () {
     return this.boardArray_.length;
   },
 
@@ -147,7 +156,7 @@ glift.flattener.Board.prototype = {
    * necessarily be the length of the board - 1 due to cropping.
    * @return {number}
    */
-  width: function() {
+  width: function () {
     // Here we assume that the Go board is rectangular.
     return this.boardArray_[0].length;
   },
@@ -177,11 +186,15 @@ glift.flattener.Board.prototype = {
    */
   // TODO(kashomon): Replace with getBoardPt. It's too confusing to have getInt
   // and getBoardPt (and that is already extremely confusing).
-  getIntBoardPt: function(ptOrX, opt_y) {
-    if (glift.util.typeOf(ptOrX) === 'number' &&
-        glift.util.typeOf(opt_y) === 'number') {
+  getIntBoardPt: function (ptOrX, opt_y) {
+    if (
+      glift.util.typeOf(ptOrX) === 'number' &&
+      glift.util.typeOf(opt_y) === 'number'
+    ) {
       var pt = glift.util.point(
-          /** @type {number} */ (ptOrX), /** @type {number} */ (opt_y));
+        /** @type {number} */ (ptOrX),
+        /** @type {number} */ (opt_y)
+      );
     } else {
       var pt = /** @type {!glift.Point} */ (ptOrX);
     }
@@ -207,16 +220,22 @@ glift.flattener.Board.prototype = {
    *
    * @return {T}
    */
-  getInt: function(ptOrX, opt_y) {
-    if (glift.util.typeOf(ptOrX) === 'number' &&
-        glift.util.typeOf(opt_y) === 'number') {
+  getInt: function (ptOrX, opt_y) {
+    if (
+      glift.util.typeOf(ptOrX) === 'number' &&
+      glift.util.typeOf(opt_y) === 'number'
+    ) {
       var pt = glift.util.point(
-          /** @type {number} */ (ptOrX), /** @type {number} */ (opt_y));
+        /** @type {number} */ (ptOrX),
+        /** @type {number} */ (opt_y)
+      );
     } else {
       var pt = ptOrX;
     }
     var row = this.boardArray_[pt.y()];
-    if (!row) { return null };
+    if (!row) {
+      return null;
+    }
     return row[pt.x()] || null;
   },
 
@@ -227,7 +246,7 @@ glift.flattener.Board.prototype = {
    * @param {!glift.Point} pt
    * @return {!glift.Point} The translated point
    */
-  ptToBoardPt: function(pt) {
+  ptToBoardPt: function (pt) {
     return pt.translate(this.bbox_.left(), this.bbox_.top());
   },
 
@@ -239,7 +258,7 @@ glift.flattener.Board.prototype = {
    * @param {!glift.Point} pt
    * @return {!glift.Point} The translated point
    */
-  boardPtToPt: function(pt) {
+  boardPtToPt: function (pt) {
     return pt.translate(-this.bbox_.left(), -this.bbox_.top());
   },
 
@@ -247,7 +266,7 @@ glift.flattener.Board.prototype = {
    * Returns the board array.
    * @return {!Array<!Array<!T>>}
    */
-  boardArray: function() {
+  boardArray: function () {
     return this.boardArray_;
   },
 
@@ -268,7 +287,7 @@ glift.flattener.Board.prototype = {
    *
    * @template U
    */
-  transform: function(fn) {
+  transform: function (fn) {
     var outArray = [];
     for (var y = 0; y < this.boardArray_.length; y++) {
       var row = [];
@@ -294,14 +313,14 @@ glift.flattener.Board.prototype = {
    * @param {!glift.flattener.Board<T>} newBoard
    * @return {!Array<!glift.flattener.BoardDiffPt<T>>}
    */
-  diff: function(newBoard) {
+  diff: function (newBoard) {
     /**
      * @param {T} oldPoint
      * @param {T} newPoint
      * @return boolean Whether or not these points are different (or rather, not
      *    equal for this particular diffFn).
      */
-    var diffFn = function(oldPoint, newPoint) {
+    var diffFn = function (oldPoint, newPoint) {
       if (oldPoint.equals && typeof oldPoint.equals === 'function') {
         // Equals is defined, let's use it.
         return !oldPoint.equals(newPoint);
@@ -323,14 +342,30 @@ glift.flattener.Board.prototype = {
    *    different, the diffFn returns true (answering the question: 'are they
    *    different?') and returns false if they are thsame.
    */
-  differ: function(newBoard, diffFn) {
-    if (!newBoard|| !newBoard.boardArray_ || !newBoard.bbox_ || !newBoard.maxBoardSize_) {
+  differ: function (newBoard, diffFn) {
+    if (
+      !newBoard ||
+      !newBoard.boardArray_ ||
+      !newBoard.bbox_ ||
+      !newBoard.maxBoardSize_
+    ) {
       throw new Error('Diff board not defined or not a flattener board');
     }
-    if (this.height() !== newBoard.height() || this.width() !== newBoard.width()) {
-      throw new Error('Boards do not have the same dimensions.' +
-        ' This: h:' + this.height() + ' w:' + this.width() +
-        ' That: h:' + newBoard.height() + ' w:' + newBoard.width());
+    if (
+      this.height() !== newBoard.height() ||
+      this.width() !== newBoard.width()
+    ) {
+      throw new Error(
+        'Boards do not have the same dimensions.' +
+          ' This: h:' +
+          this.height() +
+          ' w:' +
+          this.width() +
+          ' That: h:' +
+          newBoard.height() +
+          ' w:' +
+          newBoard.width()
+      );
     }
     var out = [];
     for (var i = 0; i < this.boardArray_.length; i++) {
@@ -343,17 +378,25 @@ glift.flattener.Board.prototype = {
 
         // Out of bounds. This shouldn't happen if the diff function is used in
         // a sane way.
-        if (!newIntp) { break; }
+        if (!newIntp) {
+          break;
+        }
         var ptsAreDifferent = diffFn(intp, newIntp);
         if (ptsAreDifferent) {
           var pt = new glift.Point(j, i);
-          out.push(new glift.flattener.BoardDiffPt(
-            intp, newIntp, pt, this.ptToBoardPt(pt)));
+          out.push(
+            new glift.flattener.BoardDiffPt(
+              intp,
+              newIntp,
+              pt,
+              this.ptToBoardPt(pt)
+            )
+          );
         }
       }
     }
     return out;
-  }
+  },
 };
 
 /**
@@ -371,7 +414,12 @@ glift.flattener.Board.prototype = {
  *
  * @constructor @final @struct
  */
-glift.flattener.BoardDiffPt = function(prevValue, newValue, colRowPt, boardPt) {
+glift.flattener.BoardDiffPt = function (
+  prevValue,
+  newValue,
+  colRowPt,
+  boardPt
+) {
   this.prevValue = prevValue;
   this.newValue = newValue;
   this.colRowPt = colRowPt;

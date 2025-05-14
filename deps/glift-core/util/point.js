@@ -5,7 +5,6 @@ goog.provide('glift.util.point');
 goog.require('glift');
 goog.require('glift.util');
 
-
 /**
  * A point string is just a string with the format '<Number>,<Number>'. We use
  * this special type as a reminder to the reader of the code.
@@ -22,7 +21,7 @@ glift.PtStr;
  * @param {number} y
  * @return {!glift.Point}
  */
-glift.util.point = function(x, y) {
+glift.util.point = function (x, y) {
   return new glift.Point(x, y);
 };
 
@@ -31,7 +30,7 @@ glift.util.point = function(x, y) {
  * @param {number} y
  * @return {!glift.PtStr}
  */
-glift.util.coordToString = function(x, y) {
+glift.util.coordToString = function (x, y) {
   return x + ',' + y;
 };
 
@@ -39,13 +38,13 @@ glift.util.coordToString = function(x, y) {
  * @param {glift.PtStr} str
  * @return {!glift.Point}
  */
-glift.util.pointFromString = function(str) {
+glift.util.pointFromString = function (str) {
   try {
-    var split = str.split(",");
+    var split = str.split(',');
     var x = parseInt(split[0], 10);
     var y = parseInt(split[1], 10);
     return glift.util.point(x, y);
-  } catch(e) {
+  } catch (e) {
     throw "Parsing Error! Couldn't parse a point from: " + str;
   }
 };
@@ -61,7 +60,7 @@ glift.util.pointFromString = function(str) {
  * @param {string} str The sgf string to pars.
  * @return {!Array<!glift.Point>} An array of points.
  */
-glift.util.pointArrFromSgfProp = function(str) {
+glift.util.pointArrFromSgfProp = function (str) {
   if (str.length === 2) {
     // Assume the properties have the form [ab].
     return [glift.util.pointFromSgfCoord(str)];
@@ -70,20 +69,28 @@ glift.util.pointArrFromSgfProp = function(str) {
     // why this function exists. See http://www.red-bean.com/sgf/sgf4.html#3.5.1
     var splat = str.split(':');
     if (splat.length !== 2) {
-      throw new Error('Expected two points: TopLeft and BottomRight for ' +
-        'point rectangle. Instead found: ' + str);
+      throw new Error(
+        'Expected two points: TopLeft and BottomRight for ' +
+          'point rectangle. Instead found: ' +
+          str
+      );
     }
     var out = [];
     var tl = glift.util.pointFromSgfCoord(splat[0]);
     var br = glift.util.pointFromSgfCoord(splat[1]);
     if (br.x() < tl.x() || br.y() < br.y()) {
-      throw new Error('Invalid point rectangle: tl: ' + tl.toString() +
-          ', br: ' + br.toString());
+      throw new Error(
+        'Invalid point rectangle: tl: ' +
+          tl.toString() +
+          ', br: ' +
+          br.toString()
+      );
     }
     var delta = br.translate(-tl.x(), -tl.y());
     for (var i = 0; i <= delta.y(); i++) {
       for (var j = 0; j <= delta.x(); j++) {
-        var newX = tl.x() + j, newY = tl.y() + i;
+        var newX = tl.x() + j,
+          newY = tl.y() + i;
         out.push(glift.util.point(newX, newY));
       }
     }
@@ -92,7 +99,6 @@ glift.util.pointArrFromSgfProp = function(str) {
     throw new Error('Unknown pointformat for property data: ' + str);
   }
 };
-
 
 /**
  * Take an SGF point (e.g., 'mc') and return a GliftPoint.
@@ -106,15 +112,13 @@ glift.util.pointArrFromSgfProp = function(str) {
  * @param {string} str The SGF string point
  * @return {!glift.Point} the finished point.
  */
-glift.util.pointFromSgfCoord = function(str) {
+glift.util.pointFromSgfCoord = function (str) {
   if (str.length !== 2) {
-    throw 'Unknown SGF Coord length: ' + str.length +
-        'for property ' + str;
+    throw 'Unknown SGF Coord length: ' + str.length + 'for property ' + str;
   }
   var a = 'a'.charCodeAt(0);
   return glift.util.point(str.charCodeAt(0) - a, str.charCodeAt(1) - a);
 };
-
 
 /**
  * Basic Point class.
@@ -127,7 +131,7 @@ glift.util.pointFromSgfCoord = function(str) {
  * @param {number} yIn
  * @constructor @struct @final
  */
-glift.Point = function(xIn, yIn) {
+glift.Point = function (xIn, yIn) {
   /**
    * @private {number}
    * @const
@@ -142,39 +146,48 @@ glift.Point = function(xIn, yIn) {
 
 glift.Point.prototype = {
   /** @return {number} x value */
-  x: function() { return this.x_; },
+  x: function () {
+    return this.x_;
+  },
   /** @return {number} y value */
-  y: function() { return this.y_; },
+  y: function () {
+    return this.y_;
+  },
   /**
    * @param {?Object} inpt
    * @return {boolean} Whether this point equals another obj.
    */
-  equals: function(inpt) {
-    if (!inpt) { return false; }
-    if (!inpt.x && !inpt.y) { return false; }
+  equals: function (inpt) {
+    if (!inpt) {
+      return false;
+    }
+    if (!inpt.x && !inpt.y) {
+      return false;
+    }
     var pt = /** @type {!glift.Point} */ (inpt);
     return this.x_ === pt.x() && this.y_ === pt.y();
   },
 
   /** @return {!glift.Point} */
-  clone: function() {
+  clone: function () {
     return glift.util.point(this.x(), this.y());
   },
 
   /**
    * @return {string}  an SGF coord, e.g., 'ab' for (0,1)
    */
-  toSgfCoord: function() {
+  toSgfCoord: function () {
     var a = 'a'.charCodeAt(0);
-    return String.fromCharCode(this.x() + a) +
-        String.fromCharCode(this.y() + a);
+    return (
+      String.fromCharCode(this.x() + a) + String.fromCharCode(this.y() + a)
+    );
   },
 
   /**
    * Return a string representation of the coordinate.  I.e., "12,3".
    * @return {!glift.PtStr}
    */
-  toString: function() {
+  toString: function () {
     return glift.util.coordToString(this.x(), this.y());
   },
 
@@ -183,7 +196,7 @@ glift.Point.prototype = {
    * @param {number} y
    * @return {!glift.Point} a new point that's a translation from this one.
    */
-  translate: function(x, y) {
+  translate: function (x, y) {
     return glift.util.point(this.x() + x, this.y() + y);
   },
 
@@ -197,11 +210,13 @@ glift.Point.prototype = {
    *
    * @return {!glift.Point} A new point that has possibly been rotated.
    */
-  rotate: function(maxIntersections, rotation) {
+  rotate: function (maxIntersections, rotation) {
     var rotations = glift.enums.rotations;
-    if (maxIntersections < 0 ||
-        rotation === undefined ||
-        rotation === rotations.NO_ROTATION) {
+    if (
+      maxIntersections < 0 ||
+      rotation === undefined ||
+      rotation === rotations.NO_ROTATION
+    ) {
       return this;
     }
 
@@ -209,19 +224,20 @@ glift.Point.prototype = {
 
     var normalized = this.normalize(maxIntersections);
 
-    if (glift.util.outBounds(this.x(), maxIntersections) ||
-        glift.util.outBounds(this.x(), maxIntersections)) {
-      throw new Error("rotating a point outside the bounds: " +
-          this.toString());
+    if (
+      glift.util.outBounds(this.x(), maxIntersections) ||
+      glift.util.outBounds(this.x(), maxIntersections)
+    ) {
+      throw new Error(
+        'rotating a point outside the bounds: ' + this.toString()
+      );
     }
 
     var rotated = normalized;
     if (rotation === rotations.CLOCKWISE_90) {
       rotated = point(normalized.y(), -normalized.x());
-
     } else if (rotation === rotations.CLOCKWISE_180) {
       rotated = point(-normalized.x(), -normalized.y());
-
     } else if (rotation === rotations.CLOCKWISE_270) {
       rotated = point(-normalized.y(), normalized.x());
     }
@@ -235,7 +251,7 @@ glift.Point.prototype = {
    * @param {glift.enums.rotations} rotation Usually 9, 13, or 19.
    * @return {!glift.Point} A rotated point.
    */
-  antirotate: function(maxIntersections, rotation) {
+  antirotate: function (maxIntersections, rotation) {
     var rotations = glift.enums.rotations;
     if (rotation === rotations.CLOCKWISE_90) {
       return this.rotate(maxIntersections, rotations.CLOCKWISE_270);
@@ -253,7 +269,7 @@ glift.Point.prototype = {
    * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  flipVert: function(size) {
+  flipVert: function (size) {
     if (!size) {
       throw new Error('The board size must be defined. Was:' + size);
     }
@@ -266,7 +282,7 @@ glift.Point.prototype = {
    * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  flipHorz: function(size) {
+  flipHorz: function (size) {
     if (!size) {
       throw new Error('The board size must be defined. Was:' + size);
     }
@@ -274,13 +290,12 @@ glift.Point.prototype = {
     return glift.util.point(-n.x(), n.y()).denormalize(size);
   },
 
-
   /**
    * Makes the 0,0 point in the very center of the board.
    * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  normalize: function(size) {
+  normalize: function (size) {
     if (!size) {
       throw new Error('Size is required for normalization. Was: ' + size);
     }
@@ -293,7 +308,7 @@ glift.Point.prototype = {
    * @param {number} size Usually 9, 13, or 19
    * @return {!glift.Point}
    */
-  denormalize: function(size) {
+  denormalize: function (size) {
     var mid = (size - 1) / 2;
     return glift.util.point(mid + this.x(), -this.y() + mid);
   },

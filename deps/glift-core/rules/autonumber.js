@@ -6,10 +6,10 @@
  *
  * @param {!glift.rules.MoveTree} movetree The movetree to autonumber.
  */
-glift.rules.autonumber = function(movetree) {
+glift.rules.autonumber = function (movetree) {
   var digitregex = /\d+/;
   var singledigit = /0\d/;
-  movetree.recurseFromRoot(function(mt) {
+  movetree.recurseFromRoot(function (mt) {
     if (!mt.properties().getComment()) {
       return; // Nothing to do.  We only autonumber on comments.
     }
@@ -21,7 +21,7 @@ glift.rules.autonumber = function(movetree) {
      */
     var lblMap = {};
     for (var i = 0; labels && i < labels.length; i++) {
-      var lblData = labels[i].split(':')
+      var lblData = labels[i].split(':');
       if (digitregex.test(lblData[1])) {
         // Clear out digits
       } else {
@@ -33,18 +33,21 @@ glift.rules.autonumber = function(movetree) {
     var newMt = pathOut.movetree;
     var goban = glift.rules.goban.getFromMoveTree(newMt).goban;
 
-    var mvnum = mt.onMainline() ?
-        newMt.node().getNodeNum() + 1:
-        newMt.movesToMainline() + 1;
+    var mvnum = mt.onMainline()
+      ? newMt.node().getNodeNum() + 1
+      : newMt.movesToMainline() + 1;
     var applied = glift.rules.treepath.applyNextMoves(
-        newMt, goban, pathOut.nextMoves);
+      newMt,
+      goban,
+      pathOut.nextMoves
+    );
 
     var seen = 0;
     for (var i = 0, st = applied.stones; i < st.length; i++) {
       var stone = st[i];
       if (!stone.collision) {
         var sgfPoint = stone.point.toSgfCoord();
-        lblMap[sgfPoint] = (mvnum + seen) + '';
+        lblMap[sgfPoint] = mvnum + seen + '';
         seen++;
       }
     }
@@ -81,7 +84,7 @@ glift.rules.autonumber = function(movetree) {
  * @param {!Object<string>} lblMap Map of SGF Point string to label.
  * @package
  */
-glift.rules.removeCollidingLabels = function(mt, lblMap) {
+glift.rules.removeCollidingLabels = function (mt, lblMap) {
   var toConsider = ['TR', 'SQ'];
   for (var i = 0; i < toConsider.length; i++) {
     var key = toConsider[i];

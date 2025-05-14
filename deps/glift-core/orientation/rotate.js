@@ -17,22 +17,21 @@ goog.provide('glift.orientation.AutoRotateCropPrefs');
  */
 glift.orientation.AutoRotateCropPrefs;
 
-
 /**
  * Rotate all point-based properties in a movetree.
  * @param {!glift.rules.MoveTree} movetree
  * @param {!glift.enums.rotations} rotation
  * @return {!glift.rules.MoveTree} root-move tree.
  */
-glift.orientation.rotateMovetree = function(movetree, rotation) {
+glift.orientation.rotateMovetree = function (movetree, rotation) {
   if (!rotation || rotation === glift.enums.rotations.NO_ROTATION) {
     return movetree.getTreeFromRoot();
   }
   movetree = movetree.newTreeRef();
   var size = movetree.getIntersections();
-  movetree.recurseFromRoot(function(mt) {
+  movetree.recurseFromRoot(function (mt) {
     var props = mt.properties();
-    props.forEach(function(prop, vals) {
+    props.forEach(function (prop, vals) {
       props.rotate(prop, size, rotation);
     });
   });
@@ -45,15 +44,15 @@ glift.orientation.rotateMovetree = function(movetree, rotation) {
  * @param {!glift.enums.Flip} flip
  * @return {!glift.rules.MoveTree} root-move tree.
  */
-glift.orientation.flipMovetree = function(movetree, flip) {
+glift.orientation.flipMovetree = function (movetree, flip) {
   if (!flip || flip === glift.enums.Flip.NO_FLIP) {
     return movetree.getTreeFromRoot();
   }
   movetree = movetree.newTreeRef();
   var size = movetree.getIntersections();
-  movetree.recurseFromRoot(function(mt) {
+  movetree.recurseFromRoot(function (mt) {
     var props = mt.properties();
-    props.forEach(function(prop, vals) {
+    props.forEach(function (prop, vals) {
       if (flip === glift.enums.Flip.VERTICAL) {
         props.flipVert(prop, size);
       } else {
@@ -73,7 +72,7 @@ glift.orientation.flipMovetree = function(movetree, flip) {
  * @param {!glift.orientation.AutoRotateCropPrefs=} opt_prefs
  * @return {!glift.rules.MoveTree}
  */
-glift.orientation.autoRotateCrop = function(movetree, opt_prefs) {
+glift.orientation.autoRotateCrop = function (movetree, opt_prefs) {
   var nmt = movetree.getTreeFromRoot();
   var region = glift.orientation.getQuadCropFromMovetree(nmt);
   var rotation = glift.orientation.findCropRotation_(region, opt_prefs);
@@ -95,14 +94,13 @@ glift.orientation.autoRotateCrop = function(movetree, opt_prefs) {
   return nmt.getTreeFromRoot();
 };
 
-
 /**
  * Automatically rotate a game by ensuring that the first stone is always in
  * the upper right.
  * @param {!glift.rules.MoveTree} movetree
  * @return {!glift.rules.MoveTree}
  */
-glift.orientation.autoRotateGame = function(movetree) {
+glift.orientation.autoRotateGame = function (movetree) {
   var nmt = movetree.getTreeFromRoot();
   var pt = null;
   var props = glift.rules.prop;
@@ -158,7 +156,7 @@ glift.orientation.autoRotateGame = function(movetree) {
  * @param {!glift.orientation.AutoRotateCropPrefs=} opt_prefs
  * @return {!glift.enums.rotations} The rotation that should be performed.
  */
-glift.orientation.findCanonicalRotation = function(movetree, opt_prefs) {
+glift.orientation.findCanonicalRotation = function (movetree, opt_prefs) {
   var region = glift.orientation.getQuadCropFromMovetree(movetree);
   return glift.orientation.findCropRotation_(region, opt_prefs);
 };
@@ -171,20 +169,20 @@ glift.orientation.findCanonicalRotation = function(movetree, opt_prefs) {
  * @return {!glift.enums.rotations} The rotation that should be performed.
  * @private
  */
-glift.orientation.findCropRotation_ = function(region, opt_prefs) {
+glift.orientation.findCropRotation_ = function (region, opt_prefs) {
   var boardRegions = glift.enums.boardRegions;
   var rotations = glift.enums.rotations;
   var cornerRegions = {
     TOP_LEFT: 0,
     BOTTOM_LEFT: 90,
     BOTTOM_RIGHT: 180,
-    TOP_RIGHT: 270
+    TOP_RIGHT: 270,
   };
   var sideRegions = {
     TOP: 0,
     LEFT: 90,
     BOTTOM: 180,
-    RIGHT: 270
+    RIGHT: 270,
   };
 
   var prefs = opt_prefs || {};
@@ -204,9 +202,12 @@ glift.orientation.findCropRotation_ = function(region, opt_prefs) {
     return rotations.NO_ROTATION;
   }
 
-  if (cornerRegions[region] !== undefined ||
-      sideRegions[region] !== undefined) {
-    var start = 0, end = 0;
+  if (
+    cornerRegions[region] !== undefined ||
+    sideRegions[region] !== undefined
+  ) {
+    var start = 0,
+      end = 0;
     if (cornerRegions[region] !== undefined) {
       start = cornerRegions[region];
       end = cornerRegions[prefs.corner];
@@ -218,12 +219,17 @@ glift.orientation.findCropRotation_ = function(region, opt_prefs) {
     }
 
     var rot = (360 + start - end) % 360;
-    switch(rot) {
-      case 0: return rotations.NO_ROTATION;
-      case 90: return rotations.CLOCKWISE_90;
-      case 180: return rotations.CLOCKWISE_180;
-      case 270: return rotations.CLOCKWISE_270;
-      default: return rotations.NO_ROTATION;
+    switch (rot) {
+      case 0:
+        return rotations.NO_ROTATION;
+      case 90:
+        return rotations.CLOCKWISE_90;
+      case 180:
+        return rotations.CLOCKWISE_180;
+      case 270:
+        return rotations.CLOCKWISE_270;
+      default:
+        return rotations.NO_ROTATION;
     }
   }
 
@@ -238,35 +244,43 @@ glift.orientation.findCropRotation_ = function(region, opt_prefs) {
  * @return {glift.enums.Flip}
  * @private
  */
-glift.orientation.flipForRotation_ = function(region, rotation) {
+glift.orientation.flipForRotation_ = function (region, rotation) {
   var br = glift.enums.boardRegions;
   var rots = glift.enums.rotations;
 
   // For when the board region is a corner.
-  if (rotation === rots.CLOCKWISE_90 &&
-      (region == br.TOP_LEFT || region == br.BOTTOM_RIGHT)) {
+  if (
+    rotation === rots.CLOCKWISE_90 &&
+    (region == br.TOP_LEFT || region == br.BOTTOM_RIGHT)
+  ) {
     return glift.enums.Flip.HORIZONTAL;
-
-  } else if (rotation === rots.CLOCKWISE_90 &&
-      (region == br.TOP_RIGHT || region == br.BOTTOM_LEFT)) {
+  } else if (
+    rotation === rots.CLOCKWISE_90 &&
+    (region == br.TOP_RIGHT || region == br.BOTTOM_LEFT)
+  ) {
     return glift.enums.Flip.VERTICAL;
-
-  } else if (rotation === rots.CLOCKWISE_270 &&
-      (region == br.TOP_LEFT || region == br.BOTTOM_RIGHT)) {
+  } else if (
+    rotation === rots.CLOCKWISE_270 &&
+    (region == br.TOP_LEFT || region == br.BOTTOM_RIGHT)
+  ) {
     return glift.enums.Flip.VERTICAL;
-
-  } else if (rotation === rots.CLOCKWISE_270 &&
-      (region == br.TOP_RIGHT || region == br.BOTTOM_LEFT)) {
+  } else if (
+    rotation === rots.CLOCKWISE_270 &&
+    (region == br.TOP_RIGHT || region == br.BOTTOM_LEFT)
+  ) {
     return glift.enums.Flip.HORIZONTAL;
   }
 
   // For when the board region is a side.
-  else if (rotation === rots.CLOCKWISE_180 &&
-      (region == br.TOP || region == br.BOTTOM)) {
+  else if (
+    rotation === rots.CLOCKWISE_180 &&
+    (region == br.TOP || region == br.BOTTOM)
+  ) {
     return glift.enums.Flip.VERTICAL;
-
-  } else if (rotation === rots.CLOCKWISE_180 &&
-      (region == br.LEFT || region == br.RIGHT)) {
+  } else if (
+    rotation === rots.CLOCKWISE_180 &&
+    (region == br.LEFT || region == br.RIGHT)
+  ) {
     return glift.enums.Flip.HORIZONTAL;
   }
 

@@ -2,7 +2,7 @@
  * Takes a movetree and returns the optimal BoardRegion-Quad for cropping purposes.
  *
  * This isn't a minimal cropping: we split the board into 4 quadrants.
- * Then, we use the quad as part of the final quad-output. 
+ * Then, we use the quad as part of the final quad-output.
  *
  * Optionally, we allow a nextMovesPath so that we can 'optimally' crop just a
  * variation.
@@ -14,13 +14,15 @@
  *
  * @param {!glift.rules.MoveTree} movetree The movetree we want to find the
  *    optimal cropping-region for.
- * @param {!(glift.rules.Treepath|string)=} opt_nextMovesPath 
+ * @param {!(glift.rules.Treepath|string)=} opt_nextMovesPath
  *    Optional next moves path for cropping along a specific path.
  *
  * @return {!glift.enums.boardRegions} The resulting boardregion cropping.
  */
-glift.orientation.getQuadCropFromMovetree =
-    function(movetree, opt_nextMovesPath) {
+glift.orientation.getQuadCropFromMovetree = function (
+  movetree,
+  opt_nextMovesPath
+) {
   var br = glift.enums.boardRegions;
   var ints = movetree.getIntersections();
   // It's not clear to me if we should be cropping boards smaller than 19.  It
@@ -30,7 +32,9 @@ glift.orientation.getQuadCropFromMovetree =
   }
 
   var minimalBox = glift.orientation.minimalBoundingBox(
-      movetree, opt_nextMovesPath);
+    movetree,
+    opt_nextMovesPath
+  );
   var boxMapping = glift.orientation.getCropboxMapping_();
   for (var i = 0; i < boxMapping.length; i++) {
     var obj = boxMapping[i];
@@ -39,8 +43,9 @@ glift.orientation.getQuadCropFromMovetree =
     }
   }
 
-  throw new Error('None of the boxes cover the minimal bbox!! ' +
-      'This should never happen');
+  throw new Error(
+    'None of the boxes cover the minimal bbox!! ' + 'This should never happen'
+  );
 };
 
 /**
@@ -53,7 +58,6 @@ glift.orientation.getQuadCropFromMovetree =
  * }}
  */
 glift.orientation.CropboxMapping;
-
 
 /**
  * For 19x19, we cache the cropbox mappings.
@@ -68,10 +72,10 @@ glift.orientation.cropboxMappingCache_ = null;
  * @private
  * @return {!Object<!glift.orientation.CropboxMapping>}
  */
-glift.orientation.getCropboxMapping_ = function() {
+glift.orientation.getCropboxMapping_ = function () {
   var br = glift.enums.boardRegions;
   // See glift.orientation.cropbox for more about how cropboxes are defined.
-  var cbox = function(boardRegion) {
+  var cbox = function (boardRegion) {
     return glift.orientation.cropbox.get(boardRegion, 19);
   };
 
@@ -89,33 +93,43 @@ glift.orientation.getCropboxMapping_ = function() {
       // First, we check the very middle of the board.
       {
         bbox: cbox(br.TOP_LEFT).bbox.intersect(cbox(br.BOTTOM_RIGHT).bbox),
-        result: br.ALL
-      // Now, check the side-overlaps.
-      }, {
+        result: br.ALL,
+        // Now, check the side-overlaps.
+      },
+      {
         bbox: cbox(br.TOP_LEFT).bbox.intersect(cbox(br.TOP_RIGHT).bbox),
-        result: br.TOP
-      }, {
+        result: br.TOP,
+      },
+      {
         bbox: cbox(br.TOP_LEFT).bbox.intersect(cbox(br.BOTTOM_LEFT).bbox),
-        result: br.LEFT
-      }, {
+        result: br.LEFT,
+      },
+      {
         bbox: cbox(br.BOTTOM_RIGHT).bbox.intersect(cbox(br.TOP_RIGHT).bbox),
-        result: br.RIGHT
-      }, {
+        result: br.RIGHT,
+      },
+      {
         bbox: cbox(br.BOTTOM_RIGHT).bbox.intersect(cbox(br.BOTTOM_LEFT).bbox),
-        result: br.BOTTOM
-      }
+        result: br.BOTTOM,
+      },
     ];
 
     var toAdd = [
-      br.TOP_LEFT, br.TOP_RIGHT, br.BOTTOM_LEFT, br.BOTTOM_RIGHT,
-      br.TOP, br.BOTTOM, br.LEFT, br.RIGHT,
-      br.ALL
+      br.TOP_LEFT,
+      br.TOP_RIGHT,
+      br.BOTTOM_LEFT,
+      br.BOTTOM_RIGHT,
+      br.TOP,
+      br.BOTTOM,
+      br.LEFT,
+      br.RIGHT,
+      br.ALL,
     ];
     for (var i = 0; i < toAdd.length; i++) {
       var bri = toAdd[i];
       boxRegions.push({
         bbox: cbox(bri).bbox,
-        result: bri
+        result: bri,
       });
     }
     glift.orientation.cropboxMappingCache_ = boxRegions;
@@ -123,5 +137,6 @@ glift.orientation.getCropboxMapping_ = function() {
 
   // Cropbox mapping must be defined here by the logic above
   return /** @type !{glift.orientation.CropboxMapping} */ (
-      glift.orientation.cropboxMappingCache_);
+    glift.orientation.cropboxMappingCache_
+  );
 };

@@ -6,7 +6,7 @@ goog.provide('glift.displays.position.WidgetColumn');
  *
  * @constructor @final @struct
  */
-glift.displays.position.WidgetBoxes = function() {
+glift.displays.position.WidgetBoxes = function () {
   /** @private {glift.displays.position.WidgetColumn} */
   this._first = null;
   /** @private {glift.displays.position.WidgetColumn} */
@@ -15,22 +15,22 @@ glift.displays.position.WidgetBoxes = function() {
 
 glift.displays.position.WidgetBoxes.prototype = {
   /** @param {!glift.displays.position.WidgetColumn} col */
-  setFirst: function(col) {
+  setFirst: function (col) {
     this._first = col;
   },
 
   /** @param {!glift.displays.position.WidgetColumn} col */
-  setSecond: function(col) {
+  setSecond: function (col) {
     this._second = col;
   },
 
   /** @return {glift.displays.position.WidgetColumn} First column */
-  first: function() {
+  first: function () {
     return this._first;
   },
 
   /** @return {glift.displays.position.WidgetColumn} Second column */
-  second: function(col) {
+  second: function (col) {
     return this._second;
   },
 
@@ -39,12 +39,12 @@ glift.displays.position.WidgetBoxes.prototype = {
    * @param {glift.BoardComponent} key Component key
    * @return {?glift.orientation.BoundingBox} A bounding box or null.
    */
-  getBbox: function(key) {
+  getBbox: function (key) {
     if (this._first && this._first.mapping[key]) {
-      return this._first.mapping[key]
+      return this._first.mapping[key];
     }
     if (this._second && this._second.mapping[key]) {
-      return this._second.mapping[key]
+      return this._second.mapping[key];
     }
     return null;
   },
@@ -55,7 +55,7 @@ glift.displays.position.WidgetBoxes.prototype = {
    * @param {glift.BoardComponent} key Component key
    * @return {!glift.orientation.BoundingBox}.
    */
-  mustGetBbox: function(key) {
+  mustGetBbox: function (key) {
     var bbox = this.getBbox(key);
     if (bbox == null) {
       throw new Error('Column was null for component: ' + key);
@@ -71,17 +71,17 @@ glift.displays.position.WidgetBoxes.prototype = {
    *
    * fn(<component-name>, bbox>);
    */
-  map: function(fn) {
+  map: function (fn) {
     if (glift.util.typeOf(fn) !== 'function') {
       return;
     }
-    var applyOrdering = (function(col, inFn) {
+    var applyOrdering = function (col, inFn) {
       var ordering = col.ordering;
       for (var j = 0; j < ordering.length; j++) {
         var key = ordering[j];
         inFn(key, col.mapping[key]);
       }
-    }).bind(this);
+    }.bind(this);
     this._first && applyOrdering(this._first, fn.bind(this));
     this._second && applyOrdering(this._second, fn.bind(this));
   },
@@ -91,12 +91,12 @@ glift.displays.position.WidgetBoxes.prototype = {
    * divs.  Note: Returns a new bounding box everytime, since it's calculated
    * based on the existing bboxes.
    */
-  fullWidgetBbox: function() {
+  fullWidgetBbox: function () {
     var top = null;
     var left = null;
     var bottom = null;
     var right = null;
-    this.map(function(compName, bbox) {
+    this.map(function (compName, bbox) {
       if (top === null) {
         top = bbox.top();
         left = bbox.left();
@@ -104,19 +104,28 @@ glift.displays.position.WidgetBoxes.prototype = {
         right = bbox.right();
         return;
       }
-      if (bbox.top() < top) { top = bbox.top(); }
-      if (bbox.left () < left) { left = bbox.left(); }
-      if (bbox.bottom() > bottom) { bottom = bbox.bottom(); }
-      if (bbox.right() > right) { right = bbox.right(); }
+      if (bbox.top() < top) {
+        top = bbox.top();
+      }
+      if (bbox.left() < left) {
+        left = bbox.left();
+      }
+      if (bbox.bottom() > bottom) {
+        bottom = bbox.bottom();
+      }
+      if (bbox.right() > right) {
+        right = bbox.right();
+      }
     });
     if (top !== null && left !== null && bottom !== null && right !== null) {
       return glift.orientation.bbox.fromPts(
-          glift.util.point(left, top),
-          glift.util.point(right, bottom));
-    } else  {
+        glift.util.point(left, top),
+        glift.util.point(right, bottom)
+      );
+    } else {
       return null;
     }
-  }
+  },
 };
 
 /**
@@ -124,7 +133,7 @@ glift.displays.position.WidgetBoxes.prototype = {
  *
  * @constructor @final @struct
  */
-glift.displays.position.WidgetColumn = function() {
+glift.displays.position.WidgetColumn = function () {
   /** Mapping from component from map to box. */
   this.mapping = {};
 
@@ -134,7 +143,7 @@ glift.displays.position.WidgetColumn = function() {
 
 glift.displays.position.WidgetColumn.prototype = {
   /** Set a mapping from from component to bounding box. */
-  setComponent: function(component, bbox) {
+  setComponent: function (component, bbox) {
     if (!glift.BoardComponent[component]) {
       throw new Error('Unknown component: ' + component);
     }
@@ -148,7 +157,7 @@ glift.displays.position.WidgetColumn.prototype = {
    * @param {glift.BoardComponent} component Component key
    * @return {?glift.orientation.BoundingBox} A bounding box or null.
    */
-  getBbox: function(component) {
+  getBbox: function (component) {
     return this.mapping[component] || null;
   },
 
@@ -158,7 +167,7 @@ glift.displays.position.WidgetColumn.prototype = {
    * @param {glift.BoardComponent} component Component key
    * @return {!glift.orientation.BoundingBox}
    */
-  mustGetBbox: function(component) {
+  mustGetBbox: function (component) {
     var bbox = this.getBbox(component);
     if (bbox == null) {
       throw new Error('Bbox was null for component: ' + component);
@@ -177,12 +186,12 @@ glift.displays.position.WidgetColumn.prototype = {
    *
    * This is typically set before setting components.
    */
-  setOrderingFromRatioArray: function(column) {
+  setOrderingFromRatioArray: function (column) {
     var ordering = [];
     for (var i = 0; i < column.length; i++) {
       var item = column[i];
       if (item && item.component) {
-          ordering.push(item.component);
+        ordering.push(item.component);
       }
     }
     this.ordering = ordering;
@@ -192,9 +201,9 @@ glift.displays.position.WidgetColumn.prototype = {
   /**
    * An ordering function. Expects the fn to take a component name.
    */
-  orderFn: function(fn) {
+  orderFn: function (fn) {
     for (var i = 0; i < this.ordering.length; i++) {
       fn(this.ordering[i]);
     }
-  }
+  },
 };

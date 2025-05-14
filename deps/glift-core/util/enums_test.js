@@ -1,7 +1,7 @@
-(function() {
+(function () {
   module('glift.enumsTest');
 
-  test('toCamelCase', function() {
+  test('toCamelCase', function () {
     var toCamelCase = glift.enums.toCamelCase;
     deepEqual(toCamelCase('FOO'), 'foo');
     deepEqual(toCamelCase('FOO_BAR'), 'fooBar');

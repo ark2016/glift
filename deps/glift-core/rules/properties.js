@@ -5,7 +5,7 @@ goog.provide('glift.rules.MoveCollection');
  * @param {!Object<glift.rules.prop, !Array<string>>=} opt_map
  * @return {!glift.rules.Properties}
  */
-glift.rules.properties = function(opt_map) {
+glift.rules.properties = function (opt_map) {
   return new glift.rules.Properties(opt_map);
 };
 
@@ -19,7 +19,6 @@ glift.rules.properties = function(opt_map) {
  */
 glift.rules.MoveCollection;
 
-
 /**
  * Mark Value. Encapsulates type of mark properties.
  * @typedef {{
@@ -29,14 +28,12 @@ glift.rules.MoveCollection;
  */
 glift.rules.MarkValue;
 
-
 /**
  * A collection of marks.
  *
  * @typedef {!Object<glift.enums.marks, !Array<glift.rules.MarkValue>>}
  */
 glift.rules.MarkCollection;
-
 
 /**
  * An object describing a property.
@@ -72,9 +69,16 @@ glift.rules.PropDescriptor;
  */
 glift.rules.propertiesWithPts = {
   // Marks
-  CR: true, LB: true, MA: true, SQ: true, TR: true,
+  CR: true,
+  LB: true,
+  MA: true,
+  SQ: true,
+  TR: true,
   // Stones
-  B: true, W: true, AW: true, AB: true,
+  B: true,
+  W: true,
+  AW: true,
+  AB: true,
   // Clear Stones
   AE: true,
   // Misc. These properties are very rare, and usually can be ignored.
@@ -83,7 +87,7 @@ glift.rules.propertiesWithPts = {
   DD: true, // gray area
   LN: true, // line
   TB: true, // black area/territory
-  TW: true // white area
+  TW: true, // white area
 };
 
 /**
@@ -92,7 +96,7 @@ glift.rules.propertiesWithPts = {
  * @package
  * @constructor @final @struct
  */
-glift.rules.Properties = function(opt_map) {
+glift.rules.Properties = function (opt_map) {
   /** @package {!Object<glift.rules.prop, !Array<string>>} */
   this.propMap = opt_map || {};
 };
@@ -113,12 +117,16 @@ glift.rules.Properties.prototype = {
    *    strings.
    * @return {!glift.rules.Properties} this
    */
-  add: function(prop, value) {
+  add: function (prop, value) {
     // Return if the property is not string or a real property
     if (!glift.rules.prop[prop]) {
-      glift.util.logz('Warning! The property [' + prop + ']' +
+      glift.util.logz(
+        'Warning! The property [' +
+          prop +
+          ']' +
           ' is not valid and is not recognized in the SGF spec.' +
-          ' Thus, this property will be ignored');
+          ' Thus, this property will be ignored'
+      );
       return this;
     }
 
@@ -145,7 +153,7 @@ glift.rules.Properties.prototype = {
    *
    * If the property doesn't exist, returns null.
    */
-  getAllValues: function(strProp) {
+  getAllValues: function (strProp) {
     if (glift.rules.prop[strProp] === undefined) {
       return null; // Not a valid Property
     } else if (this.propMap[strProp]) {
@@ -167,7 +175,7 @@ glift.rules.Properties.prototype = {
    * @param {number=} opt_index Optional index. Defaults to 0.
    * @return {?string} The string property or null.
    */
-  getOneValue: function(prop, opt_index) {
+  getOneValue: function (prop, opt_index) {
     var index = opt_index || 0;
     var arr = this.getAllValues(prop);
     if (arr && arr.length >= 1) {
@@ -187,7 +195,7 @@ glift.rules.Properties.prototype = {
    * @return {?glift.Point} Returns a Glift point or null if the property
    *    doesn't exist.
    */
-  getAsPoint: function(prop, opt_index) {
+  getAsPoint: function (prop, opt_index) {
     var out = this.getOneValue(prop, opt_index);
     if (out) {
       return glift.util.pointFromSgfCoord(out);
@@ -207,19 +215,22 @@ glift.rules.Properties.prototype = {
    * @param {number} size Size of the Go Board.
    * @param {glift.enums.rotations} rotation Rotation to perform
    */
-  rotate: function(prop, size, rotation) {
+  rotate: function (prop, size, rotation) {
     if (!glift.rules.propertiesWithPts[prop]) {
       return;
     }
-    if (!glift.enums.rotations[rotation] ||
-        rotation === glift.enums.rotations.NO_ROTATION) {
-      return
+    if (
+      !glift.enums.rotations[rotation] ||
+      rotation === glift.enums.rotations.NO_ROTATION
+    ) {
+      return;
     }
     // Replace all the values for this property.
-    this.pointsReplace_(prop, size, function(sgfPoint) {
-      return glift.util.pointFromSgfCoord(sgfPoint)
-          .rotate(size, rotation)
-          .toSgfCoord();
+    this.pointsReplace_(prop, size, function (sgfPoint) {
+      return glift.util
+        .pointFromSgfCoord(sgfPoint)
+        .rotate(size, rotation)
+        .toSgfCoord();
     });
   },
 
@@ -228,14 +239,12 @@ glift.rules.Properties.prototype = {
    * @param {glift.rules.prop} prop
    * @param {number} size
    */
-  flipHorz: function(prop, size) {
+  flipHorz: function (prop, size) {
     if (!glift.rules.propertiesWithPts[prop]) {
       return;
     }
-    this.pointsReplace_(prop, size, function(sgfPoint) {
-      return glift.util.pointFromSgfCoord(sgfPoint)
-          .flipHorz(size)
-          .toSgfCoord();
+    this.pointsReplace_(prop, size, function (sgfPoint) {
+      return glift.util.pointFromSgfCoord(sgfPoint).flipHorz(size).toSgfCoord();
     });
   },
 
@@ -244,14 +253,12 @@ glift.rules.Properties.prototype = {
    * @param {glift.rules.prop} prop
    * @param {number} size
    */
-  flipVert: function(prop, size) {
+  flipVert: function (prop, size) {
     if (!glift.rules.propertiesWithPts[prop]) {
       return;
     }
-    this.pointsReplace_(prop, size, function(sgfPoint) {
-      return glift.util.pointFromSgfCoord(sgfPoint)
-          .flipVert(size)
-          .toSgfCoord();
+    this.pointsReplace_(prop, size, function (sgfPoint) {
+      return glift.util.pointFromSgfCoord(sgfPoint).flipVert(size).toSgfCoord();
     });
   },
 
@@ -262,7 +269,7 @@ glift.rules.Properties.prototype = {
    * @param {function(string): string} replFn
    * @private
    */
-  pointsReplace_: function(prop, size, replFn) {
+  pointsReplace_: function (prop, size, replFn) {
     if (!glift.rules.propertiesWithPts[prop]) {
       return;
     }
@@ -288,7 +295,7 @@ glift.rules.Properties.prototype = {
    * @param {glift.rules.prop} prop
    * @return {boolean}
    */
-  contains: function(prop) {
+  contains: function (prop) {
     return prop in this.propMap;
   },
 
@@ -296,7 +303,7 @@ glift.rules.Properties.prototype = {
    * Loop over each property / value list.
    * @param {!function(glift.rules.prop, !Array<string>)} func
    */
-  forEach: function(func) {
+  forEach: function (func) {
     for (var p in this.propMap) {
       func(p, this.propMap[p]);
     }
@@ -309,7 +316,7 @@ glift.rules.Properties.prototype = {
    * @param {string} value
    * @return {boolean}
    */
-  hasValue : function(prop, value) {
+  hasValue: function (prop, value) {
     if (!this.contains(prop)) {
       return false;
     }
@@ -327,7 +334,7 @@ glift.rules.Properties.prototype = {
    * @param {glift.rules.prop} prop
    * @return {?Array<string>} The former values of this property.
    */
-  remove: function(prop) {
+  remove: function (prop) {
     if (this.contains(prop)) {
       var allValues = this.getAllValues(prop);
       delete this.propMap[prop];
@@ -344,7 +351,7 @@ glift.rules.Properties.prototype = {
    * @param {glift.rules.prop} prop
    * @param {string} value
    */
-  removeOneValue: function(prop, value) {
+  removeOneValue: function (prop, value) {
     if (this.contains(prop)) {
       var allValues = this.getAllValues(prop);
       var index = -1;
@@ -369,7 +376,7 @@ glift.rules.Properties.prototype = {
    * @param {string|!Array<string>} value
    * @return {glift.rules.Properties} this
    */
-  set: function(prop, value) {
+  set: function (prop, value) {
     if (prop && value && glift.rules.prop[prop]) {
       if (glift.util.typeOf(value) === 'string') {
         this.propMap[prop] = [/** @type {string} */ (value)];
@@ -390,14 +397,14 @@ glift.rules.Properties.prototype = {
    * @return {!Array<!glift.Point>} points. If no placements are found, returns
    *    an empty array.
    */
-  getPlacementsAsPoints: function(color) {
+  getPlacementsAsPoints: function (color) {
     var prop;
     if (color === glift.enums.states.BLACK) {
       prop = glift.rules.prop.AB;
     } else if (color === glift.enums.states.WHITE) {
       prop = glift.rules.prop.AW;
     } else {
-      return  [];
+      return [];
     }
 
     if (!this.contains(prop)) {
@@ -415,7 +422,7 @@ glift.rules.Properties.prototype = {
    * @return {!Array<!glift.Point>} the points. If the AE property isn't found,
    *    returns an empty array.
    */
-  getClearLocationsAsPoints: function() {
+  getClearLocationsAsPoints: function () {
     var AE = glift.rules.prop.AE;
     if (!this.contains(AE)) {
       return [];
@@ -429,7 +436,7 @@ glift.rules.Properties.prototype = {
    *
    * @return {?string}
    */
-  getComment: function() {
+  getComment: function () {
     if (this.contains(glift.rules.prop.C)) {
       return this.getOneValue(glift.rules.prop.C);
     } else {
@@ -446,17 +453,17 @@ glift.rules.Properties.prototype = {
    *
    * @return {?glift.rules.Move}.
    */
-  getMove: function() {
+  getMove: function () {
     var BLACK = glift.enums.states.BLACK;
     var WHITE = glift.enums.states.WHITE;
     if (this.contains(glift.rules.prop.B)) {
-      if (this.getOneValue(glift.rules.prop.B) === "") {
+      if (this.getOneValue(glift.rules.prop.B) === '') {
         return { color: BLACK }; // This is a PASS
       } else {
         return {
           color: BLACK,
-          point: this.getAsPoint(glift.rules.prop.B) || undefined
-        }
+          point: this.getAsPoint(glift.rules.prop.B) || undefined,
+        };
       }
     } else if (this.contains(glift.rules.prop.W)) {
       if (this.getOneValue(glift.rules.prop.W) === '') {
@@ -464,7 +471,7 @@ glift.rules.Properties.prototype = {
       } else {
         return {
           color: WHITE,
-          point: this.getAsPoint(glift.rules.prop.W) || undefined
+          point: this.getAsPoint(glift.rules.prop.W) || undefined,
         };
       }
     } else {
@@ -490,7 +497,7 @@ glift.rules.Properties.prototype = {
    *    property-conditions to check.
    * @return {boolean}
    */
-  matches: function(conditions) {
+  matches: function (conditions) {
     for (var key in conditions) {
       if (this.contains(key)) {
         var substrings = conditions[key];
@@ -498,7 +505,7 @@ glift.rules.Properties.prototype = {
           return true;
         }
         var allValues = this.getAllValues(key);
-        for (var i = 0, len = allValues.length ; i < len; i++) {
+        for (var i = 0, len = allValues.length; i < len; i++) {
           for (var j = 0, slen = substrings.length; j < slen; j++) {
             var value = allValues[i];
             var substr = substrings[j];
@@ -517,21 +524,21 @@ glift.rules.Properties.prototype = {
    *
    * @return {!glift.rules.MoveCollection}
    */
-  getAllStones: function() {
+  getAllStones: function () {
     var states = glift.enums.states,
-        out = {},
-        BLACK = states.BLACK,
-        WHITE = states.WHITE;
+      out = {},
+      BLACK = states.BLACK,
+      WHITE = states.WHITE;
     out.WHITE = [];
     out.BLACK = [];
 
     var bplace = this.getPlacementsAsPoints(states.BLACK);
     var wplace = this.getPlacementsAsPoints(states.WHITE);
     for (var i = 0; i < bplace.length; i++) {
-      out.BLACK.push({point: bplace[i], color: BLACK});
+      out.BLACK.push({ point: bplace[i], color: BLACK });
     }
     for (var i = 0; i < wplace.length; i++) {
-      out.WHITE.push({point: wplace[i], color: WHITE});
+      out.WHITE.push({ point: wplace[i], color: WHITE });
     }
     var move = this.getMove();
     if (move && move.point) {
@@ -539,7 +546,6 @@ glift.rules.Properties.prototype = {
     }
     return out;
   },
-
 
   /**
    * Gets all the marks, where the output is a map from glift mark enum to array
@@ -554,7 +560,7 @@ glift.rules.Properties.prototype = {
    *  }
    * return {!glift.rules.MarkCollection}
    */
-  getAllMarks: function() {
+  getAllMarks: function () {
     /**
      * @type {!Object<glift.rules.prop, glift.enums.states>}
      */
@@ -563,7 +569,7 @@ glift.rules.Properties.prototype = {
       LB: glift.enums.marks.LABEL,
       MA: glift.enums.marks.XMARK,
       SQ: glift.enums.marks.SQUARE,
-      TR: glift.enums.marks.TRIANGLE
+      TR: glift.enums.marks.TRIANGLE,
     };
     var outMarks = {};
     for (var prop in propertiesToMarks) {
@@ -578,10 +584,10 @@ glift.rules.Properties.prototype = {
           } else {
             // A single point or a point rectangle (which is why the return-type
             // is an array.
-            var newPts = glift.util.pointArrFromSgfProp(data[i])
+            var newPts = glift.util.pointArrFromSgfProp(data[i]);
             for (var j = 0; j < newPts.length; j++) {
               marksToAdd.push({
-                point: newPts[j]
+                point: newPts[j],
               });
             }
           }
@@ -603,7 +609,7 @@ glift.rules.Properties.prototype = {
    * @return {!Array<!glift.rules.PropDescriptor>}
    */
   // TODO(kashomon): Add test
-  getGameInfo: function() {
+  getGameInfo: function () {
     var gameInfoArr = [];
     /**
      * @type {!Object<glift.rules.prop, string>}
@@ -620,7 +626,7 @@ glift.rules.Properties.prototype = {
       EV: 'Event',
       RO: 'Round',
       PC: 'Place Name',
-      DT: 'Date'
+      DT: 'Date',
     };
     for (var key in propNameMap) {
       if (this.contains(key)) {
@@ -628,15 +634,16 @@ glift.rules.Properties.prototype = {
         var obj = {
           prop: key,
           displayName: displayName,
-          value: this.getOneValue(key)
+          value: this.getOneValue(key),
         };
         // Post processing for some values.
         // We attach the ranks like Kashomon [9d], if they exist.
-        if (key === glift.rules.prop.PW &&
-            this.contains(glift.rules.prop.WR)) {
+        if (key === glift.rules.prop.PW && this.contains(glift.rules.prop.WR)) {
           obj.value += ' [' + this.getOneValue(glift.rules.prop.WR) + ']';
-        } else if (key === glift.rules.prop.PB &&
-            this.contains(glift.rules.prop.BR)) {
+        } else if (
+          key === glift.rules.prop.PB &&
+          this.contains(glift.rules.prop.BR)
+        ) {
           obj.value += ' [' + this.getOneValue(glift.rules.prop.BR) + ']';
         }
         // Remove trailing zeroes on komi amounts.

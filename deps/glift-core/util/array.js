@@ -13,7 +13,7 @@ glift.array = {
    *
    * @template T
    */
-  remove: function(arr, elem) {
+  remove: function (arr, elem) {
     var index = arr.indexOf(elem);
     if (index > -1) {
       arr.splice(index, 1);
@@ -29,11 +29,11 @@ glift.array = {
    *
    * @template T
    */
-  replace: function(arr, elem, elemRep) {
+  replace: function (arr, elem, elemRep) {
     var index = arr.indexOf(elem);
     if (index > -1) {
       arr[index] = elemRep;
     }
     return arr;
-  }
+  },
 };

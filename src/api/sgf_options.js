@@ -37,7 +37,7 @@ glift.api.WidgetTypeOptions;
  * @param {glift.api.SgfOptions=} opt_o Options which may be partially filled
  *    out.
  */
-glift.api.SgfOptions = function(opt_o) {
+glift.api.SgfOptions = function (opt_o) {
   var o = opt_o || {};
 
   /**
@@ -163,7 +163,7 @@ glift.api.SgfOptions = function(opt_o) {
     glift.BoardComponent.BOARD,
     glift.BoardComponent.COMMENT_BOX,
     glift.BoardComponent.STATUS_BAR,
-    glift.BoardComponent.ICONBAR
+    glift.BoardComponent.ICONBAR,
   ];
 
   /**
@@ -211,8 +211,9 @@ glift.api.SgfOptions = function(opt_o) {
    * @const {number|undefined}
    */
   this.correctVariationsResetTime =
-      o.correctVariationsResetTime !== undefined ?
-      o.correctVariationsResetTime : 750; // ms
+    o.correctVariationsResetTime !== undefined
+      ? o.correctVariationsResetTime
+      : 750; // ms
 
   /**
    * You can, if you wish, override the total number of correct variations
@@ -223,7 +224,7 @@ glift.api.SgfOptions = function(opt_o) {
    * @const {number|undefined}
    */
   this.totalCorrectVariationsOverride =
-      o.totalCorrectVariationsOverride || undefined;
+    o.totalCorrectVariationsOverride || undefined;
 
   /**
    * Whether or not to mark ko locations.  Either true or false, but
@@ -232,7 +233,7 @@ glift.api.SgfOptions = function(opt_o) {
    * api:1.0
    * @const {boolean}
    */
-  this.markKo = o.markKo !== undefined ? !!o.markKo: true;
+  this.markKo = o.markKo !== undefined ? !!o.markKo : true;
 
   /**
    * Hook options for SGFs.
@@ -280,7 +281,7 @@ glift.api.SgfOptions = function(opt_o) {
    */
   this.keyMappings = o.keyMappings || {
     ARROW_LEFT: 'iconActions.chevron-left.click',
-    ARROW_RIGHT: 'iconActions.chevron-right.click'
+    ARROW_RIGHT: 'iconActions.chevron-right.click',
   };
 
   /**
@@ -297,7 +298,7 @@ glift.api.SgfOptions = function(opt_o) {
    */
   this.problemConditions = o.problemConditions || {
     GB: [],
-    C: ['Correct', 'is correct', 'is the correct']
+    C: ['Correct', 'is correct', 'is the correct'],
   };
 
   /**
@@ -307,7 +308,7 @@ glift.api.SgfOptions = function(opt_o) {
    * api:experimental
    * @const {string}
    */
-  this.problemTermination = 'INCORRECT_PATH'
+  this.problemTermination = 'INCORRECT_PATH';
 
   /**
    * Whether or not to show variations.  See glift.enums.showVariations
@@ -316,8 +317,8 @@ glift.api.SgfOptions = function(opt_o) {
    * api:1.0
    * @const {glift.enums.showVariations}
    */
-  this.showVariations = o.showVariations ||
-      glift.enums.showVariations.MORE_THAN_ONE;
+  this.showVariations =
+    o.showVariations || glift.enums.showVariations.MORE_THAN_ONE;
 
   /**
    * Whether or not to mark the last move played.  Either true or false, but
@@ -326,7 +327,6 @@ glift.api.SgfOptions = function(opt_o) {
    * @const {boolean}
    */
   this.markLastMove = o.markLastMove !== undefined ? !!o.markLastMove : true;
-
 
   /**
    * Whether or not to enable the mousewheel for game viewing. Scrolling up
@@ -388,10 +388,14 @@ glift.api.SgfOptions.prototype = {
    * @return {!glift.api.SgfOptions} The completed SGF options, which can be then
    * used by the widget manager and the controller.
    */
-  createSgfObj: function(sgf) {
+  createSgfObj: function (sgf) {
     if (glift.util.typeOf(sgf) !== 'object') {
-      throw new Error('SGF must be of type object, was: '
-          + glift.util.typeOf(sgf) + ', for ' + sgf);
+      throw new Error(
+        'SGF must be of type object, was: ' +
+          glift.util.typeOf(sgf) +
+          ', for ' +
+          sgf
+      );
     }
 
     var widgetType = sgf.widgetType || this.widgetType;
@@ -410,5 +414,5 @@ glift.api.SgfOptions.prototype = {
     }
 
     return new glift.api.SgfOptions(/** @type {!glift.api.SgfOptions} */ (sgf));
-  }
+  },
 };

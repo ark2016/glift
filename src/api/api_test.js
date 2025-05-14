@@ -1,8 +1,8 @@
-(function() {
+(function () {
   module('glift.api.createTest');
   var testUtil = glift.testUtil;
 
-  test('Successfully create a basic widget (Game Viewer)', function() {
+  test('Successfully create a basic widget (Game Viewer)', function () {
     var manager = glift.api.create({
       sgf: testdata.sgfs.complexproblem,
     });
@@ -25,21 +25,25 @@
     manager.destroy();
   });
 
-  test('Succesfully create a complex problem series', function() {
+  test('Succesfully create a complex problem series', function () {
     var wtypes = glift.WidgetType;
     var sgfs = testdata.sgfs;
     // TODO(kashomon): Do more extensive integration testing here.
     var manager = glift.api.create({
-      sgfCollection: [{
+      sgfCollection: [
+        {
           sgfString: sgfs.complexproblem,
-          widgetType: wtypes.STANDARD_PROBLEM
-        }, {
+          widgetType: wtypes.STANDARD_PROBLEM,
+        },
+        {
           sgfString: sgfs.marktest,
-          widgetType: wtypes.EXAMPLE
-        }, {
+          widgetType: wtypes.EXAMPLE,
+        },
+        {
           sgfString: sgfs.twoOptions,
-          widgetType: wtypes.CORRECT_VARIATIONS_PROBLEM
-        }]
+          widgetType: wtypes.CORRECT_VARIATIONS_PROBLEM,
+        },
+      ],
     });
     ok(manager !== undefined);
     ok(glift.dom.elem(manager.divId).html(), 'must not be empty.');

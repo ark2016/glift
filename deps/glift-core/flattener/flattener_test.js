@@ -1,13 +1,13 @@
-(function() {
+(function () {
   module('glift.flattener.flattenTest');
   var symb = glift.flattener.symbols;
   var boardRegions = glift.enums.boardRegions;
   var sgfs = testdata.sgfs;
-  var flattener  = glift.flattener;
+  var flattener = glift.flattener;
   var toPt = glift.util.pointFromSgfCoord;
   var point = glift.util.point;
 
-  test('Basic Flattened', function() {
+  test('Basic Flattened', function () {
     var basicSgf = '(;GB[1]C[foo]AW[aa]AB[ab]LB[ab:z]SQ[cc])';
     var movetree = glift.rules.movetree.getFromSgf(basicSgf);
     var f = flattener.flatten(movetree);
@@ -36,7 +36,7 @@
     deepEqual(f.labels()[toPt('ab').toString()], 'z');
   });
 
-  test('Goban auto-recalculation', function() {
+  test('Goban auto-recalculation', function () {
     var basicSgf = '(;GB[1];B[aa]C[zo];W[ab]C[zed])';
     var mt = glift.rules.movetree.getFromSgf(basicSgf);
     mt.moveDown().moveDown();
@@ -47,11 +47,11 @@
     deepEqual(f.board().getIntBoardPt(toPt('ab')).stone(), symb.WSTONE);
   });
 
-  test('Simple next moves + labeling', function() {
+  test('Simple next moves + labeling', function () {
     var basicSgf = '(;GB[1];B[aa]C[zo];W[ab]C[zed])';
     var mt = glift.rules.movetree.getFromSgf(basicSgf);
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0,0]
+      nextMovesPath: [0, 0],
     });
 
     var i = f.board().getIntBoardPt(toPt('aa'));
@@ -65,11 +65,11 @@
     deepEqual(i.textLabel(), '2');
   });
 
-  test('Simple next moves + ignoring labeling', function() {
+  test('Simple next moves + ignoring labeling', function () {
     var basicSgf = '(;GB[1];B[aa]C[zo];W[ab]C[zed])';
     var mt = glift.rules.movetree.getFromSgf(basicSgf);
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0,0],
+      nextMovesPath: [0, 0],
       ignoreLabels: true,
     });
 
@@ -84,34 +84,35 @@
     deepEqual(i.textLabel(), null);
   });
 
-  test('Init position', function() {
+  test('Init position', function () {
     var basicSgf = '(;GB[1];B[aa]C[zo];W[ab]C[zed])';
     var mt = glift.rules.movetree.getFromSgf(basicSgf);
     var f = flattener.flatten(mt, {
       initPosition: [0],
     });
-    deepEqual(f.comment(), 'zo')
+    deepEqual(f.comment(), 'zo');
   });
 
-  test('Init position + next moves', function() {
+  test('Init position + next moves', function () {
     var basicSgf = '(;GB[1];B[aa]C[zo];W[ab]C[zed])';
     var mt = glift.rules.movetree.getFromSgf(basicSgf);
     var f = flattener.flatten(mt, {
       initPosition: '1',
-      nextMovesPath: [0]
+      nextMovesPath: [0],
     });
-    deepEqual(f.comment(), 'zed')
+    deepEqual(f.comment(), 'zed');
   });
 
-  test('Create collision labels', function() {
-    var sgf = '(;GB[1]AW[aa][ba]AB[ab][bb][cb]' +
-        ';B[jj]' +
-        ';W[ca]' + // for move numbering.
-        ';B[da]' + // capture
-        ';W[ca];B[ba])'; // collisions
+  test('Create collision labels', function () {
+    var sgf =
+      '(;GB[1]AW[aa][ba]AB[ab][bb][cb]' +
+      ';B[jj]' +
+      ';W[ca]' + // for move numbering.
+      ';B[da]' + // capture
+      ';W[ca];B[ba])'; // collisions
     var mt = glift.rules.movetree.getFromSgf(sgf);
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0,0,0,0,0],
+      nextMovesPath: [0, 0, 0, 0, 0],
     });
 
     deepEqual(f.collisions().length, 2);
@@ -125,13 +126,14 @@
     deepEqual(col[1].label, 'a');
   });
 
-  test('Create collision labels -- manual labels', function() {
-    var sgf = '(;GB[1]AW[aa][ba]AB[ab][bb]' +
-        ';B[ca]' + // capture
-        ';W[aa]LB[aa:X])'; // collision + labels
+  test('Create collision labels -- manual labels', function () {
+    var sgf =
+      '(;GB[1]AW[aa][ba]AB[ab][bb]' +
+      ';B[ca]' + // capture
+      ';W[aa]LB[aa:X])'; // collision + labels
     var mt = glift.rules.movetree.getFromSgf(sgf);
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0,0],
+      nextMovesPath: [0, 0],
     });
     deepEqual(f.collisions().length, 1);
     var col = f.collisions();
@@ -140,15 +142,15 @@
     deepEqual(col[0].label, 'X');
   });
 
-  test('isOnMainPath', function() {
+  test('isOnMainPath', function () {
     var sgf = '(;GB[1](;B[aa])(;B[ab]))';
     var mt = glift.rules.movetree.getFromSgf(sgf);
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0]
+      nextMovesPath: [0],
     });
 
     f = flattener.flatten(mt, {
-      nextMovesPath: [1]
+      nextMovesPath: [1],
     });
     var inter = f.board().getIntBoardPt(toPt('ab'));
     deepEqual(inter.stone(), symb.BSTONE);
@@ -160,18 +162,19 @@
     ok(!f.isOnMainPath());
   });
 
-  test('findStartingMoveNum', function() {
+  test('findStartingMoveNum', function () {
     findNum = glift.flattener.findStartingMoveNum_;
-    var sgf = '(;GB[1]' +
-        ';B[aa]' +
-        '(;W[ba](;B[cc])(;B[dd]))' +
-        '(;W[ab](;B[cc])(;B[dd])))';
+    var sgf =
+      '(;GB[1]' +
+      ';B[aa]' +
+      '(;W[ba](;B[cc])(;B[dd]))' +
+      '(;W[ab](;B[cc])(;B[dd])))';
     var mt = glift.rules.movetree.getFromSgf(sgf, []);
     deepEqual(findNum(mt, []), 1, 'at root');
     deepEqual(findNum(mt, [0]), 1, 'at root with next moves');
     deepEqual(findNum(mt, [1]), 1, 'at root with next moves on var');
 
-    mt.moveDown()
+    mt.moveDown();
     deepEqual(findNum(mt, []), 2, 'next move mainpath');
     deepEqual(findNum(mt, [0]), 2, 'next move, mainpath, next on root');
     deepEqual(findNum(mt, [1]), 1, 'next move, mainpath, next on variation');
@@ -181,7 +184,7 @@
     deepEqual(findNum(mt, [1]), 2, 'next move, variation, next on variation');
   });
 
-  test('Move numbers', function() {
+  test('Move numbers', function () {
     var simpleSgf = '(;GB[1];B[aa];W[bb])';
     var mt = glift.rules.movetree.getFromSgf(simpleSgf, '2');
     deepEqual(mt.node().getNodeNum(), 2);
@@ -197,7 +200,7 @@
     var mainpathSgf = '(;GB[1];B[aa];W[bb];B[cc];W[dd];B[ee];W[ff])';
     mt = glift.rules.movetree.getFromSgf(mainpathSgf, '1');
     f = flattener.flatten(mt, {
-      nextMovesPath: [0,0,0,0]
+      nextMovesPath: [0, 0, 0, 0],
     });
     deepEqual(f.baseMoveNum(), 1, 'At move 1 before next moves');
     deepEqual(f.startingMoveNum(), 2, 'next path on main line');
@@ -208,7 +211,7 @@
     var variationSgf = '(;GB[1];B[aa];W[bb](;B[kk])(;B[cc];W[dd];B[ee];W[ff]))';
     mt = glift.rules.movetree.getFromSgf(variationSgf, '2');
     f = flattener.flatten(mt, {
-      nextMovesPath: [1,0,0,0]
+      nextMovesPath: [1, 0, 0, 0],
     });
     deepEqual(f.baseMoveNum(), 2, 'At move 2 before next moves');
     deepEqual(f.startingMoveNum(), 1, '1st move into the variation');
@@ -218,7 +221,7 @@
 
     mt = glift.rules.movetree.getFromSgf(variationSgf, '2.1');
     f = flattener.flatten(mt, {
-      nextMovesPath: [0,0,0]
+      nextMovesPath: [0, 0, 0],
     });
     deepEqual(f.baseMoveNum(), 3, 'At move 3 before next moves');
     deepEqual(f.startingMoveNum(), 2, '2nd move into the variation');
@@ -227,22 +230,22 @@
     deepEqual(f.isOnMainPath(), false);
   });
 
-  test('Move numbers > 100', function() {
+  test('Move numbers > 100', function () {
     var mt = glift.rules.movetree.getFromSgf(sgfs.yearbookExample, '99');
     deepEqual(mt.node().getNodeNum(), 99);
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0,0,0,0,0,0,0,0]
+      nextMovesPath: [0, 0, 0, 0, 0, 0, 0, 0],
     });
     var stones = ['go', 'fo', 'ho', 'il', 'ej', 'jn', 'jm', 'in'];
     for (var i = 0; i < stones.length; i++) {
       var s = stones[i];
       var pt = glift.util.pointFromSgfCoord(s);
-      var intpt  = f.board().getIntBoardPt(pt);
+      var intpt = f.board().getIntBoardPt(pt);
       deepEqual(intpt.textLabel(), i + 100 + '');
     }
   });
 
-  test('Auto-truncation for labels', function() {
+  test('Auto-truncation for labels', function () {
     var mt = glift.rules.movetree.getFromSgf(sgfs.yearbookExample, '121');
     deepEqual(mt.node().getNodeNum(), 121);
     var f = flattener.flatten(mt);
@@ -255,16 +258,17 @@
     deepEqual(f.autoTruncateLabel(222), '22');
   });
 
-  test('Auto-truncation for labels: Long Branch', function() {
+  test('Auto-truncation for labels: Long Branch', function () {
     var mt = glift.rules.movetree.getFromSgf(sgfs.yearbookExample, '90');
     deepEqual(mt.node().getNodeNum(), 90);
     var f = flattener.flatten(mt, {
       nextMovesPath: [
-          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-      ]
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      ],
     });
     deepEqual(f.autoTruncateLabel('a'), 'a');
     deepEqual(f.autoTruncateLabel(10), '10');
@@ -275,72 +279,71 @@
     deepEqual(f.autoTruncateLabel(222), '222');
   });
 
-  test('Test autocrop on next moves: Top', function() {
+  test('Test autocrop on next moves: Top', function () {
     var mt = glift.rules.movetree.getFromSgf(
-        '(;GM[1]AB[aa][as][sa][ss]' +
-        ';B[rr];W[cc];B[re];W[ee])',
-        [0,0]);
+      '(;GM[1]AB[aa][as][sa][ss]' + ';B[rr];W[cc];B[re];W[ee])',
+      [0, 0]
+    );
     deepEqual(mt.node().getNodeNum(), 2, 'sanity check');
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0,0],
+      nextMovesPath: [0, 0],
       autoBoxCropOnNextMoves: true,
     });
     deepEqual(f.board().width(), 19);
     deepEqual(f.board().height(), 11);
   });
 
-  test('Test crop restriction + crop on next moves', function() {
+  test('Test crop restriction + crop on next moves', function () {
     // top crop
     var mt = glift.rules.movetree.getFromSgf(
-        '(;GM[1]AB[aa][as][sa][ss]' +
-        ';B[rr];W[cc];B[re];W[ee])',
-        [0,0]);
+      '(;GM[1]AB[aa][as][sa][ss]' + ';B[rr];W[cc];B[re];W[ee])',
+      [0, 0]
+    );
     deepEqual(mt.node().getNodeNum(), 2, 'sanity check');
     var f = flattener.flatten(mt, {
-      nextMovesPath: [0,0],
+      nextMovesPath: [0, 0],
       autoBoxCropOnNextMoves: true,
       regionRestrictions: [
         glift.enums.boardRegions.TOP,
         glift.enums.boardRegions.LEFT,
-      ]
+      ],
     });
     deepEqual(f.board().width(), 19);
     deepEqual(f.board().height(), 11);
 
     // Region isn't correct
     f = flattener.flatten(mt, {
-      nextMovesPath: [0,0],
+      nextMovesPath: [0, 0],
       autoBoxCropOnNextMoves: true,
-      regionRestrictions: [
-        glift.enums.boardRegions.LEFT,
-      ]
+      regionRestrictions: [glift.enums.boardRegions.LEFT],
     });
     deepEqual(f.board().width(), 19);
     deepEqual(f.board().height(), 19);
 
     // top-left crop
     mt = glift.rules.movetree.getFromSgf(
-        '(;GM[1]AB[aa][as][sa][ss]' + // full board base
+      '(;GM[1]AB[aa][as][sa][ss]' + // full board base
         ';B[bb];W[cc];B[dd];W[ee])',
-        [0,0]);
+      [0, 0]
+    );
     // Region is super-set
     f = flattener.flatten(mt, {
-      nextMovesPath: [0,0],
+      nextMovesPath: [0, 0],
       autoBoxCropOnNextMoves: true,
       regionRestrictions: [
         glift.enums.boardRegions.TOP,
         glift.enums.boardRegions.LEFT,
-      ]
+      ],
     });
     deepEqual(f.board().width(), 19);
     deepEqual(f.board().height(), 11);
   });
 
-  test('Getting moves', function() {
-    var initPos = [0,0,0,0,1];
+  test('Getting moves', function () {
+    var initPos = [0, 0, 0, 0, 1];
     var sgf =
-        '(;GM[1]AB[aa][as][sa][ss]' +
-        ';B[bb];W[cc];B[dd];W[ee](;B[fa];W[fb])(;B[fb];W[fc]))';
+      '(;GM[1]AB[aa][as][sa][ss]' +
+      ';B[bb];W[cc];B[dd];W[ee](;B[fa];W[fb])(;B[fb];W[fc]))';
     var mt = glift.rules.movetree.getFromSgf(sgf, initPos);
     var f = flattener.flatten(mt, {});
     ok(f);
@@ -355,7 +358,7 @@
     deepEqual(f.nextMainlineMove().point, toPt('bb'), 'next mainline pt');
     deepEqual(f.nextMainlineMoveNum(), 1, 'mainline num');
 
-    initPos = [0,0,0,0,0,0,0];
+    initPos = [0, 0, 0, 0, 0, 0, 0];
     mt = glift.rules.movetree.getFromSgf(sgf, initPos);
     f = flattener.flatten(mt, {});
     deepEqual(f.mainlineMove().point, toPt('fb'), 'mainline end');
@@ -364,32 +367,36 @@
     deepEqual(f.nextMainlineMoveNum(), 7, 'mainline num end');
   });
 
-  test('Ko', function() {
-    var initPos = [0,0,0,0,0,0];
-    var kosgf =
-        '(;GM[1]SZ[19]' +
-        ';B[ba];W[ca];B[ab];W[bb];B[bc];W[aa])';
+  test('Ko', function () {
+    var initPos = [0, 0, 0, 0, 0, 0];
+    var kosgf = '(;GM[1]SZ[19]' + ';B[ba];W[ca];B[ab];W[bb];B[bc];W[aa])';
     var mt = glift.rules.movetree.getFromSgf(kosgf, initPos);
     var f = flattener.flatten(mt, {
       markKo: true,
     });
     ok(f);
-    deepEqual(f.marks()[toPt('ba').toString()], glift.flattener.symbols.KO_LOCATION,
-      'Ko Location');
+    deepEqual(
+      f.marks()[toPt('ba').toString()],
+      glift.flattener.symbols.KO_LOCATION,
+      'Ko Location'
+    );
 
     // Now, without othe option set
     var mt = glift.rules.movetree.getFromSgf(kosgf, initPos);
     var f = flattener.flatten(mt, {});
     ok(f);
-    deepEqual(f.marks()[toPt('ba').toString()], undefined)
+    deepEqual(f.marks()[toPt('ba').toString()], undefined);
 
     // Ko doesn't make sense when a nextMovesPath is specified, and so must be
     // null.
-    mt = glift.rules.movetree.getFromSgf(kosgf)
+    mt = glift.rules.movetree.getFromSgf(kosgf);
     var f = flattener.flatten(mt, {
-      nextMovesPath: initPos
+      nextMovesPath: initPos,
     });
     ok(f);
-    deepEqual(f.marks()[toPt('ba').toString()], glift.flattener.symbols.TEXTLABEL);
+    deepEqual(
+      f.marks()[toPt('ba').toString()],
+      glift.flattener.symbols.TEXTLABEL
+    );
   });
 })();

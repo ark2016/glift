@@ -8,7 +8,7 @@ goog.require('glift.displays.icons');
  * @param {string} iconName name of the relevant icon.
  * @return {!glift.displays.icons.WrappedIcon}
  */
-glift.displays.icons.wrappedIcon = function(iconName) {
+glift.displays.icons.wrappedIcon = function (iconName) {
   return new glift.displays.icons.WrappedIcon(iconName);
 };
 
@@ -18,17 +18,16 @@ glift.displays.icons.wrappedIcon = function(iconName) {
  * @param {!Array<string|!Array<string>>} iconsRaw
  * return {Array<glift.displays.icons.WrappedIcon>}
  */
-glift.displays.icons.wrapIcons = function(iconsRaw) {
+glift.displays.icons.wrapIcons = function (iconsRaw) {
   var out = [];
   for (var i = 0; i < iconsRaw.length; i++) {
     var item = iconsRaw[i];
     if (glift.util.typeOf(item) === 'string') {
-      out.push(glift.displays.icons.wrappedIcon(
-          /** @type {string} */ (item)));
+      out.push(glift.displays.icons.wrappedIcon(/** @type {string} */ (item)));
     } else if (glift.util.typeOf(item) === 'array') {
       var subIcons = item;
       // Looks like we only accept the multiopen icon for this category...
-      var outerIcon = glift.displays.icons.wrappedIcon('multiopen')
+      var outerIcon = glift.displays.icons.wrappedIcon('multiopen');
       for (var j = 0; j < subIcons.length; j++) {
         outerIcon.addAssociatedIcon(subIcons[j]);
       }
@@ -43,9 +42,11 @@ glift.displays.icons.wrapIcons = function(iconsRaw) {
  * @param {string} iconName
  * @return {string}
  */
-glift.displays.icons.validateIcon = function(iconName) {
-  if (iconName === undefined ||
-      glift.displays.icons.svg[iconName] === undefined) {
+glift.displays.icons.validateIcon = function (iconName) {
+  if (
+    iconName === undefined ||
+    glift.displays.icons.svg[iconName] === undefined
+  ) {
     throw new Error('Icon unknown: [' + iconName + ']');
   }
   return iconName;
@@ -60,13 +61,14 @@ glift.displays.icons.validateIcon = function(iconName) {
  * @constructor
  * @final
  */
-glift.displays.icons.WrappedIcon = function(iconName) {
+glift.displays.icons.WrappedIcon = function (iconName) {
   this.iconName = glift.displays.icons.validateIcon(iconName);
   var iconData = glift.displays.icons.svg[iconName];
   this.iconStr = iconData.string;
   this.originalBbox = glift.orientation.bbox.fromPts(
-      glift.util.point(iconData.bbox.x, iconData.bbox.y),
-      glift.util.point(iconData.bbox.x2, iconData.bbox.y2));
+    glift.util.point(iconData.bbox.x, iconData.bbox.y),
+    glift.util.point(iconData.bbox.x2, iconData.bbox.y2)
+  );
   this.associatedIcons = []; // Added with addAssociatedIcon
   this.activeAssociated = 0; // Index into the above array
   this.bbox = this.originalBbox; // can change on "translate"
@@ -85,8 +87,8 @@ glift.displays.icons.WrappedIcon.prototype = {
   /**
    * Add an associated icon and return the new icon.
    */
-  addAssociatedIcon: function(iconName) {
-    var newIcon = glift.displays.icons.wrappedIcon(iconName)
+  addAssociatedIcon: function (iconName) {
+    var newIcon = glift.displays.icons.wrappedIcon(iconName);
     this.associatedIcons.push(newIcon);
     return newIcon;
   },
@@ -94,9 +96,9 @@ glift.displays.icons.WrappedIcon.prototype = {
   /**
    * Add an associated icon and return the icon (for parity with the above).
    */
-  _addAssociatedWrapped: function(wrapped) {
+  _addAssociatedWrapped: function (wrapped) {
     if (wrapped.originalBbox === undefined) {
-      throw "Wrapped icon not actually a wrapped icon: " + wrapped;
+      throw 'Wrapped icon not actually a wrapped icon: ' + wrapped;
     }
     this.associatedIcons.push(wrapped);
     return wrapped;
@@ -105,7 +107,7 @@ glift.displays.icons.WrappedIcon.prototype = {
   /**
    * Clear the associated icons, returning the old list.
    */
-  clearAssociatedIcons: function() {
+  clearAssociatedIcons: function () {
     var oldIcons = this.associatedIcons;
     this.associatedIcons = [];
     return oldIcons;
@@ -115,7 +117,7 @@ glift.displays.icons.WrappedIcon.prototype = {
    * Return a the wrapped icon from the associated icon list. If index isn't
    * specified, the assumption is that the index is the active index;
    */
-  getAssociated: function(index) {
+  getAssociated: function (index) {
     index = index || this.activeAssociated;
     return this.associatedIcons[index];
   },
@@ -123,7 +125,7 @@ glift.displays.icons.WrappedIcon.prototype = {
   /**
    * Get the active associated icon.
    */
-  getActive: function() {
+  getActive: function () {
     return this.associatedIcons[this.activeAssociated];
   },
 
@@ -131,7 +133,7 @@ glift.displays.icons.WrappedIcon.prototype = {
    * Set the 'active' icon. Note: this doesn't refresh the icons on screen.
    * That task is left to the bar or selector.
    */
-  setActive: function(iconName) {
+  setActive: function (iconName) {
     for (var i = 0, len = this.associatedIcons.length; i < len; i++) {
       var icon = this.associatedIcons[i];
       if (icon.iconName === iconName) {
@@ -144,7 +146,7 @@ glift.displays.icons.WrappedIcon.prototype = {
   /**
    * Set the div element id.
    */
-  setElementId: function(id) {
+  setElementId: function (id) {
     this.elementId = id;
     return this;
   },
@@ -153,7 +155,7 @@ glift.displays.icons.WrappedIcon.prototype = {
    * Set a subbox, so we can center icons within the subbox.  A caveat is that
    * the subbox must be specified as an icon.
    */
-  setSubboxIcon: function(iconName) {
+  setSubboxIcon: function (iconName) {
     this.subboxIcon = glift.displays.icons.wrappedIcon(iconName);
     return this.subboxIcon;
   },
@@ -162,12 +164,16 @@ glift.displays.icons.WrappedIcon.prototype = {
    * Center a icon (specified as a wrapped icon) within a subbox. Returns the
    * wrapped icon with the proper scaling.
    */
-  centerWithinSubbox: function(wrapped, vMargin, hMargin) {
+  centerWithinSubbox: function (wrapped, vMargin, hMargin) {
     if (this.subboxIcon === undefined) {
-      throw "No subbox defined, so cannot centerWithin.";
+      throw 'No subbox defined, so cannot centerWithin.';
     }
     var centerObj = glift.displays.centerWithin(
-        this.subboxIcon.bbox, wrapped.bbox, vMargin, hMargin);
+      this.subboxIcon.bbox,
+      wrapped.bbox,
+      vMargin,
+      hMargin
+    );
     wrapped.performTransform(centerObj.transform);
     return wrapped;
   },
@@ -176,9 +182,13 @@ glift.displays.icons.WrappedIcon.prototype = {
    * Center a icon (specified as a wrapped icon) within the current icon.
    * Returns the wrapped icon with the proper scaling.
    */
-  centerWithinIcon: function(wrapped, vMargin, hMargin) {
+  centerWithinIcon: function (wrapped, vMargin, hMargin) {
     var centerObj = glift.displays.centerWithin(
-        this.bbox, wrapped.bbox, vMargin, hMargin);
+      this.bbox,
+      wrapped.bbox,
+      vMargin,
+      hMargin
+    );
     wrapped.performTransform(centerObj.transform);
     return wrapped;
   },
@@ -195,9 +205,9 @@ glift.displays.icons.WrappedIcon.prototype = {
    *
    * Note that the scale is performed first, then the translate is performed.
    */
-  performTransform: function(transformObj) {
+  performTransform: function (transformObj) {
     if (transformObj.scale) {
-      this.bbox = this.bbox.scale(transformObj.scale)
+      this.bbox = this.bbox.scale(transformObj.scale);
     }
     if (transformObj.xMove && transformObj.yMove) {
       this.bbox = this.bbox.translate(transformObj.xMove, transformObj.yMove);
@@ -213,7 +223,7 @@ glift.displays.icons.WrappedIcon.prototype = {
   /**
    * Reset the bounding box to the initial position.
    */
-  resetTransform: function() {
+  resetTransform: function () {
     this.bbox = this.originalBbox;
     this.transformObj = undefined;
     return this;
@@ -224,20 +234,27 @@ glift.displays.icons.WrappedIcon.prototype = {
    *
    * @return {string} the SVG transform string.
    */
-  transformString: function() {
+  transformString: function () {
     if (this.transformObj != undefined) {
-      return 'translate(' + this.transformObj.xMove + ','
-          + this.transformObj.yMove + ') '
-          + 'scale(' + this.transformObj.scale + ')';
+      return (
+        'translate(' +
+        this.transformObj.xMove +
+        ',' +
+        this.transformObj.yMove +
+        ') ' +
+        'scale(' +
+        this.transformObj.scale +
+        ')'
+      );
     } else {
-      return "";
+      return '';
     }
   },
 
   /**
-  * Create a new wrapper icon.  This 'forgets' all
-  */
-  rewrapIcon: function() {
+   * Create a new wrapper icon.  This 'forgets' all
+   */
+  rewrapIcon: function () {
     return glift.displays.icons.wrappedIcon(this.iconName);
-  }
+  },
 };

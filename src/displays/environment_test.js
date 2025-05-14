@@ -1,29 +1,30 @@
-(function() {
+(function () {
   module('glift.displays.environmentTest');
   var util = glift.util,
-      displays = glift.displays,
-      enums = glift.enums,
-      env = glift.displays.environment,
-      cropbox = displays.cropbox,
-      pt = glift.util.point,
-      tl = pt(0,0),
-      bbox = glift.orientation.bbox,
-      opts = {},
-      WIDTH = 300,
-      HEIGHT = 400;
+    displays = glift.displays,
+    enums = glift.enums,
+    env = glift.displays.environment,
+    cropbox = displays.cropbox,
+    pt = glift.util.point,
+    tl = pt(0, 0),
+    bbox = glift.orientation.bbox,
+    opts = {},
+    WIDTH = 300,
+    HEIGHT = 400;
 
-  var createEnv = function(opt) {
+  var createEnv = function (opt) {
     var opt = opt || {};
-    var boardBox = opt.boardBox !== undefined ?
-        opt.boardBox :
-        bbox.fromPts(tl, pt(WIDTH, HEIGHT));
+    var boardBox =
+      opt.boardBox !== undefined
+        ? opt.boardBox
+        : bbox.fromPts(tl, pt(WIDTH, HEIGHT));
     var boardRegion = opt.boardRegion || glift.enums.boardRegions.ALL;
     var intersections = opt.intersections || 19;
     var drawBoardCoords = opt.drawBoardCoords || false;
     return env.get(boardBox, boardRegion, intersections, drawBoardCoords);
   };
 
-  test('Creation of env object', function() {
+  test('Creation of env object', function () {
     var envObj = createEnv();
     deepEqual(envObj.bbox.width(), WIDTH);
     deepEqual(envObj.bbox.height(), HEIGHT);
@@ -34,25 +35,29 @@
     deepEqual(envObj.drawBoardCoords, false);
   });
 
-  test('Creation of square go board box', function() {
+  test('Creation of square go board box', function () {
     var guiEnv = createEnv({
-      boardBox: bbox.fromPts(tl, pt(WIDTH, HEIGHT))
-    }).init();
-    deepEqual(guiEnv.goBoardBox.height(), guiEnv.goBoardBox.width(),
-        'Must create a square board for a long box');
-
-    var guiEnv = createEnv({
-      boardBox: bbox.fromPts(tl, pt(HEIGHT, WIDTH))
+      boardBox: bbox.fromPts(tl, pt(WIDTH, HEIGHT)),
     }).init();
     deepEqual(
-        Math.round(guiEnv.goBoardBox.height()),
-        Math.round(guiEnv.goBoardBox.width()),
-        'Must create a square board for a tall box');
+      guiEnv.goBoardBox.height(),
+      guiEnv.goBoardBox.width(),
+      'Must create a square board for a long box'
+    );
+
+    var guiEnv = createEnv({
+      boardBox: bbox.fromPts(tl, pt(HEIGHT, WIDTH)),
+    }).init();
+    deepEqual(
+      Math.round(guiEnv.goBoardBox.height()),
+      Math.round(guiEnv.goBoardBox.width()),
+      'Must create a square board for a tall box'
+    );
   });
 
-  test('Test creation: tall div, square board', function() {
+  test('Test creation: tall div, square board', function () {
     var e = createEnv({
-      boardBox: bbox.fromPts(tl, pt(200, 400))
+      boardBox: bbox.fromPts(tl, pt(200, 400)),
     }).init();
     deepEqual(e.divBox_.width(), 200, 'divBox width');
     deepEqual(e.divBox_.height(), 400, 'divBox height');
@@ -64,9 +69,9 @@
     deepEqual(e.goBoardBox.botRight().y(), 300, 'botRight y');
   });
 
-  test('Test creation: wide div, square board', function() {
+  test('Test creation: wide div, square board', function () {
     var e = createEnv({
-      boardBox: bbox.fromPts(tl, pt(400, 200))
+      boardBox: bbox.fromPts(tl, pt(400, 200)),
     }).init();
     deepEqual(e.divBox_.width(), 400, 'divBox width');
     deepEqual(e.divBox_.height(), 200, 'divBox height');

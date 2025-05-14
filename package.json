@@ -15,7 +15,9 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "test": "gulp"
+    "test": "gulp",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write \"**/*.{js,json,md}\""
   },
   "keywords": [
     "glift",
@@ -25,13 +27,18 @@
     "weiqi"
   ],
   "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-prettier": "^5.4.0",
     "glob": "^7.1.1",
+    "google-closure-compiler": "^20170910.0.0",
     "gulp": "^4.0.0",
     "gulp-chmod": "^2.0.0",
     "gulp-concat": "^2.6.0",
     "gulp-qunit": "^1.5.0",
     "gulp-size": "^2.1.0",
-    "through2": "^2.0.1",
-    "google-closure-compiler": "^20170910.0.0"
+    "prettier": "^3.5.3",
+    "through2": "^2.0.1"
   }
 }

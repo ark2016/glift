@@ -13,8 +13,8 @@ glift.enums = {
    * @param {string} input The enum to input
    * @return {string} transformed enum name.
    */
-  toCamelCase: function(input) {
-    return input.toLowerCase().replace(/_(.)?/g, function(match, group1) {
+  toCamelCase: function (input) {
+    return input.toLowerCase().replace(/_(.)?/g, function (match, group1) {
       return group1 ? group1.toUpperCase() : '';
     });
   },
@@ -27,7 +27,7 @@ glift.enums = {
 glift.enums.states = {
   BLACK: 'BLACK',
   WHITE: 'WHITE',
-  EMPTY: 'EMPTY'
+  EMPTY: 'EMPTY',
 };
 
 /**
@@ -36,9 +36,8 @@ glift.enums.states = {
 glift.enums.boardAlignments = {
   TOP: 'TOP',
   RIGHT: 'RIGHT',
-  CENTER: 'CENTER'
+  CENTER: 'CENTER',
 };
-
 
 /**
  * List of directions. Used for a variety of tasks.
@@ -48,7 +47,7 @@ glift.enums.directions = {
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
   TOP: 'TOP',
-  BOTTOM: 'BOTTOM'
+  BOTTOM: 'BOTTOM',
 };
 
 /**
@@ -69,7 +68,7 @@ glift.enums.boardRegions = {
   AUTO: 'AUTO',
   // Minimal cropbox, modulo some heuristics. To do this, you usually need a
   // movetree, and usually, you need next-path information.
-  MINIMAL: 'MINIMAL'
+  MINIMAL: 'MINIMAL',
 };
 
 /**
@@ -101,7 +100,7 @@ glift.enums.marks = {
   CORRECT_VARIATION: 'CORRECT_VARIATION',
 
   // We color 'correct' variations differently in problems,
-  KO_LOCATION: 'KO_LOCATION'
+  KO_LOCATION: 'KO_LOCATION',
 };
 
 /**
@@ -112,7 +111,7 @@ glift.enums.problemResults = {
   CORRECT: 'CORRECT',
   INCORRECT: 'INCORRECT',
   INDETERMINATE: 'INDETERMINATE',
-  FAILURE: 'FAILURE' // i.e., none of these (couldn't place stone).
+  FAILURE: 'FAILURE', // i.e., none of these (couldn't place stone).
 };
 
 /**
@@ -122,7 +121,7 @@ glift.enums.problemResults = {
 glift.enums.showVariations = {
   ALWAYS: 'ALWAYS',
   NEVER: 'NEVER',
-  MORE_THAN_ONE: 'MORE_THAN_ONE'
+  MORE_THAN_ONE: 'MORE_THAN_ONE',
 };
 
 /**
@@ -134,7 +133,7 @@ glift.enums.rotations = {
   NO_ROTATION: 'NO_ROTATION',
   CLOCKWISE_90: 'CLOCKWISE_90',
   CLOCKWISE_180: 'CLOCKWISE_180',
-  CLOCKWISE_270: 'CLOCKWISE_270'
+  CLOCKWISE_270: 'CLOCKWISE_270',
 };
 
 /**

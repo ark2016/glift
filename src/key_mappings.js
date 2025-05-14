@@ -10,21 +10,21 @@ glift.keyMappings = {
   specialChars: {
     BACKSPACE: 8,
     ESCAPE: 27,
-    ARROW_LEFT:37,
-    ARROW_UP:38,
-    ARROW_RIGHT:39,
-    ARROW_DOWN:40
+    ARROW_LEFT: 37,
+    ARROW_UP: 38,
+    ARROW_RIGHT: 39,
+    ARROW_DOWN: 40,
   },
 
   _codeToNameKeyDown: undefined, // lazilyDefined
 
   /** Convert a key name (see above) to a standard key code. */
-  nameToCode: function(name) {
+  nameToCode: function (name) {
     if (name.length !== 1) {
       if (/[A-Z](_[A-Z]+)*/.test(name)) {
-        return glift.keyMappings.specialChars[name] || null
+        return glift.keyMappings.specialChars[name] || null;
       } else {
-        return null
+        return null;
       }
     } else {
       return name.charCodeAt(0);
@@ -32,12 +32,12 @@ glift.keyMappings = {
   },
 
   /** Convert a standard key code to a key name (see above). */
-  codeToName: function(keyCode) {
+  codeToName: function (keyCode) {
     if (!glift.keyMappings._codeToNameKeyDown) {
       // Bite the bullet and define the map.
       var newmap = {};
       for (var name in glift.keyMappings.specialChars) {
-        var keycode = glift.keyMappings.specialChars[name]
+        var keycode = glift.keyMappings.specialChars[name];
         newmap[keycode] = name;
       }
       glift.keyMappings._codeToNameKeyDown = newmap;
@@ -66,7 +66,7 @@ glift.keyMappings = {
    * keyName: string representing the keypress. Must be a member of _nameToCode.
    * funcOrIcon: The function or icon.name to register.
    */
-  registerKeyAction: function(id, keyName, funcOrIcon) {
+  registerKeyAction: function (id, keyName, funcOrIcon) {
     var map = glift.keyMappings._keyBindingMap;
     if (!glift.keyMappings.nameToCode(keyName)) {
       // We don't know about this particular keyCode.  It might be an error, or
@@ -83,7 +83,7 @@ glift.keyMappings = {
   },
 
   /** Remove all keys associated with an ID. */
-  unregisterInstance: function(id) {
+  unregisterInstance: function (id) {
     if (glift.keyMappings._keyBindingMap[id]) {
       delete glift.keyMappings._keyBindingMap[id];
     }
@@ -95,7 +95,7 @@ glift.keyMappings = {
    * id: The glift manager instance id.
    * keyName: The number representing the instance.
    */
-  getFuncOrIcon: function(id, keyName) {
+  getFuncOrIcon: function (id, keyName) {
     var map = glift.keyMappings._keyBindingMap;
     if (id && keyName && map[id] && map[id][keyName]) {
       return map[id][keyName];
@@ -112,7 +112,7 @@ glift.keyMappings = {
    * will be idempotent.
    * @param {string} divId
    */
-  initKeybindingListener: function(divId) {
+  initKeybindingListener: function (divId) {
     if (glift.keyMappings._initializedListener) {
       return;
     }
@@ -135,9 +135,9 @@ glift.keyMappings = {
   /**
    * Internal function for processing key-presses.
    */
-  _keyHandlerFunc: function(keyEvent) {
-    var keyName = glift.keyMappings.codeToName(keyEvent.which);// || e.charCode);
-    if (keyEvent.type === 'keydown' && !(/[A-Z_]+/.test(keyName))) {
+  _keyHandlerFunc: function (keyEvent) {
+    var keyName = glift.keyMappings.codeToName(keyEvent.which); // || e.charCode);
+    if (keyEvent.type === 'keydown' && !/[A-Z_]+/.test(keyName)) {
       // This key should be processed by the keypress event rather than this
       // one.
       return;
@@ -146,15 +146,21 @@ glift.keyMappings = {
     var activeId = glift.global.activeInstanceId;
     var bindingMap = glift.keyMappings._keyBindingMap;
     var funcOrIcon = glift.keyMappings.getFuncOrIcon(activeId, keyName);
-    if (!funcOrIcon) { return; }
+    if (!funcOrIcon) {
+      return;
+    }
 
     var manager = glift.global.instanceRegistry[activeId];
-    if (!manager) { return; }
+    if (!manager) {
+      return;
+    }
 
     var widget = manager.getCurrentWidget();
-    if (!widget) { return; }
+    if (!widget) {
+      return;
+    }
 
-    var argType = glift.util.typeOf(funcOrIcon)
+    var argType = glift.util.typeOf(funcOrIcon);
 
     if (argType === 'function') {
       funcOrIcon(widget);
@@ -168,8 +174,10 @@ glift.keyMappings = {
       // Assume it's an icon-action-path
       // icon namespaces look like: icons.arrowleft.mouseup
       var actionNamespace = funcOrIcon.split('.');
-      if (actionNamespace[0] !== 'iconActions' &&
-          actionNamespace[0] !== 'stoneActions') {
+      if (
+        actionNamespace[0] !== 'iconActions' &&
+        actionNamespace[0] !== 'stoneActions'
+      ) {
         throw new Error('Unexpected action namespace: ' + actionNamespace[0]);
       }
       var action = widget[actionNamespace[0]];
@@ -181,8 +189,8 @@ glift.keyMappings = {
         // We don't want the widget interacting with anything else while
         // full-screen.
         if (keyEvent.preventDefault) keyEvent.preventDefault();
-        else  keyEvent.returnValue = false; // IE
+        else keyEvent.returnValue = false; // IE
       }
     }
-  }
+  },
 };

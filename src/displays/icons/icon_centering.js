@@ -7,9 +7,8 @@ goog.require('glift.displays.icons');
  */
 glift.displays.icons.CenterDir = {
   H: 'h',
-  V: 'v'
+  V: 'v',
 };
-
 
 /**
  * Row-Center an array of wrapped icons.
@@ -20,13 +19,23 @@ glift.displays.icons.CenterDir = {
  * @param {number} hMargin
  * @param {number=} opt_minSpacing
  */
-glift.displays.icons.rowCenterWrapped = function(
-    divBbox, wrappedIcons, vMargin, hMargin, opt_minSpacing) {
+glift.displays.icons.rowCenterWrapped = function (
+  divBbox,
+  wrappedIcons,
+  vMargin,
+  hMargin,
+  opt_minSpacing
+) {
   var minSpacing = opt_minSpacing || 0;
   return glift.displays.icons._centerWrapped(
-      divBbox, wrappedIcons, vMargin, hMargin, minSpacing,
-      glift.displays.icons.CenterDir.H);
-}
+    divBbox,
+    wrappedIcons,
+    vMargin,
+    hMargin,
+    minSpacing,
+    glift.displays.icons.CenterDir.H
+  );
+};
 
 /**
  * Column-Center an array of wrapped icons.
@@ -37,13 +46,23 @@ glift.displays.icons.rowCenterWrapped = function(
  * @param {number} hMargin
  * @param {number=} opt_minSpacing
  */
-glift.displays.icons.columnCenterWrapped = function(
-    divBbox, wrappedIcons, vMargin, hMargin, opt_minSpacing) {
+glift.displays.icons.columnCenterWrapped = function (
+  divBbox,
+  wrappedIcons,
+  vMargin,
+  hMargin,
+  opt_minSpacing
+) {
   var minSpacing = opt_minSpacing || 0;
   return glift.displays.icons._centerWrapped(
-      divBbox, wrappedIcons, vMargin, hMargin, minSpacing,
-      glift.displays.icons.CenterDir.V);
-}
+    divBbox,
+    wrappedIcons,
+    vMargin,
+    hMargin,
+    minSpacing,
+    glift.displays.icons.CenterDir.V
+  );
+};
 
 /**
  * Center wrapped icons
@@ -57,11 +76,19 @@ glift.displays.icons.columnCenterWrapped = function(
  * @param {number} minSpacing
  * @param {glift.displays.icons.CenterDir} direction
  */
-glift.displays.icons._centerWrapped = function(
-    divBbox, wrappedIcons, vMargin, hMargin, minSpacing, direction) {
+glift.displays.icons._centerWrapped = function (
+  divBbox,
+  wrappedIcons,
+  vMargin,
+  hMargin,
+  minSpacing,
+  direction
+) {
   var bboxes = [];
-  if (direction !== glift.displays.icons.CenterDir.H &&
-      direction !== glift.displays.icons.CenterDir.V) {
+  if (
+    direction !== glift.displays.icons.CenterDir.H &&
+    direction !== glift.displays.icons.CenterDir.V
+  ) {
     direction = glift.displays.icons.CenterDir.H;
   }
   for (var i = 0; i < wrappedIcons.length; i++) {
@@ -71,10 +98,20 @@ glift.displays.icons._centerWrapped = function(
   // Row center returns: { transforms: [...], bboxes: [...] }
   if (direction === glift.displays.icons.CenterDir.H) {
     var centeringData = glift.displays.rowCenterSimple(
-        divBbox, bboxes, vMargin, hMargin, minSpacing);
+      divBbox,
+      bboxes,
+      vMargin,
+      hMargin,
+      minSpacing
+    );
   } else {
     var centeringData = glift.displays.columnCenterSimple(
-        divBbox, bboxes, vMargin, hMargin, minSpacing)
+      divBbox,
+      bboxes,
+      vMargin,
+      hMargin,
+      minSpacing
+    );
   }
   var transforms = centeringData.transforms;
 

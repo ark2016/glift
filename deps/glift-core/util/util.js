@@ -2,13 +2,12 @@ goog.provide('glift.util');
 
 goog.require('glift');
 
-
 glift.util = {
   /**
    * Log a message. Allows the for the possibility of overwriting for tests.
    * @param {*} msg
    */
-  logz: function(msg) {
+  logz: function (msg) {
     console.log(msg);
   },
 
@@ -17,7 +16,7 @@ glift.util = {
    * @param {*} value
    * @return {string}
    */
-  typeOf: function(value) {
+  typeOf: function (value) {
     var s = typeof value;
     if (s === 'object') {
       if (value) {
@@ -38,8 +37,8 @@ glift.util = {
    * @param {number} bounds
    * @return {boolean}
    */
-  inBounds: function(num, bounds) {
-    return ((num < bounds) && (num >= 0));
+  inBounds: function (num, bounds) {
+    return num < bounds && num >= 0;
   },
 
   /**
@@ -49,13 +48,13 @@ glift.util = {
    * @param {number} bounds
    * @return {boolean}
    */
-  outBounds: function(num, bounds) {
-    return ((num >= bounds) || (num < 0));
+  outBounds: function (num, bounds) {
+    return num >= bounds || num < 0;
   },
 
   // Init a key if the obj is undefined at the key with the given value.
   // Return the value
-  getKeyWithDefault: function(obj, key, value) {
+  getKeyWithDefault: function (obj, key, value) {
     if (obj[key] === undefined) {
       obj[key] = value;
     }
@@ -65,7 +64,7 @@ glift.util = {
   /*
    * Get the size of an object
    */
-  sizeOf: function(obj) {
+  sizeOf: function (obj) {
     var size = 0;
     for (var key in obj) {
       size += 1;
@@ -79,7 +78,7 @@ glift.util = {
    * @param {!Object} methods
    * @return {!Object}
    */
-  setMethods: function(base, methods) {
+  setMethods: function (base, methods) {
     for (var key in methods) {
       base[key] = methods[key].bind(base);
     }
@@ -111,10 +110,13 @@ glift.util = {
    *
    * @template T
    */
-  simpleClone: function(obj) {
+  simpleClone: function (obj) {
     // Handle immutable types (null, Boolean, Number, String) and functions.
-    if (glift.util.typeOf(obj) !== 'array' &&
-        glift.util.typeOf(obj) !== 'object') return obj;
+    if (
+      glift.util.typeOf(obj) !== 'array' &&
+      glift.util.typeOf(obj) !== 'object'
+    )
+      return obj;
     if (obj instanceof Date) {
       var copy = new Date();
       copy.setTime(obj.getTime());
@@ -130,11 +132,11 @@ glift.util = {
     if (glift.util.typeOf(obj) === 'object') {
       var copy = {};
       for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] =
-            glift.util.simpleClone(obj[attr]);
+        if (obj.hasOwnProperty(attr))
+          copy[attr] = glift.util.simpleClone(obj[attr]);
       }
       return copy;
     }
     throw new Error("Unable to copy obj! Its type isn't supported.");
-  }
+  },
 };

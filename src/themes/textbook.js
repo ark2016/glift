@@ -5,12 +5,12 @@ goog.provide('glift.themes.registered.TEXTBOOK');
  */
 glift.themes.registered.TEXTBOOK = {
   board: {
-    fill: '#FFF'
+    fill: '#FFF',
   },
 
   commentBox: {
     css: {
-      background: '#FFF'
-    }
-  }
+      background: '#FFF',
+    },
+  },
 };

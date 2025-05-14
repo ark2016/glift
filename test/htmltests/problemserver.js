@@ -1,6 +1,4 @@
-
 var http = require('http');
-
 
 var p1 = [
   '(;GM[1]FF[4]CA[UTF-8]AP[CGoban:3]ST[2]',
@@ -16,28 +14,28 @@ var p2 = [
   ';B[sa]C[Correct. Black makes two eyes.])',
 ].join('\n');
 
-
-var handler = function(req, res) {
+var handler = function (req, res) {
   if (req.url == '/problem' && req.method == 'GET') {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(p1);
   } else if (req.url == '/problemresult' && req.method == 'POST') {
     var body = '';
-    req.on('data', function(data) {
+    req.on('data', function (data) {
       body += data;
     });
-    req.on('end', function() {
+    req.on('end', function () {
       console.log('Response:' + body);
-      res.writeHead(200, {'Content-Type': 'text/plain'});
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
       res.end('Response:' + body);
     });
   } else {
-    res.writeHead(404, {'Content-Type': 'text/plain'});
-    res.end('No endpoint found for url: ' + req.url + ' and method ' + req.method);
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end(
+      'No endpoint found for url: ' + req.url + ' and method ' + req.method
+    );
   }
 };
 
-http.createServer(handler).listen(1337, "127.0.0.1");
+http.createServer(handler).listen(1337, '127.0.0.1');
 
 console.log('Server running at http://127.0.0.1:1337/');
-

@@ -10,13 +10,15 @@ goog.require('glift.displays.board');
  * @param {!glift.flattener.BoardPoints} boardPoints Board points object.
  * @param {!glift.themes.base} theme The theme object
  */
-glift.displays.board.boardLabels = function(svg, idGen, boardPoints, theme) {
+glift.displays.board.boardLabels = function (svg, idGen, boardPoints, theme) {
   var container = glift.svg.group().setId(idGen.boardCoordLabelGroup());
   svg.append(container);
   var labels = boardPoints.edgeLabels;
   for (var i = 0, ii = labels.length; i < ii; i++) {
     var lbl = labels[i];
-    container.append(glift.svg.text()
+    container.append(
+      glift.svg
+        .text()
         .setText(lbl.label)
         .setAttr('fill', theme.boardCoordLabels.fill)
         .setAttr('stroke', theme.boardCoordLabels.stroke)
@@ -26,7 +28,10 @@ glift.displays.board.boardLabels = function(svg, idGen, boardPoints, theme) {
         .setAttr('x', lbl.coordPt.x()) // x and y are the anchor points.
         .setAttr('y', lbl.coordPt.y())
         .setAttr('font-family', theme.boardCoordLabels['font-family'])
-        .setAttr('font-size',
-            boardPoints.spacing * theme.boardCoordLabels['font-size']));
+        .setAttr(
+          'font-size',
+          boardPoints.spacing * theme.boardCoordLabels['font-size']
+        )
+    );
   }
 };

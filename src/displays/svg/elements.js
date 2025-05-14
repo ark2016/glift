@@ -35,5 +35,5 @@ glift.displays.svg.Element = {
   ICON_CONTAINER: 'icon_container',
   TEMP_ICON: 'temp_icon',
   TEMP_TEXT: 'temp_text',
-  TEMP_ICON_CONTAINER: 'temp_icon_container'
+  TEMP_ICON_CONTAINER: 'temp_icon_container',
 };

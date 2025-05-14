@@ -1,14 +1,14 @@
-(function() {
+(function () {
   module('glift.orientation.rotationTests');
   var rotations = glift.enums.rotations;
   var boardRegions = glift.enums.boardRegions;
 
   var ordering = {
     corner: boardRegions.TOP_RIGHT,
-    side: boardRegions.TOP
+    side: boardRegions.TOP,
   };
 
-  test('findCanonicalRotation: corner', function() {
+  test('findCanonicalRotation: corner', function () {
     var find = glift.orientation.findCanonicalRotation;
     var mt = glift.rules.movetree.getFromSgf('(;GM[1];B[aa])');
     deepEqual(find(mt, ordering), rotations.CLOCKWISE_90);
@@ -23,7 +23,7 @@
     deepEqual(find(mt, ordering), rotations.CLOCKWISE_270);
   });
 
-  test('findCanonicalRotation: side', function() {
+  test('findCanonicalRotation: side', function () {
     var find = glift.orientation.findCanonicalRotation;
     var mt = glift.rules.movetree.getFromSgf('(;GM[1];B[aa];W[ma])');
     deepEqual(find(mt, ordering), rotations.NO_ROTATION);
@@ -38,18 +38,17 @@
     deepEqual(find(mt, ordering), rotations.CLOCKWISE_270);
   });
 
-  test('Autorotate: corner', function() {
+  test('Autorotate: corner', function () {
     var pt = glift.util.point;
-    var mt = glift.rules.movetree.getFromSgf(
-      '(;GM[1]B[cb]C[foo];W[ac])');
+    var mt = glift.rules.movetree.getFromSgf('(;GM[1]B[cb]C[foo];W[ac])');
 
-    deepEqual(mt.properties().getAsPoint('B'),  pt(2, 1));
+    deepEqual(mt.properties().getAsPoint('B'), pt(2, 1));
     var nmt = glift.orientation.autoRotateCrop(mt, {
       corner: boardRegions.TOP_LEFT,
       side: boardRegions.TOP,
       preferRotate: true,
     });
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(2, 1));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(2, 1));
     deepEqual(nmt.properties().getOneValue('C'), 'foo');
 
     nmt = glift.orientation.autoRotateCrop(mt, {
@@ -57,38 +56,38 @@
       side: boardRegions.TOP,
       preferRotate: true,
     });
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(17, 2));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(17, 2));
     deepEqual(nmt.properties().getOneValue('C'), 'foo');
     nmt.moveDown();
-    deepEqual(nmt.properties().getAsPoint('W'),  pt(16, 0));
+    deepEqual(nmt.properties().getAsPoint('W'), pt(16, 0));
 
     nmt = glift.orientation.autoRotateCrop(mt, {
       corner: boardRegions.BOTTOM_RIGHT,
       side: boardRegions.TOP,
       preferRotate: true,
     });
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(16, 17));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(16, 17));
 
     nmt = glift.orientation.autoRotateCrop(mt, {
       corner: boardRegions.BOTTOM_LEFT,
       side: boardRegions.TOP,
       preferRotate: true,
     });
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(1, 16));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(1, 16));
   });
 
-  test('Autorotate: corner, flip', function() {
+  test('Autorotate: corner, flip', function () {
     var pt = glift.util.point;
     var sgf = '(;GM[1]B[cb]C[foo];W[ac])';
     var mt = glift.rules.movetree.getFromSgf(sgf);
-    deepEqual(mt.properties().getAsPoint('B'),  pt(2, 1));
+    deepEqual(mt.properties().getAsPoint('B'), pt(2, 1));
 
     // Should be no flip
     var nmt = glift.orientation.autoRotateCrop(mt, {
       corner: boardRegions.TOP_LEFT,
       preferRotate: false,
     });
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(2, 1));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(2, 1));
     deepEqual(nmt.properties().getOneValue('C'), 'foo');
 
     // Horizontal flip
@@ -97,10 +96,10 @@
       corner: boardRegions.TOP_RIGHT,
       preferRotate: false,
     });
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(16, 1));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(16, 1));
     deepEqual(nmt.properties().getOneValue('C'), 'foo');
     nmt.moveDown();
-    deepEqual(nmt.properties().getAsPoint('W'),  pt(18, 2));
+    deepEqual(nmt.properties().getAsPoint('W'), pt(18, 2));
 
     // Vertical flip
     mt = glift.rules.movetree.getFromSgf(sgf);
@@ -108,17 +107,17 @@
       corner: boardRegions.BOTTOM_LEFT,
       preferRotate: false,
     });
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(2, 17));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(2, 17));
     deepEqual(nmt.properties().getOneValue('C'), 'foo');
     nmt.moveDown();
-    deepEqual(nmt.properties().getAsPoint('W'),  pt(0, 16));
+    deepEqual(nmt.properties().getAsPoint('W'), pt(0, 16));
   });
 
-  test('Autorotate: side, flip', function() {
+  test('Autorotate: side, flip', function () {
     var pt = glift.util.point;
     var sgf = '(;GM[1]AB[aa];B[cb]C[foo];W[sc])';
     var mt = glift.rules.movetree.getFromSgf(sgf);
-    deepEqual(mt.properties().getAsPoint('AB').toString(),  pt(0, 0).toString());
+    deepEqual(mt.properties().getAsPoint('AB').toString(), pt(0, 0).toString());
 
     // Should be no flip
     var nmt = glift.orientation.autoRotateCrop(mt, {
@@ -126,7 +125,7 @@
       preferRotate: false,
     });
     nmt.moveDown();
-    deepEqual(nmt.properties().getAsPoint('B').toString(),  pt(2, 1).toString());
+    deepEqual(nmt.properties().getAsPoint('B').toString(), pt(2, 1).toString());
     deepEqual(nmt.properties().getOneValue('C'), 'foo');
 
     // Vertical flip
@@ -135,9 +134,15 @@
       side: boardRegions.BOTTOM,
       preferRotate: false,
     });
-    deepEqual(nmt.properties().getAsPoint('AB').toString(),  pt(0, 18).toString());
+    deepEqual(
+      nmt.properties().getAsPoint('AB').toString(),
+      pt(0, 18).toString()
+    );
     nmt.moveDown();
-    deepEqual(nmt.properties().getAsPoint('B').toString(),  pt(2, 17).toString());
+    deepEqual(
+      nmt.properties().getAsPoint('B').toString(),
+      pt(2, 17).toString()
+    );
 
     // Horizontal flip
     sgf = '(;GM[1]AB[aa];B[cb]C[foo];W[cs])';
@@ -146,13 +151,13 @@
       side: boardRegions.RIGHT,
       preferRotate: false,
     });
-    deepEqual(nmt.properties().getAsPoint('AB'),  pt(18, 0));
+    deepEqual(nmt.properties().getAsPoint('AB'), pt(18, 0));
     nmt.moveDown();
     deepEqual(nmt.properties().getOneValue('C'), 'foo');
-    deepEqual(nmt.properties().getAsPoint('B'),  pt(16, 1));
+    deepEqual(nmt.properties().getAsPoint('B'), pt(16, 1));
   });
 
-  test('Auto rotate: game', function() {
+  test('Auto rotate: game', function () {
     var sgf = '(;GM[1]AB[aa];B[pd]C[foo];W[sc])';
     var mt = glift.rules.movetree.getFromSgf(sgf);
     var nmt = glift.orientation.autoRotateGame(mt);

@@ -16,15 +16,16 @@ goog.require('glift.displays.position.WidgetColumn');
  *
  * @return {!glift.displays.position.WidgetPositioner} The widget positioner
  */
-glift.displays.position.positioner = function(
-    divBox,
-    boardRegion,
-    intersections,
-    componentsToUse,
-    oneColSplits,
-    twoColSplits) {
+glift.displays.position.positioner = function (
+  divBox,
+  boardRegion,
+  intersections,
+  componentsToUse,
+  oneColSplits,
+  twoColSplits
+) {
   if (!divBox) {
-    throw new Error('No Div box. [' + divBox + ']'); 
+    throw new Error('No Div box. [' + divBox + ']');
   }
   if (!boardRegion || !glift.enums.boardRegions[boardRegion]) {
     throw new Error('Invalid Board Region. [' + boardRegion + ']');
@@ -38,18 +39,29 @@ glift.displays.position.positioner = function(
   if (!twoColSplits) {
     throw new Error('No two col splits. [' + twoColSplits + ']');
   }
-  return new glift.displays.position.WidgetPositioner(divBox, boardRegion,
-      intersections, componentsToUse, oneColSplits, twoColSplits);
+  return new glift.displays.position.WidgetPositioner(
+    divBox,
+    boardRegion,
+    intersections,
+    componentsToUse,
+    oneColSplits,
+    twoColSplits
+  );
 };
-
 
 /**
  * Internal widget positioner object
  *
  * @constructor @final @struct
  */
-glift.displays.position.WidgetPositioner = function(
-    divBox, boardRegion, ints, compsToUse, oneColSplits, twoColSplits) {
+glift.displays.position.WidgetPositioner = function (
+  divBox,
+  boardRegion,
+  ints,
+  compsToUse,
+  oneColSplits,
+  twoColSplits
+) {
   this.divBox = divBox;
   this.boardRegion = boardRegion;
   this.ints = ints;
@@ -70,7 +82,7 @@ glift.displays.position.WidgetPositioner.prototype = {
    *
    * @return {!glift.displays.position.WidgetBoxes}
    */
-  calcWidgetPositioning: function() {
+  calcWidgetPositioning: function () {
     if (this.useHorzOrientation()) {
       return this.calcHorzPositioning();
     } else {
@@ -83,19 +95,18 @@ glift.displays.position.WidgetPositioner.prototype = {
    * orientation.
    * Returns: True or False
    */
-  useHorzOrientation: function() {
+  useHorzOrientation: function () {
     var divBox = this.divBox,
-        boardRegion = this.boardRegion,
-        componentSet = this.componentSet,
-        comps = glift.BoardComponent,
-        hwRatio = divBox.height() / divBox.width(),
-        longBoxRegions = { TOP: true, BOTTOM: true };
-    if (!componentSet[comps.COMMENT_BOX] ||
-        !componentSet[comps.BOARD]) {
+      boardRegion = this.boardRegion,
+      componentSet = this.componentSet,
+      comps = glift.BoardComponent,
+      hwRatio = divBox.height() / divBox.width(),
+      longBoxRegions = { TOP: true, BOTTOM: true };
+    if (!componentSet[comps.COMMENT_BOX] || !componentSet[comps.BOARD]) {
       return false; // Force vertical if no comment box or board.
     } else if (hwRatio < 0.45 && longBoxRegions[boardRegion]) {
       return true;
-    } else if (hwRatio < 0.800 && !longBoxRegions[boardRegion]) {
+    } else if (hwRatio < 0.8 && !longBoxRegions[boardRegion]) {
       return true;
     } else {
       return false; // Default to vertical orientation
@@ -108,14 +119,17 @@ glift.displays.position.WidgetPositioner.prototype = {
    *
    * @return {!glift.displays.position.WidgetBoxes}
    */
-  calcVertPositioning: function() {
+  calcVertPositioning: function () {
     var recalCol = this.recalcSplits(this.oneColSplits).first;
     var boxes = new glift.displays.position.WidgetBoxes();
-    boxes.setFirst(this.calculateColumn(
+    boxes.setFirst(
+      this.calculateColumn(
         recalCol,
         this.divBox,
         glift.enums.boardAlignments.TOP,
-        0 /* startTop */));
+        0 /* startTop */
+      )
+    );
     return boxes;
   },
 
@@ -135,20 +149,26 @@ glift.displays.position.WidgetPositioner.prototype = {
    *
    * @return {!glift.displays.position.WidgetBoxes}
    */
-  calcHorzPositioning: function() {
+  calcHorzPositioning: function () {
     var splits = this.recalcSplits(this.twoColSplits);
     var horzSplits = this.splitDivBoxHoriz();
     var boxes = new glift.displays.position.WidgetBoxes();
-    boxes.setFirst(this.calculateColumn(
+    boxes.setFirst(
+      this.calculateColumn(
         splits.first,
         horzSplits[0],
         glift.enums.boardAlignments.RIGHT,
-        0 /* startTop */));
-    boxes.setSecond(this.calculateColumn(
+        0 /* startTop */
+      )
+    );
+    boxes.setSecond(
+      this.calculateColumn(
         splits.second,
         horzSplits[1],
         null,
-        boxes.first().getBbox(boxes.first().ordering[0]).top()));
+        boxes.first().getBbox(boxes.first().ordering[0]).top()
+      )
+    );
     return boxes;
   },
 
@@ -158,7 +178,7 @@ glift.displays.position.WidgetPositioner.prototype = {
    *
    * Returns the completed WidgetColumn.
    */
-  calculateColumn: function(recalCol, wrapperDiv, alignment, startTop) {
+  calculateColumn: function (recalCol, wrapperDiv, alignment, startTop) {
     var top = startTop || 0;
     var column = new glift.displays.position.WidgetColumn();
     var components = glift.BoardComponent;
@@ -185,7 +205,10 @@ glift.displays.position.WidgetPositioner.prototype = {
     if (splitMap.BOARD) {
       // We defer to the display calculations that come from the environment.
       board = glift.displays.getResizedBox(
-          splitMap.BOARD, this.cropbox, alignment);
+        splitMap.BOARD,
+        this.cropbox,
+        alignment
+      );
       column.setComponent(components.BOARD, board);
     }
 
@@ -193,19 +216,24 @@ glift.displays.position.WidgetPositioner.prototype = {
     var previousCompTop = null;
     var colWidth = board ? board.width() : wrapperDiv.width();
     var colLeft = board ? board.left() : wrapperDiv.left();
-    column.orderFn(function(comp) {
-      if (comp === components.BOARD) {
+    column.orderFn(
+      function (comp) {
+        if (comp === components.BOARD) {
+          previousComp = comp;
+          top += board.height();
+          return;
+        }
+        var split = splitMap[comp];
+        var bbox = glift.orientation.bbox.fromSides(
+          glift.util.point(colLeft, top),
+          colWidth,
+          split.height()
+        );
+        column.setComponent(comp, bbox);
+        top += bbox.height();
         previousComp = comp;
-        top += board.height();
-        return;
-      }
-      var split = splitMap[comp];
-      var bbox = glift.orientation.bbox.fromSides(
-          glift.util.point(colLeft, top), colWidth, split.height());
-      column.setComponent(comp, bbox);
-      top += bbox.height();
-      previousComp = comp;
-    }.bind(this));
+      }.bind(this)
+    );
     return column;
   },
 
@@ -226,7 +254,7 @@ glift.displays.position.WidgetPositioner.prototype = {
    *  second: [...]
    * }
    */
-  recalcSplits: function(columnSplits) {
+  recalcSplits: function (columnSplits) {
     var out = {};
     var compsToUseSet = this.componentSet;
     // Note: this is designed with the outer loop in this way to work with
@@ -242,9 +270,10 @@ glift.displays.position.WidgetPositioner.prototype = {
       for (var i = 0; i < col.length; i++) {
         var part = col[i];
         if (compsToUseSet[part.component]) {
-          colOut.push({ // perform a copy.
+          colOut.push({
+            // perform a copy.
             component: part.component,
-            ratio: part.ratio
+            ratio: part.ratio,
           });
           total += part.ratio;
         }
@@ -268,10 +297,13 @@ glift.displays.position.WidgetPositioner.prototype = {
    *    Column 2 Bbox
    * ]
    */
-  splitDivBoxHoriz: function() {
+  splitDivBoxHoriz: function () {
     // Tentatively createa board box to see how much space it takes up.
     var boardBox = glift.displays.getResizedBox(
-        this.divBox, this.cropbox, glift.enums.boardAlignments.RIGHT);
+      this.divBox,
+      this.cropbox,
+      glift.enums.boardAlignments.RIGHT
+    );
 
     // These are precentages of boardWidth.  We require that the right column be
     // at last 1/2 go board width and at most 3/4 the go board width.
@@ -298,17 +330,22 @@ glift.displays.position.WidgetPositioner.prototype = {
     // TODO(kashomon): This assumes a BOARD is the only element in the left
     // column.
     var resizedBox = glift.displays.getResizedBox(
-        splits[0], this.cropbox, glift.enums.boardAlignments.RIGHT);
+      splits[0],
+      this.cropbox,
+      glift.enums.boardAlignments.RIGHT
+    );
 
     // Defer to the Go board height calculations.
     var baseRightCol = glift.orientation.bbox.fromPts(
       glift.util.point(splits[1].topLeft().x(), resizedBox.topLeft().y()),
-      glift.util.point(splits[1].botRight().x(), resizedBox.botRight().y()));
+      glift.util.point(splits[1].botRight().x(), resizedBox.botRight().y())
+    );
 
     // TODO(kashomon): Make max right col size configurable.
-    if (splits[1].width() > (0.75 * resizedBox.width())) {
-      baseRightCol = baseRightCol.vSplit(
-          [0.75 * resizedBox.width() / baseRightCol.width()])[0];
+    if (splits[1].width() > 0.75 * resizedBox.width()) {
+      baseRightCol = baseRightCol.vSplit([
+        (0.75 * resizedBox.width()) / baseRightCol.width(),
+      ])[0];
     }
     splits[1] = baseRightCol;
     return splits;
@@ -319,7 +356,7 @@ glift.displays.position.WidgetPositioner.prototype = {
   ////////////////////////////
 
   /** Converts the components to use array into a set (object=>true/false). */
-  _getComponentSet: function() {
+  _getComponentSet: function () {
     var out = {};
     for (var i = 0; i < this.compsToUse.length; i++) {
       out[this.compsToUse[i]] = true;
@@ -328,11 +365,11 @@ glift.displays.position.WidgetPositioner.prototype = {
   },
 
   /** Extracts ratios from either the one-col splits or two col-splits. */
-  _extractRatios: function(column) {
+  _extractRatios: function (column) {
     var out = [];
     for (var i = 0; i < column.length; i++) {
       out.push(column[i].ratio);
     }
     return out;
-  }
+  },
 };

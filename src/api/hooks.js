@@ -7,7 +7,7 @@ goog.provide('glift.api.HookOptions');
  *
  * @constructor @final @struct
  */
-glift.api.HookOptions = function(opt_o) {
+glift.api.HookOptions = function (opt_o) {
   var o = opt_o || {};
 
   /**

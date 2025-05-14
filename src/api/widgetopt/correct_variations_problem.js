@@ -1,7 +1,7 @@
 /**
  * Additional Options for the GameViewers
  */
-glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function() {
+glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function () {
   return {
     markLastMove: undefined, // rely on defaults
     keyMappings: undefined, // rely on defaults
@@ -11,19 +11,13 @@ glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function() {
 
     controllerFunc: glift.controllers.staticProblem,
 
-    icons: [
-      'refresh',
-      'problem-explanation',
-      'multiopen-boxonly'
-    ],
+    icons: ['refresh', 'problem-explanation', 'multiopen-boxonly'],
 
     showVariations: glift.enums.showVariations.NEVER,
 
-    statusBarIcons: [
-      'fullscreen'
-    ],
+    statusBarIcons: ['fullscreen'],
 
-    stoneClick: function(event, widget, pt) {
+    stoneClick: function (event, widget, pt) {
       var currentPlayer = widget.controller.getCurrentPlayer();
       var flattened = widget.controller.addStone(pt, currentPlayer);
       var problemResults = glift.enums.problemResults;
@@ -36,7 +30,7 @@ glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function() {
       widget.applyBoardData(flattened);
 
       if (widget.correctness === undefined) {
-        if (flattened.problemResult()=== problemResults.CORRECT) {
+        if (flattened.problemResult() === problemResults.CORRECT) {
           widget.iconBar.destroyTempIcons();
           if (widget.correctNextSet[pt.toString()] === undefined) {
             widget.correctNextSet[pt.toString()] = true;
@@ -44,16 +38,18 @@ glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function() {
             if (widget.numCorrectAnswers === widget.totalCorrectAnswers) {
               widget.correctness = problemResults.CORRECT;
               widget.iconBar.addTempText(
-                  'multiopen-boxonly',
-                  widget.numCorrectAnswers + '/' + widget.totalCorrectAnswers,
-                  { fill: '#0CC', stroke: '#0CC'});
+                'multiopen-boxonly',
+                widget.numCorrectAnswers + '/' + widget.totalCorrectAnswers,
+                { fill: '#0CC', stroke: '#0CC' }
+              );
               hooks.problemCorrect && hooks.problemCorrect();
             } else {
               widget.iconBar.addTempText(
-                  'multiopen-boxonly',
-                  widget.numCorrectAnswers + '/' + widget.totalCorrectAnswers,
-                  { fill: '#000', stroke: '#000'});
-              setTimeout(function() {
+                'multiopen-boxonly',
+                widget.numCorrectAnswers + '/' + widget.totalCorrectAnswers,
+                { fill: '#000', stroke: '#000' }
+              );
+              setTimeout(function () {
                 widget.controller.initialize();
                 widget.applyBoardData(widget.controller.flattenedState());
               }, widget.sgfOptions.correctVariationsResetTime);
@@ -61,7 +57,11 @@ glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function() {
           }
         } else if (flattened.problemResult() == problemResults.INCORRECT) {
           widget.iconBar.destroyTempIcons();
-          widget.iconBar.setCenteredTempIcon('multiopen-boxonly', 'cross', 'red');
+          widget.iconBar.setCenteredTempIcon(
+            'multiopen-boxonly',
+            'cross',
+            'red'
+          );
           widget.iconBar.clearTempText('multiopen-boxonly');
           widget.correctness = problemResults.INCORRECT;
           hooks.problemIncorrect && hooks.problemIncorrect();
@@ -71,5 +71,5 @@ glift.api.widgetopt[glift.WidgetType.CORRECT_VARIATIONS_PROBLEM] = function() {
 
     stoneMouseover: undefined, // rely on defaults
     stoneMouseout: undefined, // rely on defaults
-  }
+  };
 };

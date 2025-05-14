@@ -19,13 +19,14 @@ glift.flattener.intersection = {
    *
    * @return {!glift.flattener.Intersection}
    */
-  create: function(pt, stoneColor, mark, textLabel, maxInts) {
+  create: function (pt, stoneColor, mark, textLabel, maxInts) {
     var sym = glift.flattener.symbols;
     var intsect = new glift.flattener.Intersection(pt);
 
-    if (pt.x() < 0 || pt.y() < 0 ||
-        pt.x() >= maxInts || pt.y() >= maxInts) {
-      throw new Error('Pt (' + pt.x() + ',' + pt.y() + ')' + ' is out of bounds.');
+    if (pt.x() < 0 || pt.y() < 0 || pt.x() >= maxInts || pt.y() >= maxInts) {
+      throw new Error(
+        'Pt (' + pt.x() + ',' + pt.y() + ')' + ' is out of bounds.'
+      );
     }
 
     var intz = maxInts - 1;
@@ -72,7 +73,7 @@ glift.flattener.intersection = {
 };
 
 /**
- * Represents a flattened intersection. Separated into 3 layers: 
+ * Represents a flattened intersection. Separated into 3 layers:
  *  - Base layer (intersection abels)
  *  - Stone layer (black, white, or empty)
  *  - Mark layer (shapes, text labels, etc.)
@@ -83,7 +84,7 @@ glift.flattener.intersection = {
  *
  * @constructor @final @struct
  */
-glift.flattener.Intersection = function(pt) {
+glift.flattener.Intersection = function (pt) {
   var EMPTY = glift.flattener.symbols.EMPTY;
 
   /** @private {!glift.Point} */
@@ -108,18 +109,35 @@ glift.flattener.Intersection = function(pt) {
  */
 glift.flattener.intersection.layerMapping = {
   base: {
-    EMPTY: true, TL_CORNER: true, TR_CORNER: true, BL_CORNER: true,
-    BR_CORNER: true, TOP_EDGE: true, BOT_EDGE: true, LEFT_EDGE: true,
-    RIGHT_EDGE: true, CENTER: true, CENTER_STARPOINT: true
+    EMPTY: true,
+    TL_CORNER: true,
+    TR_CORNER: true,
+    BL_CORNER: true,
+    BR_CORNER: true,
+    TOP_EDGE: true,
+    BOT_EDGE: true,
+    LEFT_EDGE: true,
+    RIGHT_EDGE: true,
+    CENTER: true,
+    CENTER_STARPOINT: true,
   },
   stone: {
-    EMPTY: true, BSTONE: true, WSTONE: true
+    EMPTY: true,
+    BSTONE: true,
+    WSTONE: true,
   },
   mark: {
-    EMPTY: true, TRIANGLE: true, SQUARE: true, CIRCLE: true, XMARK: true,
-    TEXTLABEL: true, LASTMOVE: true, NEXTVARIATION: true,
-    CORRECT_VARIATION: true, KO_LOCATION: true,
-  }
+    EMPTY: true,
+    TRIANGLE: true,
+    SQUARE: true,
+    CIRCLE: true,
+    XMARK: true,
+    TEXTLABEL: true,
+    LASTMOVE: true,
+    NEXTVARIATION: true,
+    CORRECT_VARIATION: true,
+    KO_LOCATION: true,
+  },
 };
 
 glift.flattener.Intersection.prototype = {
@@ -128,14 +146,15 @@ glift.flattener.Intersection.prototype = {
    * @param {string} layer
    * @private
    */
-  validateSymbol_: function(s, layer) {
+  validateSymbol_: function (s, layer) {
     var str = glift.flattener.symbolStr(s);
     if (!str) {
       throw new Error('Symbol Val: ' + s + ' is not a defined symbol.');
     }
     if (!glift.flattener.intersection.layerMapping[layer][str]) {
-      throw new Error('Incorrect layer for: ' + str + ',' + s +
-          '. Layer was ' + layer);
+      throw new Error(
+        'Incorrect layer for: ' + str + ',' + s + '. Layer was ' + layer
+      );
     }
     return s;
   },
@@ -145,36 +164,46 @@ glift.flattener.Intersection.prototype = {
    * @param {!Object} thatint
    * @return {boolean}
    */
-  equals: function(thatint) {
+  equals: function (thatint) {
     if (thatint == null) {
       return false;
     }
     var that = /** @type {!glift.flattener.Intersection} */ (thatint);
-    return this.pt_.equals(that.pt_) &&
-        this.baseLayer_ === that.baseLayer_ &&
-        this.stoneLayer_ === that.stoneLayer_ &&
-        this.markLayer_ === that.markLayer_ &&
-        this.textLabel_ === that.textLabel_;
+    return (
+      this.pt_.equals(that.pt_) &&
+      this.baseLayer_ === that.baseLayer_ &&
+      this.stoneLayer_ === that.stoneLayer_ &&
+      this.markLayer_ === that.markLayer_ &&
+      this.textLabel_ === that.textLabel_
+    );
   },
 
   /** @return {glift.flattener.symbols} Returns the base layer. */
-  base: function() { return this.baseLayer_; },
+  base: function () {
+    return this.baseLayer_;
+  },
 
   /** @return {glift.flattener.symbols} Returns the stone layer. */
-  stone: function() { return this.stoneLayer_; },
+  stone: function () {
+    return this.stoneLayer_;
+  },
 
   /** @return {glift.flattener.symbols} Returns the mark layer. */
-  mark: function() { return this.markLayer_; },
+  mark: function () {
+    return this.markLayer_;
+  },
 
   /** @return {?string} Returns the text label. */
-  textLabel: function() { return this.textLabel_; },
+  textLabel: function () {
+    return this.textLabel_;
+  },
 
   /**
    * Sets the base layer.
    * @param {!glift.flattener.symbols} s
    * @return {!glift.flattener.Intersection} this
    */
-  setBase: function(s) {
+  setBase: function (s) {
     this.baseLayer_ = this.validateSymbol_(s, 'base');
     return this;
   },
@@ -184,7 +213,7 @@ glift.flattener.Intersection.prototype = {
    * @param {!glift.flattener.symbols} s
    * @return {!glift.flattener.Intersection} this
    */
-  setStone: function(s) {
+  setStone: function (s) {
     this.stoneLayer_ = this.validateSymbol_(s, 'stone');
     return this;
   },
@@ -194,7 +223,7 @@ glift.flattener.Intersection.prototype = {
    * @param {!glift.flattener.symbols} s
    * @return {!glift.flattener.Intersection} this
    */
-  setMark: function(s) {
+  setMark: function (s) {
     this.markLayer_ = this.validateSymbol_(s, 'mark');
     return this;
   },
@@ -204,7 +233,7 @@ glift.flattener.Intersection.prototype = {
    * @param {string} t
    * @return {!glift.flattener.Intersection} this
    */
-  setTextLabel: function(t) {
+  setTextLabel: function (t) {
     this.textLabel_ = t + '';
     return this;
   },
@@ -213,8 +242,8 @@ glift.flattener.Intersection.prototype = {
    * Clears the text label
    * @return {!glift.flattener.Intersection} this
    */
-  clearTextLabel: function() {
+  clearTextLabel: function () {
     this.textLabel_ = null;
     return this;
-  }
+  },
 };

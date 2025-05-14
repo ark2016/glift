@@ -5,8 +5,8 @@ the HTML templates and written to `../htmltests_gen`. The magic, as you will
 discover lives in the tags:
 
 ```html
-  <!-- AUTO-GEN-DEPS -->
-  <!-- END-AUTO-GEN-DEPS -->
+<!-- AUTO-GEN-DEPS -->
+<!-- END-AUTO-GEN-DEPS -->
 ```
 
 By running `gulp test` or `gulp update-html-srcs`.

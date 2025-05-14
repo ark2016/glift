@@ -8,7 +8,6 @@ goog.provide('glift.dom.ux');
 // -o-property => OProperty
 // property => property
 
-
 /**
  * Miscellaneous utility methods for UX.
  */
@@ -16,16 +15,16 @@ glift.dom.ux = {
   /**
    * Sets a div (or other element), as not selectable.
    */
-  setNotSelectable: function(id) {
+  setNotSelectable: function (id) {
     glift.dom.elem(id).css({
-      'webkitTouchCallout': 'none',
-      'webkitUserSelect': 'none',
-      'MozUserSelect': 'moz-none',
-      'msUserSelect': 'none',
+      webkitTouchCallout: 'none',
+      webkitUserSelect: 'none',
+      MozUserSelect: 'moz-none',
+      msUserSelect: 'none',
       'user-select': 'none',
-      'webkitHighlight': 'none',
-      'webkitTapHighlightColor': 'rgba(0,0,0,0)',
-      'cursor': 'default'
+      webkitHighlight: 'none',
+      webkitTapHighlightColor: 'rgba(0,0,0,0)',
+      cursor: 'default',
     });
-  }
+  },
 };

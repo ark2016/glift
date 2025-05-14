@@ -18,8 +18,8 @@ the element:
 
 ```css
 #glift-display-div {
-  min-height:500px;
-  min-width:400px;
+  min-height: 500px;
+  min-width: 400px;
 }
 ```
 
@@ -33,5 +33,6 @@ glift.create({
   display: {
     minHeight: '500px',
     minWidth: '400px',
-  }
+  },
 });
+```

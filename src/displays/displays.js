@@ -19,17 +19,21 @@ glift.displays = {
    *
    * @return {glift.displays.board.Display} The display.
    */
-  create: function(
-      elemId,
+  create: function (
+    elemId,
+    boardBox,
+    theme,
+    boardRegion,
+    intersections,
+    rotation,
+    drawBoardCoords
+  ) {
+    var env = glift.displays.environment.get(
       boardBox,
-      theme,
       boardRegion,
       intersections,
-      rotation,
-      drawBoardCoords) {
-
-    var env = glift.displays.environment.get(
-         boardBox, boardRegion, intersections, drawBoardCoords);
+      drawBoardCoords
+    );
 
     return glift.displays.board.create(elemId, env, theme, rotation);
   },
@@ -39,9 +43,12 @@ glift.displays = {
    * @param {string} divId ID of a div.
    * @return {!glift.orientation.BoundingBox}
    */
-  bboxFromDiv: function(divId) {
+  bboxFromDiv: function (divId) {
     var elem = glift.dom.elem(divId);
     return glift.orientation.bbox.fromSides(
-        glift.util.point(0,0), elem.width(), elem.height());
-  }
+      glift.util.point(0, 0),
+      elem.width(),
+      elem.height()
+    );
+  },
 };

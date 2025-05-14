@@ -16,12 +16,10 @@ glift.api = {
    *    be an object literal rather than a constructed obj.
    * @return {glift.widgets.WidgetManager}
    */
-  create: function(inOptions) {
+  create: function (inOptions) {
     var manager = glift.api.createNoDraw(inOptions);
 
-    glift.init(
-        manager.displayOptions.disableZoomForMobile,
-        manager.divId);
+    glift.init(manager.displayOptions.disableZoomForMobile, manager.divId);
 
     manager.draw();
     return manager;
@@ -37,13 +35,13 @@ glift.api = {
    * @param {!Object} inOptions
    * @return {glift.widgets.WidgetManager}
    */
-  createNoDraw: function(inOptions) {
+  createNoDraw: function (inOptions) {
     var options = new glift.api.Options(
-        /** @type {!glift.api.Options} */ (inOptions));
+      /** @type {!glift.api.Options} */ (inOptions)
+    );
     return new glift.widgets.WidgetManager(options);
-  }
+  },
 };
-
 
 /**
  * The primary entry point for Glift. Creates and draws a glift instance.

@@ -29,7 +29,7 @@ goog.provide('glift.api.Options');
  *
  * @constructor @final @struct
  */
-glift.api.Options = function(opt_o) {
+glift.api.Options = function (opt_o) {
   var o = opt_o || {};
 
   /**
@@ -139,8 +139,9 @@ glift.api.Options = function(opt_o) {
    * @type {boolean}
    */
   this.loadCollectionInBackground =
-      o.loadCollectionInBackground !== undefined ?
-      !!o.loadCollectionInBackground : true;
+    o.loadCollectionInBackground !== undefined
+      ? !!o.loadCollectionInBackground
+      : true;
 
   /**
    * Global metadata for this set of options or SGF collection.  These is not

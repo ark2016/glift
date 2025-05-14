@@ -19,7 +19,7 @@ glift.themes = {
    * @return {!glift.themes.base} A theme templated by the relevant them
    *    specified.
    */
-  get: function(id) {
+  get: function (id) {
     var registered = glift.themes.registered;
     if (!(id in registered)) {
       throw new Error('No theme available for theme with name: ' + id);
@@ -43,7 +43,7 @@ glift.themes = {
    * The builder, which should start out an empyty object, is simply a place to
    * dump the copied theme data
    */
-  deepCopy: function(builder, themeBase, templateTheme) {
+  deepCopy: function (builder, themeBase, templateTheme) {
     for (var key in templateTheme) {
       var type = glift.util.typeOf(templateTheme[key]);
       var copyFrom = templateTheme;
@@ -51,10 +51,13 @@ glift.themes = {
         copyFrom = themeBase;
       }
 
-      switch(type) {
+      switch (type) {
         case 'object':
           builder[key] = glift.themes.deepCopy(
-              {}, themeBase[key] || {}, templateTheme[key]);
+            {},
+            themeBase[key] || {},
+            templateTheme[key]
+          );
           break;
         case 'array':
           var set = {};
@@ -85,12 +88,12 @@ glift.themes = {
    * @param {string} id
    * @return {boolean} Whether or not the theme is regestered.
    */
-  has: function(id) {
+  has: function (id) {
     var registered = glift.themes.registered;
     // This isn't scrictly correct because you can set a value in an object to
     // undefined.  However, this is pretty useless for our case (and will cause
     // problems anyway).
-    return (id in registered);
+    return id in registered;
   },
 
   /**
@@ -101,12 +104,12 @@ glift.themes = {
    * @param {!glift.themes.base} theme
    * @param {string} value
    */
-  setGoBoardBackground: function(theme, value) {
+  setGoBoardBackground: function (theme, value) {
     if (theme) {
-      theme.board.imagefill = value
+      theme.board.imagefill = value;
       // "url('" + value  + "')";
     } else {
-      throw "Yikes! Not a theme: cannot set background image."
+      throw 'Yikes! Not a theme: cannot set background image.';
     }
-  }
+  },
 };

@@ -17,7 +17,7 @@
  *    Optional next moves path for cropping along a specific path.
  * @return {!glift.orientation.BoundingBox}
  */
-glift.orientation.minimalBoundingBox = function(movetree, opt_nextMovesPath) {
+glift.orientation.minimalBoundingBox = function (movetree, opt_nextMovesPath) {
   var point = glift.util.point;
   var bbox = glift.orientation.bbox.fromPts;
 
@@ -27,14 +27,17 @@ glift.orientation.minimalBoundingBox = function(movetree, opt_nextMovesPath) {
   var nextMovesPath = undefined;
   if (opt_nextMovesPath && glift.util.typeOf(opt_nextMovesPath) === 'string') {
     nextMovesPath = glift.rules.treepath.parseFragment(opt_nextMovesPath);
-  } else if (opt_nextMovesPath && glift.util.typeOf(opt_nextMovesPath) === 'array') {
+  } else if (
+    opt_nextMovesPath &&
+    glift.util.typeOf(opt_nextMovesPath) === 'array'
+  ) {
     nextMovesPath = /** @type {!glift.rules.Treepath} */ (opt_nextMovesPath);
   }
   var pts = glift.orientation.getDisplayPts_(movetree, nextMovesPath);
 
   // Return a full board when there are no points.
   if (pts.length === 0) {
-    return bbox(point(0,0), point(ints, ints));
+    return bbox(point(0, 0), point(ints, ints));
   }
 
   // Return a bbox with one point.
@@ -69,7 +72,7 @@ glift.orientation.minimalBoundingBox = function(movetree, opt_nextMovesPath) {
  *
  * @return {!Array<!glift.Point>}
  */
-glift.orientation.getDisplayPts_ = function(movetree, opt_nextMovesPath) {
+glift.orientation.getDisplayPts_ = function (movetree, opt_nextMovesPath) {
   // Ensure we aren't changing the parent movetree's state.
   movetree = movetree.newTreeRef();
   var pts = [];
@@ -83,7 +86,7 @@ glift.orientation.getDisplayPts_ = function(movetree, opt_nextMovesPath) {
    *  TEXTLABEL: [{point: {13, 5}, value: '12'}]
    * }
    */
-  var capturePoints = function(ptsObj) {
+  var capturePoints = function (ptsObj) {
     for (var key in ptsObj) {
       var moveArr = ptsObj[key];
       for (var i = 0; i < moveArr.length; i++) {
@@ -96,7 +99,7 @@ glift.orientation.getDisplayPts_ = function(movetree, opt_nextMovesPath) {
   };
 
   if (!opt_nextMovesPath) {
-    movetree.recurseFromRoot(function(mt) {
+    movetree.recurseFromRoot(function (mt) {
       capturePoints(mt.properties().getAllStones());
     });
   } else if (opt_nextMovesPath) {

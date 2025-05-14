@@ -13,7 +13,7 @@ glift.controllers.ControllerFunc;
  *
  * @return {!glift.controllers.BaseController}
  */
-glift.controllers.base = function() {
+glift.controllers.base = function () {
   return new glift.controllers.BaseController();
 };
 
@@ -25,7 +25,7 @@ glift.controllers.base = function() {
  *
  * @constructor
  */
-glift.controllers.BaseController = function() {
+glift.controllers.BaseController = function () {
   //////////////////////////////////////////////////////////////
   // Variables set during initialization but const afterwards //
   //////////////////////////////////////////////////////////////
@@ -144,12 +144,13 @@ glift.controllers.BaseController.prototype = {
    *
    * @param {!glift.api.SgfOptions} sgfOptions Object containing SGF options.
    */
-  initOptions: function(sgfOptions) {
+  initOptions: function (sgfOptions) {
     this.sgfString = sgfOptions.sgfString || '';
 
     if (sgfOptions.nextMovesPath) {
       this.nextMovesPath_ = glift.rules.treepath.parseFragment(
-          sgfOptions.nextMovesPath);
+        sgfOptions.nextMovesPath
+      );
     }
 
     this.rawInitialPosition = sgfOptions.initialPosition || [];
@@ -183,14 +184,20 @@ glift.controllers.BaseController.prototype = {
    *    GoBoard, we optionally pass in the treepath from the beginning and use
    *    that instead of the initialPosition treepath.
    */
-  initialize: function(opt_treepath) {
+  initialize: function (opt_treepath) {
     var rules = glift.rules;
     var initTreepath = opt_treepath || this.rawInitialPosition;
     this.treepath = rules.treepath.parseInitialPath(initTreepath);
 
-    this.movetree = rules.movetree.getFromSgf(this.sgfString, this.treepath, this.parseType);
+    this.movetree = rules.movetree.getFromSgf(
+      this.sgfString,
+      this.treepath,
+      this.parseType
+    );
     var gobanData = rules.goban.getFromMoveTree(
-        /** @type {!glift.rules.MoveTree} */ (this.movetree), this.treepath);
+      /** @type {!glift.rules.MoveTree} */ (this.movetree),
+      this.treepath
+    );
 
     this.goban = gobanData.goban;
     this.captureHistory = gobanData.captures;
@@ -204,7 +211,9 @@ glift.controllers.BaseController.prototype = {
    * class.  This is called during initOptions above.
    * @param {glift.api.SgfOptions=} opt_options
    */
-  extraOptions: function(opt_options) { /* Implemented by other controllers. */ },
+  extraOptions: function (opt_options) {
+    /* Implemented by other controllers. */
+  },
 
   /**
    * Add a stone.  This is intended to be overwritten.
@@ -213,13 +222,15 @@ glift.controllers.BaseController.prototype = {
    * @param {!glift.enums.states} color
    * @return {?glift.flattener.Flattened} The flattened representation.
    */
-  addStone: function(point, color) { throw "Not Implemented"; },
+  addStone: function (point, color) {
+    throw 'Not Implemented';
+  },
 
   /**
    * Creates a flattener state.
    * @return {!glift.flattener.Flattened}
    */
-  flattenedState: function() {
+  flattenedState: function () {
     var newFlat = glift.flattener.flatten(this.movetree, {
       goban: this.goban,
       showNextVariationsType: this.showVariations_,
@@ -236,7 +247,7 @@ glift.controllers.BaseController.prototype = {
    * Get the current move number.
    * @return {number}
    */
-  currentMoveNumber: function() {
+  currentMoveNumber: function () {
     return this.movetree.node().getNodeNum();
   },
 
@@ -247,7 +258,7 @@ glift.controllers.BaseController.prototype = {
    *
    * @return {number}
    */
-  nextVariationNumber: function() {
+  nextVariationNumber: function () {
     return this.treepath[this.currentMoveNumber()] || 0;
   },
 
@@ -256,7 +267,7 @@ glift.controllers.BaseController.prototype = {
    * number correlated with the next moves in the movetree.
    * @return {?glift.rules.Move}
    */
-  selectedNextMove: function() {
+  selectedNextMove: function () {
     var nextVar = this.nextVariationNumber();
     var nextMoves = this.movetree.nextMoves();
     if (nextMoves.length) {
@@ -272,7 +283,7 @@ glift.controllers.BaseController.prototype = {
    * @param {number} num
    * @return {!glift.controllers.BaseController} this
    */
-  setNextVariation: function(num) {
+  setNextVariation: function (num) {
     // Recall that currentMoveNumber  s the same as the depth number ==
     // this.treepath.length (if at the end).  Thus, if the old treepath was
     // [0,1,2,0] and the currentMoveNumber was 2, we'll have [0, 1, num].
@@ -285,7 +296,7 @@ glift.controllers.BaseController.prototype = {
    * Gets the treepath to the current position.
    * @return {!glift.rules.Treepath}.
    */
-  pathToCurrentPosition: function() {
+  pathToCurrentPosition: function () {
     return this.movetree.treepathToHere();
   },
 
@@ -295,7 +306,7 @@ glift.controllers.BaseController.prototype = {
    * name of the tournament, etc.
    * @return {!Array<!glift.rules.PropDescriptor>}
    */
-  getGameInfo: function() {
+  getGameInfo: function () {
     return this.movetree.getTreeFromRoot().properties().getGameInfo();
   },
 
@@ -304,7 +315,7 @@ glift.controllers.BaseController.prototype = {
    *
    * @return {!glift.rules.CaptureResult}
    */
-  getCaptures: function() {
+  getCaptures: function () {
     if (this.captureHistory.length === 0) {
       return { BLACK: [], WHITE: [] };
     }
@@ -318,9 +329,9 @@ glift.controllers.BaseController.prototype = {
    *  WHITE: number
    * }}
    */
-  getCaptureCount: function() {
+  getCaptureCount: function () {
     var countObj = { BLACK: 0, WHITE: 0 };
-    for (var i = 0; i < this.captureHistory.length; i++ ) {
+    for (var i = 0; i < this.captureHistory.length; i++) {
       var obj = this.captureHistory[i];
       for (var color in obj) {
         countObj[color] += obj[color].length;
@@ -340,7 +351,7 @@ glift.controllers.BaseController.prototype = {
    * @param {!glift.enums.states} color
    * @return {boolean}
    */
-  canAddStone: function(point, color) {
+  canAddStone: function (point, color) {
     return this.goban.placeable(point);
   },
 
@@ -354,22 +365,22 @@ glift.controllers.BaseController.prototype = {
    *
    * @return {!glift.enums.states}
    */
-  getCurrentPlayer: function() {
+  getCurrentPlayer: function () {
     return this.movetree.getCurrentPlayer();
   },
 
   /** @return {string} The current SGF string. */
-  currentSgf: function() {
+  currentSgf: function () {
     return this.movetree.toSgf();
   },
 
   /** @return {string} The original SGF string. */
-  originalSgf: function() {
+  originalSgf: function () {
     return this.sgfString;
   },
 
   /** @return {number} Returns the number of intersections. */
-  getIntersections: function() {
+  getIntersections: function () {
     return this.movetree.getIntersections();
   },
 
@@ -380,9 +391,10 @@ glift.controllers.BaseController.prototype = {
    *
    * @return {glift.enums.boardRegions} The recommend board region to use.
    */
-  getQuadCropFromBeginning: function() {
+  getQuadCropFromBeginning: function () {
     return glift.orientation.getQuadCropFromMovetree(
-        /** @type {!glift.rules.MoveTree} */ (this.movetree));
+      /** @type {!glift.rules.MoveTree} */ (this.movetree)
+    );
   },
 
   /**
@@ -391,10 +403,11 @@ glift.controllers.BaseController.prototype = {
    *
    * @return {!Array<!glift.rules.Move>}
    */
-  getCorrectNextMoves: function() {
+  getCorrectNextMoves: function () {
     return glift.rules.problems.correctNextMoves(
-        /** @type {!glift.rules.MoveTree} */ (this.movetree),
-        this.problemConditions);
+      /** @type {!glift.rules.MoveTree} */ (this.movetree),
+      this.problemConditions
+    );
   },
 
   /**
@@ -417,9 +430,11 @@ glift.controllers.BaseController.prototype = {
    * @return {?glift.flattener.Flattened} The flattened representation or null
    *    if there is no next move.
    */
-  nextMove: function(opt_varNum) {
-    if (this.treepath[this.currentMoveNumber()] !== undefined &&
-        (opt_varNum === undefined || this.nextVariationNumber() === opt_varNum)) {
+  nextMove: function (opt_varNum) {
+    if (
+      this.treepath[this.currentMoveNumber()] !== undefined &&
+      (opt_varNum === undefined || this.nextVariationNumber() === opt_varNum)
+    ) {
       // If possible, we prefer taking the route defined by a previously
       // traversed treepath. In otherwords, don't mess with the treepath, if
       // we're 'on variation'.
@@ -427,8 +442,7 @@ glift.controllers.BaseController.prototype = {
     } else {
       // There is no existing treepath.
       var varNum = opt_varNum === undefined ? 0 : opt_varNum;
-      if (varNum >= 0 &&
-          varNum <= this.movetree.nextMoves().length - 1) {
+      if (varNum >= 0 && varNum <= this.movetree.nextMoves().length - 1) {
         // We prefer taking 'move' nodes over nonmove nodes.
         this.setNextVariation(varNum);
         this.movetree.moveDown(varNum);
@@ -456,7 +470,7 @@ glift.controllers.BaseController.prototype = {
    * @return {?glift.flattener.Flattened} The flattened representation or null
    *    if there is no previous move.
    */
-  prevMove: function() {
+  prevMove: function () {
     if (this.currentMoveNumber() === 0) {
       return null;
     }
@@ -464,14 +478,20 @@ glift.controllers.BaseController.prototype = {
     var clears = this.clearHistory[this.clearHistory.length - 1] || [];
     var allCurrentStones = this.movetree.properties().getAllStones();
     this.captureHistory = this.captureHistory.slice(
-        0, this.captureHistory.length - 1);
+      0,
+      this.captureHistory.length - 1
+    );
     this.clearHistory = this.clearHistory.slice(
-        0, this.clearHistory.length - 1);
+      0,
+      this.clearHistory.length - 1
+    );
     this.unloadStonesFromGoban_(allCurrentStones, captures);
     for (var i = 0; i < clears.length; i++) {
       var move = clears[i];
       if (move.point === undefined) {
-        throw new Error('Unexpected error! Clear history moves must have points.');
+        throw new Error(
+          'Unexpected error! Clear history moves must have points.'
+        );
       }
       this.goban.setColor(move.point, move.color);
     }
@@ -479,7 +499,7 @@ glift.controllers.BaseController.prototype = {
     this.movetree.moveUp();
     this.koHistory.pop();
     if (this.koHistory.length) {
-      var ko = this.koHistory[this.koHistory.length -1];
+      var ko = this.koHistory[this.koHistory.length - 1];
       if (ko) {
         this.goban.setKo(ko);
       }
@@ -491,7 +511,7 @@ glift.controllers.BaseController.prototype = {
    * Go back to the beginning.
    * @return {!glift.flattener.Flattened} The flattened representation.
    */
-  toBeginning: function() {
+  toBeginning: function () {
     this.movetree = this.movetree.getTreeFromRoot();
     this.goban = glift.rules.goban.getFromMoveTree(this.movetree, []).goban;
     this.captureHistory = [];
@@ -504,7 +524,7 @@ glift.controllers.BaseController.prototype = {
    * Go to the end.
    * @return {!glift.flattener.Flattened} The flattened representation
    */
-  toEnd: function() {
+  toEnd: function () {
     while (this.nextMove()) {
       // All the action happens in nextMoveNoState.
     }
@@ -523,7 +543,7 @@ glift.controllers.BaseController.prototype = {
    *
    * @private
    */
-  unloadStonesFromGoban_: function(stones, captures) {
+  unloadStonesFromGoban_: function (stones, captures) {
     for (var color in stones) {
       var c = /** @type {glift.enums.states} */ (color);
       var arr = /** @type {!Array<!glift.rules.Move>} */ (stones[c]);

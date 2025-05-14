@@ -5,7 +5,7 @@
  * @param {!glift.displays.DisplayCropBox} cropbox
  * @return {!number}
  */
-glift.displays.getSpacing = function(boardBox, cropbox) {
+glift.displays.getSpacing = function (boardBox, cropbox) {
   // Divide the available width by the total number of horz and vert
   // intersections.
   var xSpacing = boardBox.width() / cropbox.widthIntersections();

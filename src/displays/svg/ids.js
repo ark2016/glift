@@ -10,7 +10,7 @@ glift.displays.svg.ids = {
    * @param {string} divId
    * @return {!glift.displays.svg.IdGenerator}
    */
-  gen: function(divId) {
+  gen: function (divId) {
     return new glift.displays.svg.IdGenerator(divId);
   },
 
@@ -23,18 +23,18 @@ glift.displays.svg.ids = {
    * extraData may be undefined.  Usually a point, but also be an icon name.
    * @return {string} The relevant Id.
    */
-  element: function(divId, type, opt_extraData) {
-    var base = divId + "_" + type;
+  element: function (divId, type, opt_extraData) {
+    var base = divId + '_' + type;
     if (opt_extraData !== undefined) {
       if (opt_extraData.x !== undefined) {
-        return base + '_' + opt_extraData.x() + "_" + opt_extraData.y();
+        return base + '_' + opt_extraData.x() + '_' + opt_extraData.y();
       } else {
         return base + '_' + opt_extraData.toString();
       }
     } else {
       return base;
     }
-  }
+  },
 };
 
 /**
@@ -43,7 +43,7 @@ glift.displays.svg.ids = {
  * @param {string} divId
  * @constructor @final @struct
  */
-glift.displays.svg.IdGenerator = function(divId) {
+glift.displays.svg.IdGenerator = function (divId) {
   /** @const {string}  */
   this.divId = divId;
 
@@ -80,136 +80,191 @@ glift.displays.svg.IdGenerator = function(divId) {
 
 glift.displays.svg.IdGenerator.prototype = {
   /** @return {string} ID for the svg container. */
-  svg: function() { return this.svg_; },
+  svg: function () {
+    return this.svg_;
+  },
 
   /** @return {string} ID for the board. */
-  board: function() { return this.board_; },
+  board: function () {
+    return this.board_;
+  },
 
   /** @return {string} Group id for the board coordinate label group */
-  boardCoordLabelGroup: function() { return this.boardCoordLabelGroup_; },
+  boardCoordLabelGroup: function () {
+    return this.boardCoordLabelGroup_;
+  },
 
   /** @return {string} ID for the intersections group. */
-  intersections: function() { return this.intersectionsGroup_; },
+  intersections: function () {
+    return this.intersectionsGroup_;
+  },
 
   /** @return {string} Group id for the stones. */
-  stoneGroup: function() { return this.stoneGroup_; },
+  stoneGroup: function () {
+    return this.stoneGroup_;
+  },
 
   /**
    * @param {!glift.Point} pt
    * @return {string}  Id for a stone.
    */
-  stone: function(pt) {
+  stone: function (pt) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.STONE, pt);
+      this.divId,
+      glift.displays.svg.Element.STONE,
+      pt
+    );
   },
 
   /** @return {string} Group id for the stone shadows. */
-  stoneShadowGroup: function() { return this.stoneShadowGroup_; },
+  stoneShadowGroup: function () {
+    return this.stoneShadowGroup_;
+  },
 
   /**
    * @param {!glift.Point} pt
    * @return {string}  Id for a stone shadow.
    */
-  stoneShadow: function(pt) {
+  stoneShadow: function (pt) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.STONE_SHADOW, pt);
+      this.divId,
+      glift.displays.svg.Element.STONE_SHADOW,
+      pt
+    );
   },
 
   /** @return {string} Group id for the star points. */
-  starpointGroup: function() { return this.starpointGroup_; },
+  starpointGroup: function () {
+    return this.starpointGroup_;
+  },
 
   /**
    * @param {!glift.Point} pt
    * @return {string} Id for a star point
    */
-  starpoint: function(pt) {
+  starpoint: function (pt) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.STARPOINT, pt);
+      this.divId,
+      glift.displays.svg.Element.STARPOINT,
+      pt
+    );
   },
 
   /** @return {string} Group id for a button group. */
-  buttonGroup: function() { return this.buttonGroup_; },
+  buttonGroup: function () {
+    return this.buttonGroup_;
+  },
 
   /**
    * @param {!string} name Of the button.
    * @return {string} Id for the button.
    */
-  button: function(name) {
+  button: function (name) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.BUTTON, name);
+      this.divId,
+      glift.displays.svg.Element.BUTTON,
+      name
+    );
   },
 
   /** @return {string} ID for a full-board button. */
-  fullBoardButton: function() { return this.boardButton_; },
+  fullBoardButton: function () {
+    return this.boardButton_;
+  },
 
   /** @return {string} Group ID for the lines. */
-  lineGroup: function() { return this.lineGroup_; },
+  lineGroup: function () {
+    return this.lineGroup_;
+  },
 
   /**
    * @param {!glift.Point} pt
    * @return {string} Id for a board line.
    */
-  line: function(pt) {
+  line: function (pt) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.BOARD_LINE, pt);
+      this.divId,
+      glift.displays.svg.Element.BOARD_LINE,
+      pt
+    );
   },
 
   /** @return {string} Group id a Mark Container. */
-  markGroup: function() { return this.markGroup_; },
+  markGroup: function () {
+    return this.markGroup_;
+  },
 
   /**
    * @param {!glift.Point} pt
    * @return {string} ID for a mark.
    */
-  mark: function(pt) {
+  mark: function (pt) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.MARK, pt);
+      this.divId,
+      glift.displays.svg.Element.MARK,
+      pt
+    );
   },
 
   /** @return {string} Group id for temporary marks. */
-  tempMarkGroup: function() {
+  tempMarkGroup: function () {
     return this.tempMarkGroup_;
   },
 
   /** @return {string} ID for a guideline. */
-  guideLine: function() {
+  guideLine: function () {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.GUIDE_LINE);
+      this.divId,
+      glift.displays.svg.Element.GUIDE_LINE
+    );
   },
 
   /** @return {string} Group ID for the icons.  */
-  iconGroup: function() { return this.iconGroup_; },
+  iconGroup: function () {
+    return this.iconGroup_;
+  },
 
   /**
    * @param {string} name Of the icon.
    * @return {string} ID for an icon.
    */
-  icon: function(name) {
+  icon: function (name) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.ICON, name);
+      this.divId,
+      glift.displays.svg.Element.ICON,
+      name
+    );
   },
 
   /** @return {string} ID for the temp icon group. */
-  tempIconGroup: function() {
+  tempIconGroup: function () {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.TEMP_ICON_CONTAINER);
+      this.divId,
+      glift.displays.svg.Element.TEMP_ICON_CONTAINER
+    );
   },
 
   /**
    * @param {string} name Of the icon.
    * @return {string} ID for the temp icon.
    */
-  tempIcon: function(name) {
+  tempIcon: function (name) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.TEMP_ICON, name);
+      this.divId,
+      glift.displays.svg.Element.TEMP_ICON,
+      name
+    );
   },
 
   /**
    * @param {string} name Of the icon.
    * @return {string} ID for the temp icon text.
    */
-  tempIconText: function(name) {
+  tempIconText: function (name) {
     return glift.displays.svg.ids.element(
-        this.divId, glift.displays.svg.Element.TEMP_TEXT, name);
+      this.divId,
+      glift.displays.svg.Element.TEMP_TEXT,
+      name
+    );
   },
 };

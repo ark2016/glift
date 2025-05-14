@@ -1,0 +1,6 @@
+node_modules/
+compiled/
+deps/
+test/libs/
+test/htmltests_gen/
+*.min.js 

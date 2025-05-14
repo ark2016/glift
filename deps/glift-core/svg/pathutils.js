@@ -8,8 +8,8 @@ glift.svg.pathutils = {
    * @param {number} y
    * @return {string}
    */
-  move: function(x, y) {
-    return "M" + x + " " + y;
+  move: function (x, y) {
+    return 'M' + x + ' ' + y;
   },
 
   /**
@@ -17,7 +17,7 @@ glift.svg.pathutils = {
    * @param {!glift.Point} pt
    * @return {string}
    */
-  movePt: function(pt) {
+  movePt: function (pt) {
     return glift.svg.pathutils.move(pt.x(), pt.y());
   },
 
@@ -28,8 +28,8 @@ glift.svg.pathutils = {
    * @param {number} y
    * @return {string}
    */
-  lineRel: function(x, y) {
-    return "l" + x + " " + y;
+  lineRel: function (x, y) {
+    return 'l' + x + ' ' + y;
   },
 
   /**
@@ -37,7 +37,7 @@ glift.svg.pathutils = {
    * @param {!glift.Point} pt
    * @return {string}
    */
-  lineRelPt: function(pt) {
+  lineRelPt: function (pt) {
     return glift.svg.pathutils.lineRel(pt.x(), pt.y());
   },
 
@@ -48,8 +48,8 @@ glift.svg.pathutils = {
    * @param {number} y
    * @return {string}
    */
-  lineAbs: function(x, y) {
-    return "L" + x + " " + y;
+  lineAbs: function (x, y) {
+    return 'L' + x + ' ' + y;
   },
 
   /**
@@ -57,7 +57,7 @@ glift.svg.pathutils = {
    * @param {!glift.Point} pt
    * @return {string}
    */
-  lineAbsPt: function(pt) {
+  lineAbsPt: function (pt) {
     return glift.svg.pathutils.lineAbs(pt.x(), pt.y());
   },
 };

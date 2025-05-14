@@ -10,26 +10,32 @@ goog.require('glift.displays.svg');
  * @param {!glift.orientation.BoundingBox} goBox The bounding box of the go board.
  * @param {!glift.themes.base} theme The theme object
  */
-glift.displays.board.boardBase = function(svg, idGen, goBox, theme) {
+glift.displays.board.boardBase = function (svg, idGen, goBox, theme) {
   if (theme.board.imagefill) {
-    svg.append(glift.svg.image()
-      .setAttr('x', goBox.topLeft().x())
-      .setAttr('y', goBox.topLeft().y())
-      .setAttr('width', goBox.width())
-      .setAttr('height', goBox.height())
-      .setAttr('xlink:href', theme.board.imagefill)
-      .setAttr('preserveAspectRatio', 'none'));
+    svg.append(
+      glift.svg
+        .image()
+        .setAttr('x', goBox.topLeft().x())
+        .setAttr('y', goBox.topLeft().y())
+        .setAttr('width', goBox.width())
+        .setAttr('height', goBox.height())
+        .setAttr('xlink:href', theme.board.imagefill)
+        .setAttr('preserveAspectRatio', 'none')
+    );
   }
 
-  svg.append(glift.svg.rect()
-    .setAttr('x', goBox.topLeft().x() + 'px')
-    .setAttr('y', goBox.topLeft().y() + 'px')
-    .setAttr('width', goBox.width() + 'px')
-    .setAttr('height', goBox.height() + 'px')
-    .setAttr('fill', theme.board.imagefill ? 'none' : theme.board.fill)
-    .setAttr('stroke', theme.board.stroke)
-    .setAttr('stroke-width', theme.board['stroke-width'])
-    .setId(idGen.board()));
+  svg.append(
+    glift.svg
+      .rect()
+      .setAttr('x', goBox.topLeft().x() + 'px')
+      .setAttr('y', goBox.topLeft().y() + 'px')
+      .setAttr('width', goBox.width() + 'px')
+      .setAttr('height', goBox.height() + 'px')
+      .setAttr('fill', theme.board.imagefill ? 'none' : theme.board.fill)
+      .setAttr('stroke', theme.board.stroke)
+      .setAttr('stroke-width', theme.board['stroke-width'])
+      .setId(idGen.board())
+  );
 };
 
 /**
@@ -37,10 +43,10 @@ glift.displays.board.boardBase = function(svg, idGen, goBox, theme) {
  * @param {glift.svg.SvgObj} svg Base svg obj, in which the filters should be
  *    placed.
  */
-glift.displays.board.initBlurFilter = function(divId, svg) {
+glift.displays.board.initBlurFilter = function (divId, svg) {
   // svg.append("svg:defs")
-    // .append("svg:filter")
-      // .setAttr("id", divId + '_svg_blur')
-    // .append("svg:feGaussianBlur")
-      // .setAttr("stdDeviation", 2);
+  // .append("svg:filter")
+  // .setAttr("id", divId + '_svg_blur')
+  // .append("svg:feGaussianBlur")
+  // .setAttr("stdDeviation", 2);
 };

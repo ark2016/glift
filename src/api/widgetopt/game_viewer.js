@@ -1,7 +1,7 @@
 /**
  * Additional Options for the GameViewers
  */
-glift.api.widgetopt[glift.WidgetType.GAME_VIEWER] = function() {
+glift.api.widgetopt[glift.WidgetType.GAME_VIEWER] = function () {
   return {
     markLastMove: true,
     enableMousewheel: true,
@@ -14,15 +14,15 @@ glift.api.widgetopt[glift.WidgetType.GAME_VIEWER] = function() {
       '<': 'iconActions.jump-left-arrow.click',
       '>': 'iconActions.jump-right-arrow.click',
       /** Toggle the selected variation. */
-      ']': function(widget) {
+      ']': function (widget) {
         widget.controller.moveUpVariations();
-        widget.applyBoardData(widget.controller.flattenedState())
+        widget.applyBoardData(widget.controller.flattenedState());
       },
       /** Toggle the selected variation. */
-      '[': function(widget) {
+      '[': function (widget) {
         widget.controller.moveDownVariations();
-        widget.applyBoardData(widget.controller.flattenedState())
-      }
+        widget.applyBoardData(widget.controller.flattenedState());
+      },
     },
 
     problemConditions: {}, // Disable problem evaluations
@@ -33,13 +33,9 @@ glift.api.widgetopt[glift.WidgetType.GAME_VIEWER] = function() {
 
     showVariations: glift.enums.showVariations.MORE_THAN_ONE,
 
-    statusBarIcons: [
-      'game-info',
-      'move-indicator',
-      'fullscreen'
-    ],
+    statusBarIcons: ['game-info', 'move-indicator', 'fullscreen'],
 
-    stoneClick: function(event, widget, pt) {
+    stoneClick: function (event, widget, pt) {
       var currentPlayer = widget.controller.getCurrentPlayer();
       var partialData = widget.controller.addStone(pt, currentPlayer);
       widget.applyBoardData(partialData);

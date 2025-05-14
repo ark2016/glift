@@ -26,7 +26,6 @@ glift.flattener.BoardPt;
  */
 glift.flattener.EdgeLabel;
 
-
 /**
  * Options for creating a BoardPoints instance.
  *
@@ -74,8 +73,14 @@ glift.flattener.BoardPointsOptions;
  *
  * @constructor @final @struct
  */
-glift.flattener.BoardPoints = function(
-    points, spacing, intBbox, coordBbox, numIntersections, edgeLabels) {
+glift.flattener.BoardPoints = function (
+  points,
+  spacing,
+  intBbox,
+  coordBbox,
+  numIntersections,
+  edgeLabels
+) {
   /** @const {!Array<!glift.flattener.BoardPt>} */
   this.points = points;
 
@@ -112,9 +117,13 @@ glift.flattener.BoardPoints = function(
 
 glift.flattener.BoardPoints.prototype = {
   /** @return {number} intersection-width */
-  intWidth: function() { return this.intBbox.width() + 1; },
+  intWidth: function () {
+    return this.intBbox.width() + 1;
+  },
   /** @return {number} intersection-width */
-  intHeight: function() { return this.intBbox.height() + 1; },
+  intHeight: function () {
+    return this.intBbox.height() + 1;
+  },
 
   /**
    * Get the coordinate for a given integer point string.  Note: the integer
@@ -124,7 +133,7 @@ glift.flattener.BoardPoints.prototype = {
    * @param {!glift.Point} pt
    * @return {!glift.flattener.BoardPt}
    */
-  getCoord: function(pt) {
+  getCoord: function (pt) {
     return this.cache[pt.toString()];
   },
 
@@ -132,7 +141,7 @@ glift.flattener.BoardPoints.prototype = {
    * Return all the points as an array.
    * @return {!Array<!glift.flattener.BoardPt>}
    */
-  data: function() {
+  data: function () {
     return this.points;
   },
 
@@ -141,7 +150,7 @@ glift.flattener.BoardPoints.prototype = {
    * @param {!glift.Point} pt
    * @return {boolean}
    */
-  hasCoord: function(pt) {
+  hasCoord: function (pt) {
     return this.cache[pt.toString()] !== undefined;
   },
 
@@ -152,7 +161,7 @@ glift.flattener.BoardPoints.prototype = {
    *
    * @return {!Array<!glift.Point>}
    */
-  starPoints: function() {
+  starPoints: function () {
     var sp = glift.flattener.starpoints.allPts(this.numIntersections);
     var out = [];
     for (var i = 0; i < sp.length; i++) {
@@ -162,7 +171,7 @@ glift.flattener.BoardPoints.prototype = {
       }
     }
     return out;
-  }
+  },
 };
 
 /**
@@ -172,15 +181,19 @@ glift.flattener.BoardPoints.prototype = {
  * @param {number} spacing In pt.
  * @param {glift.flattener.BoardPointsOptions=} opt_options
  */
-glift.flattener.BoardPoints.fromFlattened =
-    function(flat, spacing, opt_options) {
+glift.flattener.BoardPoints.fromFlattened = function (
+  flat,
+  spacing,
+  opt_options
+) {
   var opts = opt_options || {};
   var bbox = flat.board().boundingBox();
   return glift.flattener.BoardPoints.fromBbox(
-      bbox,
-      spacing,
-      flat.board().maxBoardSize(),
-      opts);
+    bbox,
+    spacing,
+    flat.board().maxBoardSize(),
+    opts
+  );
 };
 
 /**
@@ -193,8 +206,7 @@ glift.flattener.BoardPoints.fromFlattened =
  * @param {!glift.flattener.BoardPointsOptions} opts
  * @return {!glift.flattener.BoardPoints}
  */
-glift.flattener.BoardPoints.fromBbox =
-    function(bbox, spacing, size, opts) {
+glift.flattener.BoardPoints.fromBbox = function (bbox, spacing, size, opts) {
   var tl = bbox.topLeft();
   var br = bbox.botRight();
 
@@ -212,37 +224,44 @@ glift.flattener.BoardPoints.fromBbox =
   // letters are enough for normal boards.
   var xCoordLabels = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghjklmnopqrstuvwxyz';
 
-  var offsetPt = opts.offsetPt || new glift.Point(0,0);
+  var offsetPt = opts.offsetPt || new glift.Point(0, 0);
 
   var raggedEdgePaddingFrac = opts.croppedEdgePadding || 0;
   var raggedAmt = raggedEdgePaddingFrac * spacing;
   var raggedLeft = tl.x() === 0 ? 0 : raggedAmt;
-  var raggedRight = br.x() === size-1 ? 0 : raggedAmt;
+  var raggedRight = br.x() === size - 1 ? 0 : raggedAmt;
   var raggedTop = tl.y() === 0 ? 0 : raggedAmt;
-  var raggedBottom = br.y() === size-1 ? 0 : raggedAmt;
+  var raggedBottom = br.y() === size - 1 ? 0 : raggedAmt;
 
   var offset = drawBoardCoords ? 1 : 0;
   var startX = tl.x();
-  var endX = br.x() + 2*offset;
+  var endX = br.x() + 2 * offset;
   var startY = tl.y();
-  var endY = br.y() + 2*offset;
+  var endY = br.y() + 2 * offset;
 
   var coordBbox = new glift.orientation.BoundingBox(
-    new glift.Point(0,0),
+    new glift.Point(0, 0),
     new glift.Point(
-        (endX-startX+1)*spacing + 2*paddingAmt + raggedLeft + raggedRight,
-        (endY-startY+1)*spacing + 2*paddingAmt + raggedTop + raggedBottom));
+      (endX - startX + 1) * spacing + 2 * paddingAmt + raggedLeft + raggedRight,
+      (endY - startY + 1) * spacing + 2 * paddingAmt + raggedTop + raggedBottom
+    )
+  );
 
-  var isEdgeX = function(val) { return val === startX || val === endX; }
-  var isEdgeY = function(val) { return val === startY || val === endY; }
+  var isEdgeX = function (val) {
+    return val === startX || val === endX;
+  };
+  var isEdgeY = function (val) {
+    return val === startY || val === endY;
+  };
 
   for (var x = startX; x <= endX; x++) {
     for (var y = startY; y <= endY; y++) {
       var i = x - startX;
       var j = y - startY;
       var coordPt = new glift.Point(
-          half + i*spacing + paddingAmt + offsetPt.x() + raggedLeft,
-          half + j*spacing + paddingAmt + offsetPt.y() + raggedTop)
+        half + i * spacing + paddingAmt + offsetPt.x() + raggedLeft,
+        half + j * spacing + paddingAmt + offsetPt.y() + raggedTop
+      );
 
       if (drawBoardCoords && (isEdgeX(x) || isEdgeY(y))) {
         if (isEdgeX(x) && isEdgeY(y)) {
@@ -265,9 +284,9 @@ glift.flattener.BoardPoints.fromBbox =
 
         var label = '';
         if (isEdgeY(y)) {
-          label = xCoordLabels[x-1];
+          label = xCoordLabels[x - 1];
         } else if (isEdgeX(x)) {
-          label = (size-y+1) + '';
+          label = size - y + 1 + '';
         } else {
           throw new Error('Yikes! Should not happen! pt:' + x + ',' + y);
         }
@@ -276,7 +295,6 @@ glift.flattener.BoardPoints.fromBbox =
           coordPt: coordPt,
         });
       } else {
-
         bpts.push({
           intPt: new glift.Point(x - offset, y - offset),
           coordPt: coordPt,
@@ -285,10 +303,11 @@ glift.flattener.BoardPoints.fromBbox =
     }
   }
   return new glift.flattener.BoardPoints(
-      bpts,
-      spacing,
-      bbox,
-      coordBbox,
-      size,
-      edgeLabels);
+    bpts,
+    spacing,
+    bbox,
+    coordBbox,
+    size,
+    edgeLabels
+  );
 };

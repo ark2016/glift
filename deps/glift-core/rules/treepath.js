@@ -131,7 +131,7 @@ glift.rules.treepath = {
    *    position, which can be defined as a variety of types.
    * @return {!glift.rules.Treepath}
    */
-  parseInitialPath: function(initPos) {
+  parseInitialPath: function (initPos) {
     if (initPos === undefined) {
       return [];
     } else if (glift.util.typeOf(initPos) === 'number') {
@@ -167,7 +167,7 @@ glift.rules.treepath = {
     } else if (next === '+') {
       return out.concat(glift.rules.treepath.toEnd_());
     } else {
-      throw new Error('Unexpected token [' + next + '] for path ' + initPos)
+      throw new Error('Unexpected token [' + next + '] for path ' + initPos);
     }
   },
 
@@ -179,7 +179,7 @@ glift.rules.treepath = {
    * @param {!Array<number>|string} pathStr An initial path.
    * @return {!glift.rules.Treepath} The parsed treepath.
    */
-  parseFragment: function(pathStr) {
+  parseFragment: function (pathStr) {
     if (!pathStr) {
       pathStr = [];
     }
@@ -189,8 +189,9 @@ glift.rules.treepath = {
       return /** @type {glift.rules.Treepath} */ (pathStr);
     }
     if (vartype !== 'string') {
-      throw new Error('When parsing fragments, type should be string. was: ' + 
-          vartype);
+      throw new Error(
+        'When parsing fragments, type should be string. was: ' + vartype
+      );
     }
     var splat = pathStr.split(/([\.:+])/);
     var numre = /^\d+$/;
@@ -218,8 +219,9 @@ glift.rules.treepath = {
         }
       } else {
         if (!numre.test(token)) {
-          throw new Error('Was expecting number but found ' + token
-              + ' for path: ' + pathStr);
+          throw new Error(
+            'Was expecting number but found ' + token + ' for path: ' + pathStr
+          );
         }
         var num = parseInt(token, 10);
         if (curstate === states.VARIATION) {
@@ -228,8 +230,9 @@ glift.rules.treepath = {
           curstate = states.SEPARATOR;
         } else if (curstate === states.MULTIPLIER) {
           if (prevVariation === null) {
-            throw new Error('Error using variation multiplier for path: '
-                + pathStr);
+            throw new Error(
+              'Error using variation multiplier for path: ' + pathStr
+            );
           }
           // We should have already added the variation once, so we add num-1
           // more times. This has the side effect that 0:0 is equivalent to 0:1
@@ -255,7 +258,7 @@ glift.rules.treepath = {
    * @param {!glift.rules.Treepath} path A treepath fragment.
    * @return {string} A fragment string.
    */
-  toFragmentString: function(path) {
+  toFragmentString: function (path) {
     if (glift.util.typeOf(path) !== 'array') {
       // This is probably unnecessary, but exists for safety.
       return path.toString();
@@ -268,7 +271,7 @@ glift.rules.treepath = {
     var repeated = 0;
     var out = null;
 
-    var flush = function() {
+    var flush = function () {
       var component = '';
       if (repeated < 2) {
         component = last + '';
@@ -281,7 +284,7 @@ glift.rules.treepath = {
         out += '.' + component;
       }
       repeated = 1;
-    }
+    };
 
     for (var i = 0; i < path.length; i++) {
       next = path[i];
@@ -313,7 +316,7 @@ glift.rules.treepath = {
    * @param {!glift.rules.Treepath} path A full treepath from the root.
    * @return {string} A full path string.
    */
-  toInitPathString: function(path) {
+  toInitPathString: function (path) {
     if (glift.util.typeOf(path) !== 'array') {
       return path.toString();
     }
@@ -332,7 +335,9 @@ glift.rules.treepath = {
         firstNumber = i + 1;
       }
     }
-    var component = glift.rules.treepath.toFragmentString(path.slice(firstNumber));
+    var component = glift.rules.treepath.toFragmentString(
+      path.slice(firstNumber)
+    );
     if (component) {
       return firstNumber + '.' + component;
     } else {
@@ -353,11 +358,11 @@ glift.rules.treepath = {
    * @private
    * @return {!glift.rules.Treepath}
    */
-  toEnd_: function() {
+  toEnd_: function () {
     if (glift.rules.treepath.storedToEnd_ != null) {
       return glift.rules.treepath.storedToEnd_;
     }
-    var storedToEnd = []
+    var storedToEnd = [];
     for (var i = 0; i < 500; i++) {
       storedToEnd.push(0);
     }
@@ -396,10 +401,11 @@ glift.rules.treepath = {
    * - nextMoves: A nextMovesPath, used to apply for the purpose of
    *    crafting moveNumbers.
    */
-  findNextMovesPath: function(movetree, opt_options) {
+  findNextMovesPath: function (movetree, opt_options) {
     var opt = opt_options || {};
     var initTreepath = opt.initTreepath || movetree.treepathToHere();
-    var breakOnComment = opt.breakOnComment === undefined ? true : !!opt.breakOnComment;
+    var breakOnComment =
+      opt.breakOnComment === undefined ? true : !!opt.breakOnComment;
     var mt = movetree.getTreeFromRoot(initTreepath);
     var minusMoves = opt.minusMovesOverride || 1000;
     var nextMovesPath = [];
@@ -408,8 +414,7 @@ glift.rules.treepath = {
       var varnum = mt.node().getVarNum();
       nextMovesPath.push(varnum);
       mt.moveUp();
-      if (breakOnComment &&
-          mt.properties().getOneValue(glift.rules.prop.C)) {
+      if (breakOnComment && mt.properties().getOneValue(glift.rules.prop.C)) {
         break;
       }
 
@@ -421,7 +426,7 @@ glift.rules.treepath = {
     return {
       movetree: mt,
       treepath: mt.treepathToHere(),
-      nextMoves: nextMovesPath
+      nextMoves: nextMovesPath,
     };
   },
 
@@ -446,7 +451,7 @@ glift.rules.treepath = {
    * - movetree: The updated movetree after applying the nextmoves
    * - stones: Array of 'augmented' stone objects
    */
-  applyNextMoves: function(movetree, goban, nextMoves) {
+  applyNextMoves: function (movetree, goban, nextMoves) {
     var colors = glift.enums.states;
     var mt = movetree.newTreeRef();
     var stones = [];
@@ -468,7 +473,7 @@ glift.rules.treepath = {
     }
     return {
       movetree: mt,
-      stones: stones
+      stones: stones,
     };
   },
 
@@ -480,7 +485,7 @@ glift.rules.treepath = {
    * return {!Array<glift.rules.Treepath>} treepath An array of all possible
    *    treepaths.
    */
-  flattenMoveTree: function(movetree) {
+  flattenMoveTree: function (movetree) {
     var out = [];
     movetree = movetree.newTreeRef();
     for (var i = 0; i < movetree.node().numChildren(); i++) {
@@ -488,7 +493,7 @@ glift.rules.treepath = {
       var result = glift.rules.treepath._flattenMoveTree(movetree, []);
       movetree.moveUp();
       for (var j = 0; j < result.length; j++) {
-        out.push(result[j])
+        out.push(result[j]);
       }
     }
     return out;
@@ -499,18 +504,20 @@ glift.rules.treepath = {
    * @param {!glift.rules.Treepath} pathToHere A treepath to here.
    * @private
    */
-  _flattenMoveTree: function(movetree, pathToHere) {
+  _flattenMoveTree: function (movetree, pathToHere) {
     if (pathToHere === undefined) pathToHere = [];
     pathToHere.push(movetree.node().getVarNum());
     var out = [];
     for (var i = 0; i < movetree.node().numChildren(); i++) {
-      movetree.moveDown(i)
+      movetree.moveDown(i);
       var thisout = glift.rules.treepath._flattenMoveTree(
-          movetree, pathToHere.slice());
-      out = out.concat(thisout)
-      movetree.moveUp()
+        movetree,
+        pathToHere.slice()
+      );
+      out = out.concat(thisout);
+      movetree.moveUp();
     }
     if (out.length == 0) out.push(pathToHere);
     return out;
-  }
+  },
 };

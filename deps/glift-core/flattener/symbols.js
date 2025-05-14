@@ -62,7 +62,7 @@ glift.flattener.symbols = {
  */
 glift.flattener.symbolStoneToState = {
   0: glift.enums.states.EMPTY,
-  20: glift.enums.states.BLACK,  // BSTONE,
+  20: glift.enums.states.BLACK, // BSTONE,
   21: glift.enums.states.WHITE, // WSTONE
 };
 
@@ -97,7 +97,7 @@ glift.flattener.reverseSymbol_ = null;
  * @param {number} num Symbol number
  * @return {string} Symbol name
  */
-glift.flattener.symbolStr = function(num) {
+glift.flattener.symbolStr = function (num) {
   if (glift.flattener.reverseSymbol_ == null) {
     // Create and store a reverse mapping.
     var reverse = {};

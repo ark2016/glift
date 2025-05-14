@@ -1,6 +1,5 @@
 goog.provide('glift.api.DisplayOptions');
 
-
 /**
  * Miscellaneous options for display.
  * api:1.0
@@ -9,7 +8,7 @@ goog.provide('glift.api.DisplayOptions');
  *
  * @constructor @final @struct
  */
-glift.api.DisplayOptions = function(opt_o) {
+glift.api.DisplayOptions = function (opt_o) {
   var o = opt_o || {};
 
   /**
@@ -75,7 +74,6 @@ glift.api.DisplayOptions = function(opt_o) {
    */
   this.minWidth = o.minWidth || '';
 
-
   /**
    * Split percentages to use for a one-column widget format.
    *
@@ -85,11 +83,11 @@ glift.api.DisplayOptions = function(opt_o) {
   // TODO(kashomon): Define proper type for this.
   this.oneColumnSplits = o.oneColumnSplits || {
     first: [
-      { component: 'STATUS_BAR',   ratio: 0.06 },
-      { component: 'BOARD',       ratio: 0.67 },
+      { component: 'STATUS_BAR', ratio: 0.06 },
+      { component: 'BOARD', ratio: 0.67 },
       { component: 'COMMENT_BOX', ratio: 0.18 },
-      { component: 'ICONBAR',     ratio: 0.09 }
-    ]
+      { component: 'ICONBAR', ratio: 0.09 },
+    ],
   };
 
   /**
@@ -100,14 +98,12 @@ glift.api.DisplayOptions = function(opt_o) {
    */
   // TODO(kashomon): Define a proper type for this.
   this.twoColumnSplits = o.twoColumnSplits || {
-    first: [
-      { component: 'BOARD', ratio: 1 }
-    ],
+    first: [{ component: 'BOARD', ratio: 1 }],
     second: [
-      { component: 'STATUS_BAR',     ratio: 0.07 },
-      { component: 'COMMENT_BOX',   ratio: 0.83 },
-      { component: 'ICONBAR',       ratio: 0.10 }
-    ]
+      { component: 'STATUS_BAR', ratio: 0.07 },
+      { component: 'COMMENT_BOX', ratio: 0.83 },
+      { component: 'ICONBAR', ratio: 0.1 },
+    ],
   };
 
   /**
@@ -134,14 +130,15 @@ glift.api.DisplayOptions = function(opt_o) {
   /**
    * Whether or not to enable keyboard shortcuts. This currently binds
    * keypress events to document.body, so it's not unlikely this could
-   * conflict with other applications' keybindings. 
+   * conflict with other applications' keybindings.
    * Defaults to enabled.
    * @type {boolean}
    * @const
    */
   this.enableKeyboardShortcuts =
-      o.enableKeyboardShortcuts !== undefined ?
-      !!o.enableKeyboardShortcuts : true;
+    o.enableKeyboardShortcuts !== undefined
+      ? !!o.enableKeyboardShortcuts
+      : true;
 
   /**
    * Use Markdown for the comment box.  This requires that marked.js be

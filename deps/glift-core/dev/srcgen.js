@@ -57,11 +57,15 @@ const path = require('path');
  *
  * (note: Concatenation is used to avoid comment-breaks).
  */
-var jsSrcGlobGen = function(ordering, addGlobs, compileTs) {
+var jsSrcGlobGen = function (ordering, addGlobs, compileTs) {
   if (typeof ordering !== 'object' || !ordering.length) {
     throw new Error(
-        'Ordering must be a non-empty array of paths. ' +
-        'Was: ' + (typeof ordering) + ':' + String(ordering));
+      'Ordering must be a non-empty array of paths. ' +
+        'Was: ' +
+        typeof ordering +
+        ':' +
+        String(ordering)
+    );
   }
 
   compileTs = !!compileTs;
@@ -69,7 +73,7 @@ var jsSrcGlobGen = function(ordering, addGlobs, compileTs) {
   var out = [];
   var addGlobs = addGlobs || [];
 
-  var rread = function(dirPath) {
+  var rread = function (dirPath) {
     var components = dirPath.split(path.sep);
     var last = components[components.length - 1];
 
@@ -91,13 +95,13 @@ var jsSrcGlobGen = function(ordering, addGlobs, compileTs) {
     }
 
     fs.readdirSync(dirPath).forEach((f) => {
-      var fpath = path.join(dirPath, f)
+      var fpath = path.join(dirPath, f);
       var fd = fs.lstatSync(fpath);
       if (fd.isDirectory()) {
-        rread(fpath)
+        rread(fpath);
       }
     });
-  }
+  };
 
   ordering.forEach((fpath) => {
     if (!fs.existsSync(fpath)) {
@@ -110,7 +114,7 @@ var jsSrcGlobGen = function(ordering, addGlobs, compileTs) {
     } else {
       rread(fpath);
     }
-  })
+  });
 
   return out.concat(addGlobs);
 };

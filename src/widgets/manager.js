@@ -8,8 +8,7 @@ goog.provide('glift.widgets.WidgetManager');
  *
  * @constructor @final @struct
  */
-glift.widgets.WidgetManager = function(options) {
-
+glift.widgets.WidgetManager = function (options) {
   /**
    * Globally unique ID, at least across all glift instances in the current
    * page. In theory, the divId should be globally unique, but might as well be
@@ -84,7 +83,7 @@ glift.widgets.WidgetManager = function(options) {
   this.sgfColIndex = options.initialIndex;
 
   /** @type {boolean} */
-  this.allowWrapAround = options.allowWrapAround
+  this.allowWrapAround = options.allowWrapAround;
 
   /**
    * The SGF Defaults template.
@@ -132,7 +131,7 @@ glift.widgets.WidgetManager = function(options) {
    * results window.
    * @type {!glift.widgets.BaseWidget|undefined}
    */
-  this.temporaryWidget = undefined
+  this.temporaryWidget = undefined;
 
   /**
    * Global metadata for this manager instance.
@@ -155,28 +154,36 @@ glift.widgets.WidgetManager.prototype = {
    * @return {!glift.widgets.WidgetManager} The manager object.
    * @export
    */
-  draw: function() {
+  draw: function () {
     var that = this;
-    var afterCollectionLoad = function() {
+    var afterCollectionLoad = function () {
       if (!this.initBackgroundLoading && this.loadColInBack) {
         // Only start background loading once.
         this.initBackgroundLoading = true;
         this.backgroundLoad_();
       }
       var curObj = this.getCurrentSgfObj();
-      this.loadSgfString_(curObj, function(sgfObj) {
-        // Prevent flickering by destroying the widget after loading the SGF.
-        this.destroy();
-        this.currentWidget = this.createWidget(sgfObj).draw();
-      }.bind(this));
+      this.loadSgfString_(
+        curObj,
+        function (sgfObj) {
+          // Prevent flickering by destroying the widget after loading the SGF.
+          this.destroy();
+          this.currentWidget = this.createWidget(sgfObj).draw();
+        }.bind(this)
+      );
     }.bind(this);
 
     if (this.sgfCollection.length === 0 && this.sgfCollectionUrl) {
-      glift.ajax.get(this.sgfCollectionUrl, function(data) {
-        this.sgfCollection = /** @type {!Array<string|!glift.api.SgfOptions>} */ (
-            JSON.parse(data));
-        afterCollectionLoad();
-      }.bind(this));
+      glift.ajax.get(
+        this.sgfCollectionUrl,
+        function (data) {
+          this.sgfCollection =
+            /** @type {!Array<string|!glift.api.SgfOptions>} */ (
+              JSON.parse(data)
+            );
+          afterCollectionLoad();
+        }.bind(this)
+      );
     } else {
       afterCollectionLoad();
     }
@@ -187,8 +194,8 @@ glift.widgets.WidgetManager.prototype = {
    * Redraws the current widget.
    * @export
    */
-  redraw: function() {
-    var widget = this.getCurrentWidget()
+  redraw: function () {
+    var widget = this.getCurrentWidget();
     if (widget) {
       widget.redraw();
     }
@@ -198,14 +205,16 @@ glift.widgets.WidgetManager.prototype = {
    * Set as the active widget in the global registry. Used from icons-land
    * @export
    */
-  setActive: function() { glift.global.activeInstanceId = this.id; },
+  setActive: function () {
+    glift.global.activeInstanceId = this.id;
+  },
 
   /**
    * Gets the current (active) widget object or undefined if the widget hasn't
    * been created.
    * @return {!glift.widgets.BaseWidget|undefined}
    */
-  getCurrentWidget: function() {
+  getCurrentWidget: function () {
     if (this.temporaryWidget) {
       return this.temporaryWidget;
     } else {
@@ -218,17 +227,20 @@ glift.widgets.WidgetManager.prototype = {
    * @param {!glift.api.Options} options The input-options.
    * @private
    */
-  initSgfCollection_: function(options) {
+  initSgfCollection_: function (options) {
     // Process explicitly defined collection arrays.
     if (glift.util.typeOf(options.sgfCollection) === 'array') {
       var coll = /** @type {!Array<!glift.api.SgfOptions|string>} */ (
-          options.sgfCollection);
+        options.sgfCollection
+      );
       for (var i = 0; i < coll.length; i++) {
         this.sgfCollection.push(coll[i]);
       }
       if (options.sgf && options.sgfCollection.length > 0) {
-        throw new Error('Illegal options configuration: you cannot define both ' +
-            'sgf and sgfCollection')
+        throw new Error(
+          'Illegal options configuration: you cannot define both ' +
+            'sgf and sgfCollection'
+        );
       } else if (options.sgf && options.sgfCollection.length === 0) {
         // Move the single SGF into the SGF collection.
         this.sgfCollection.push(options.sgf);
@@ -244,20 +256,25 @@ glift.widgets.WidgetManager.prototype = {
   },
 
   /**
-   * Gets the current SGF Object from the SGF collection. 
+   * Gets the current SGF Object from the SGF collection.
    */
-  getCurrentSgfObj: function() { return this.getSgfObj(this.sgfColIndex); },
+  getCurrentSgfObj: function () {
+    return this.getSgfObj(this.sgfColIndex);
+  },
 
   /** @return {boolean} Whether there's a 'next' sgf */
-  hasNextSgf: function() {
-    if (this.sgfCollection.length &&
-        this.sgfColIndex >= 0 &&
-        this.sgfColIndex < this.sgfCollection.length - 1) {
+  hasNextSgf: function () {
+    if (
+      this.sgfCollection.length &&
+      this.sgfColIndex >= 0 &&
+      this.sgfColIndex < this.sgfCollection.length - 1
+    ) {
       return true;
     } else if (
-        this.sgfCollection.length &&
-        this.sgfColIndex === this.sgfCollection.length - 1 &&
-        this.allowWrapAround) {
+      this.sgfCollection.length &&
+      this.sgfColIndex === this.sgfCollection.length - 1 &&
+      this.allowWrapAround
+    ) {
       return true;
     } else {
       return false;
@@ -265,15 +282,18 @@ glift.widgets.WidgetManager.prototype = {
   },
 
   /** @return {boolean} Whether there's a previous sgf */
-  hasPrevSgf: function() {
-    if (this.sgfCollection.length &&
-        this.sgfColIndex > 0 &&
-        this.sgfColIndex <= this.sgfCollection.length - 1) {
+  hasPrevSgf: function () {
+    if (
+      this.sgfCollection.length &&
+      this.sgfColIndex > 0 &&
+      this.sgfColIndex <= this.sgfCollection.length - 1
+    ) {
       return true;
     } else if (
-        this.sgfCollection.length &&
-        this.sgfColIndex === 0 &&
-        this.allowWrapAround) {
+      this.sgfCollection.length &&
+      this.sgfColIndex === 0 &&
+      this.allowWrapAround
+    ) {
       return true;
     } else {
       return false;
@@ -287,10 +307,15 @@ glift.widgets.WidgetManager.prototype = {
    *
    * @return {!glift.api.SgfOptions}
    */
-  getSgfObj: function(index) {
+  getSgfObj: function (index) {
     if (index < 0 || index > this.sgfCollection.length) {
-      throw new Error("Index [" + index +  " ] out of bounds."
-          + " List size was " + this.sgfCollection.length);
+      throw new Error(
+        'Index [' +
+          index +
+          ' ] out of bounds.' +
+          ' List size was ' +
+          this.sgfCollection.length
+      );
     }
     var curSgfObj = this.sgfCollection[index];
     if (glift.util.typeOf(curSgfObj) === 'string') {
@@ -318,7 +343,7 @@ glift.widgets.WidgetManager.prototype = {
    * @param {!function(glift.api.SgfOptions)} callback
    * @private
    */
-  loadSgfString_: function(sgfObj, callback) {
+  loadSgfString_: function (sgfObj, callback) {
     var alias = sgfObj.alias;
     var url = sgfObj.url;
     if (alias && this.sgfCache[alias]) {
@@ -359,7 +384,7 @@ glift.widgets.WidgetManager.prototype = {
    *    sgf finished.
    * @export
    */
-  loadSgfStringSync: function(sgfObj) {
+  loadSgfStringSync: function (sgfObj) {
     var alias = sgfObj.alias;
     var url = sgfObj.url;
     if (alias && this.sgfCache[alias]) {
@@ -380,7 +405,7 @@ glift.widgets.WidgetManager.prototype = {
    * the current div ID to be the fullscreened div id.
    * @return {string}
    */
-  getDivId: function() {
+  getDivId: function () {
     if (this.fullscreenDivId) {
       return this.fullscreenDivId;
     } else {
@@ -396,10 +421,16 @@ glift.widgets.WidgetManager.prototype = {
    *    point, the widget has not yet been 'drawn'.
    * @export
    */
-  createWidget: function(sgfObj) {
+  createWidget: function (sgfObj) {
     return new glift.widgets.BaseWidget(
-        this.getDivId(), sgfObj, this.displayOptions, this.iconActions,
-        this.stoneActions, this, this.hooks);
+      this.getDivId(),
+      sgfObj,
+      this.displayOptions,
+      this.iconActions,
+      this.stoneActions,
+      this,
+      this.hooks
+    );
   },
 
   /**
@@ -408,7 +439,7 @@ glift.widgets.WidgetManager.prototype = {
    * you want to see an answer, you jump to a separate game viewer widget.
    * @param {!glift.api.SgfOptions} sgfObj
    */
-  createTemporaryWidget: function(sgfObj) {
+  createTemporaryWidget: function (sgfObj) {
     this.currentWidget && this.currentWidget.destroy();
     var obj = this.sgfDefaults.createSgfObj(sgfObj);
     this.temporaryWidget = this.createWidget(obj).draw();
@@ -417,7 +448,7 @@ glift.widgets.WidgetManager.prototype = {
   /**
    * Returns from the temporary widget to the original widget.
    */
-  returnToOriginalWidget: function() {
+  returnToOriginalWidget: function () {
     this.temporaryWidget && this.temporaryWidget.destroy();
     this.temporaryWidget = undefined;
     this.currentWidget.draw();
@@ -428,13 +459,14 @@ glift.widgets.WidgetManager.prototype = {
    * @param {number} indexChange
    * @private
    */
-  nextSgfInternal_: function(indexChange) {
+  nextSgfInternal_: function (indexChange) {
     if (!this.sgfCollection.length > 1) {
       return; // Nothing to do
     }
     if (this.allowWrapAround) {
-      this.sgfColIndex = (this.sgfColIndex + indexChange + this.sgfCollection.length)
-          % this.sgfCollection.length;
+      this.sgfColIndex =
+        (this.sgfColIndex + indexChange + this.sgfCollection.length) %
+        this.sgfCollection.length;
     } else {
       this.sgfColIndex = this.sgfColIndex + indexChange;
       if (this.sgfColIndex < 0) {
@@ -452,13 +484,17 @@ glift.widgets.WidgetManager.prototype = {
    * then redraws the widget.
    * @export
    */
-  nextSgf: function() { this.nextSgfInternal_(1); },
+  nextSgf: function () {
+    this.nextSgfInternal_(1);
+  },
 
   /**
    * Very similar to nextSgf. Load the previous SGF.
    * @export
    */
-  prevSgf: function() { this.nextSgfInternal_(-1); },
+  prevSgf: function () {
+    this.nextSgfInternal_(-1);
+  },
 
   /**
    * Load a urlOrObject with AJAX.  If the urlOrObject is an object, then we
@@ -468,12 +504,15 @@ glift.widgets.WidgetManager.prototype = {
    * @param {!function(glift.api.SgfOptions)} callback For when the ajax request
    *    completes.
    */
-  loadSgfWithAjax: function(url, sgfObj, callback) {
-    glift.ajax.get(url, function(data) {
-      this.sgfCache[url] = data;
-      sgfObj.sgfString = data;
-      callback(sgfObj);
-    }.bind(this));
+  loadSgfWithAjax: function (url, sgfObj, callback) {
+    glift.ajax.get(
+      url,
+      function (data) {
+        this.sgfCache[url] = data;
+        sgfObj.sgfString = data;
+        callback(sgfObj);
+      }.bind(this)
+    );
   },
 
   /**
@@ -481,14 +520,17 @@ glift.widgets.WidgetManager.prototype = {
    * end of the SGF collection.
    * @private
    */
-  backgroundLoad_: function() {
-    var loader = function(idx) {
+  backgroundLoad_: function () {
+    var loader = function (idx) {
       if (idx < this.sgfCollection.length) {
         var curObj = this.getSgfObj(idx);
-        this.loadSgfString_(curObj, function() {
-          setTimeout(function() {
-            loader(idx + 1);
-          }.bind(this), 250); // 250ms
+        this.loadSgfString_(curObj, function () {
+          setTimeout(
+            function () {
+              loader(idx + 1);
+            }.bind(this),
+            250
+          ); // 250ms
         });
       }
     }.bind(this);
@@ -500,7 +542,7 @@ glift.widgets.WidgetManager.prototype = {
    * @return {boolean}
    * @export
    */
-  isFullscreen: function() {
+  isFullscreen: function () {
     return !!this.fullscreenDivId;
   },
 
@@ -514,18 +556,22 @@ glift.widgets.WidgetManager.prototype = {
    * window.onresize.
    * @export
    */
-  enableFullscreenAutoResize: function() {
+  enableFullscreenAutoResize: function () {
     // It might be tempting to write check if we're fullscreened, but currently
     // the enableFullscreenAutoResize is called after widget destruction.
-    if (window.onresize) { this.oldWindowResize = window.onresize; }
-    window.onresize = function() { this.redraw(); }.bind(this);
+    if (window.onresize) {
+      this.oldWindowResize = window.onresize;
+    }
+    window.onresize = function () {
+      this.redraw();
+    }.bind(this);
   },
 
   /**
    * Disable auto-resizing of the glift instance. Called from the status bar.
    * @export
    */
-  disableFullscreenAutoResize: function() {
+  disableFullscreenAutoResize: function () {
     window.onresize = this.oldWindowResize;
     this.oldWindowResize = null;
   },
@@ -534,11 +580,11 @@ glift.widgets.WidgetManager.prototype = {
    * Undraw the most recent widget and remove references to it.
    * @export
    */
-  destroy: function() {
+  destroy: function () {
     this.currentWidget && this.currentWidget.destroy();
     this.currentWidget = undefined;
     this.temporaryWidget && this.temporaryWidget.destroy();
     this.temporaryWidget = undefined;
     return this;
-  }
+  },
 };

@@ -21,7 +21,7 @@ glift.parse = {
      *
      * Prefer SGF, this is now equivalent.
      */
-    PANDANET: 'PANDANET'
+    PANDANET: 'PANDANET',
   },
 
   /**
@@ -39,9 +39,9 @@ glift.parse = {
    * @param {string} filename The filename
    * @return {boolean} whether or not the filename has a known type
    */
-  knownGoFile: function(filename) {
-    if (!filename || typeof(filename) !== 'string') {
-      return false
+  knownGoFile: function (filename) {
+    if (!filename || typeof filename !== 'string') {
+      return false;
     }
     for (var key in glift.parse.suffixToType) {
       if (filename.indexOf(key) > -1) {
@@ -57,7 +57,7 @@ glift.parse = {
    * @param {string} filename Filename
    * @return {glift.parse.parseType} The parse type
    */
-  parseTypeFromFilename: function(filename) {
+  parseTypeFromFilename: function (filename) {
     var ttype = glift.parse.parseType.SGF; // default type = SGF.
     for (var key in glift.parse.suffixToType) {
       if (filename.indexOf(key) > -1) {
@@ -74,9 +74,11 @@ glift.parse = {
    * @param {string} filename Name of the file from which the contents came.
    * @return {!glift.rules.MoveTree}
    */
-  fromFileName: function(str, filename) {
+  fromFileName: function (str, filename) {
     return glift.parse.fromString(
-        str, glift.parse.parseTypeFromFilename(filename));
+      str,
+      glift.parse.parseTypeFromFilename(filename)
+    );
   },
 
   /**
@@ -87,7 +89,7 @@ glift.parse = {
    *    if unspecified.
    * @return {!glift.rules.MoveTree} The generated movetree
    */
-  fromString: function(str, opt_ttype) {
+  fromString: function (str, opt_ttype) {
     var ttype = opt_ttype || glift.parse.parseType.SGF;
     if (ttype === glift.parse.parseType.PANDANET) {
       // PANDANET type is now equivalent to SGF.
@@ -97,5 +99,5 @@ glift.parse = {
     var func = glift.parse[methodName];
     var movetree = func(str);
     return glift.rules.movetree.initRootProperties(movetree);
-  }
+  },
 };

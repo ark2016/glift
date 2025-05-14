@@ -1,6 +1,5 @@
 'use strict';
 
-
 /**
  *
  */
@@ -16,9 +15,9 @@ const closureCompiler = require('google-closure-compiler').gulp({
  *
  * @return {object} whatever closureCompiler returns.
  */
-var defaultCompile = function(outName) {
+var defaultCompile = function (outName) {
   if (outName == '') {
-    throw new Error('Name is required but was not provided')
+    throw new Error('Name is required but was not provided');
   }
 
   return closureCompiler({

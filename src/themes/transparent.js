@@ -5,13 +5,13 @@ goog.provide('glift.themes.registered.TRANSPARENT');
  */
 glift.themes.registered.TRANSPARENT = {
   board: {
-    fill: 'none'
+    fill: 'none',
   },
 
   commentBox: {
     css: {
       background: 'none',
-      border: ''
-    }
-  }
+      border: '',
+    },
+  },
 };

@@ -24,7 +24,6 @@ goog.provide('glift.flattener.FlattenedParams');
  */
 glift.flattener.FlattenedParams;
 
-
 /** @private {!Object<number, !glift.flattener.Flattened>} */
 glift.flattener.emptyFlattenedCache_ = {};
 
@@ -36,7 +35,7 @@ glift.flattener.emptyFlattenedCache_ = {};
  * @param {number} size
  * @return {!glift.flattener.Flattened}
  */
-glift.flattener.emptyFlattened = function(size) {
+glift.flattener.emptyFlattened = function (size) {
   if (glift.flattener.emptyFlattenedCache_[size]) {
     return glift.flattener.emptyFlattenedCache_[size];
   }
@@ -52,7 +51,7 @@ glift.flattener.emptyFlattened = function(size) {
  * @param {!glift.flattener.FlattenedParams} params
  * @constructor @final @struct
  */
-glift.flattener.Flattened = function(params) {
+glift.flattener.Flattened = function (params) {
   /**
    * Board wrapper. Essentially a double array of intersection objects.
    * @private {!glift.flattener.Board}
@@ -158,13 +157,17 @@ glift.flattener.Flattened.prototype = {
    * Return the constructed board.
    * @return {!glift.flattener.Board}
    */
-  board: function() { return this.board_; },
+  board: function () {
+    return this.board_;
+  },
 
   /**
    * The comment for the position.
    * @return {string}
    */
-  comment: function() { return this.comment_; },
+  comment: function () {
+    return this.comment_;
+  },
 
   /**
    * A structure illustrating the board collisions. Only relevant for positions
@@ -179,7 +182,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {!Array<!glift.flattener.Collision>}
    */
-  collisions: function() { return this.collisions_; },
+  collisions: function () {
+    return this.collisions_;
+  },
 
   /**
    * Whether or not this position is on the main line or path variation.  For
@@ -188,7 +193,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {boolean}
    */
-  isOnMainPath: function() { return this.isOnMainPath_; },
+  isOnMainPath: function () {
+    return this.isOnMainPath_;
+  },
 
   /**
    * Returns the base move number before applying the next moves path. In an
@@ -196,7 +203,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {number}
    */
-  baseMoveNum: function() { return this.baseMoveNum_; },
+  baseMoveNum: function () {
+    return this.baseMoveNum_;
+  },
 
   /**
    * Returns the starting move number. Should only be used in the context of a
@@ -210,7 +219,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {number}
    */
-  startingMoveNum: function() { return this.startMoveNum_; },
+  startingMoveNum: function () {
+    return this.startMoveNum_;
+  },
 
   /**
    * Returns the ending move number. Should be tha same as the starting move
@@ -218,7 +229,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {number}
    */
-  endingMoveNum: function() { return this.endMoveNum_; },
+  endingMoveNum: function () {
+    return this.endMoveNum_;
+  },
 
   /**
    * Returns the first mainline move number in the parent-chain. This will be
@@ -226,7 +239,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {number}
    */
-  mainlineMoveNum: function() { return this.mainlineMoveNum_; },
+  mainlineMoveNum: function () {
+    return this.mainlineMoveNum_;
+  },
 
   /**
    * Returns the move number of the nextMainlineMove (regardless of whether or
@@ -234,7 +249,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {number}
    */
-  nextMainlineMoveNum: function() { return this.mainlineMoveNum() + 1; },
+  nextMainlineMoveNum: function () {
+    return this.mainlineMoveNum() + 1;
+  },
 
   /**
    * Returns the first mainline move in the parent-chain. Can be null if no move
@@ -242,7 +259,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {?glift.rules.Move}
    */
-  mainlineMove: function() { return this.mainlineMove_; },
+  mainlineMove: function () {
+    return this.mainlineMove_;
+  },
 
   /**
    * Returns the next mainline move after the mainline move in the parent-chain.
@@ -251,21 +270,25 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {?glift.rules.Move}
    */
-  nextMainlineMove: function() { return this.nextMainlineMove_; },
+  nextMainlineMove: function () {
+    return this.nextMainlineMove_;
+  },
 
   /**
    * Returns the stone map. An object with the following structure:
    *
    * @return {!Object<glift.PtStr, !glift.rules.Move>}
    */
-  stoneMap: function() { return this.stoneMap_; },
+  stoneMap: function () {
+    return this.stoneMap_;
+  },
 
   /**
    * Returns the labels map. An object with the following structure:
    *
    * @return {!Object<glift.PtStr, string>}
    */
-  labels: function() {
+  labels: function () {
     return this.markMap_.labels;
   },
 
@@ -278,7 +301,7 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {!Object<glift.PtStr, glift.flattener.symbols>}
    */
-  marks: function() {
+  marks: function () {
     return this.markMap_.marks;
   },
 
@@ -289,7 +312,7 @@ glift.flattener.Flattened.prototype = {
    * @param {glift.enums.problemResults} result
    */
   // TODO(kashomon): Remove once this is set from the flattener.
-  setProblemResult: function(result) {
+  setProblemResult: function (result) {
     this.problemResult_ = result;
   },
 
@@ -299,7 +322,9 @@ glift.flattener.Flattened.prototype = {
    *
    * @return {?glift.enums.problemResults} The problem correctness.
    */
-  problemResult: function() { return this.problemResult_ },
+  problemResult: function () {
+    return this.problemResult_;
+  },
 
   /**
    * Helper for truncating labels if the labels are numbers > 100, which
@@ -314,7 +339,7 @@ glift.flattener.Flattened.prototype = {
    *    string or a number (probably the former, but who are we to judge?).
    * @return {string} The processed string label.
    */
-  autoTruncateLabel: function(numOrString) {
+  autoTruncateLabel: function (numOrString) {
     var num = numOrString;
     if (typeof numOrString === 'number') {
       // noop
@@ -329,5 +354,5 @@ glift.flattener.Flattened.prototype = {
       num = num % 100;
     }
     return num + '';
-  }
+  },
 };

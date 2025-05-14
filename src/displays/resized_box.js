@@ -8,25 +8,29 @@
  * @param {glift.enums.boardAlignments=} opt_alignment
  * @return {!glift.orientation.BoundingBox} The new bounding box.
  */
-glift.displays.getResizedBox = function(divBox, cropbox, opt_alignment) {
+glift.displays.getResizedBox = function (divBox, cropbox, opt_alignment) {
   var aligns = glift.enums.boardAlignments;
   var alignment = opt_alignment || aligns.CENTER;
   var newDims = glift.displays.getCropDimensions(
-          divBox.width(),
-          divBox.height(),
-          cropbox),
-      newWidth = newDims.width,
-      newHeight = newDims.height,
-      xDiff = divBox.width() - newWidth,
-      yDiff = divBox.height() - newHeight,
-      // These are used to center the box.  However, it's not always the case
-      // that we really do want to center the box.
-      xDelta = alignment === aligns.RIGHT ? xDiff : xDiff / 2,
-      yDelta = alignment === aligns.TOP ? 0 : yDiff / 2,
-      newLeft = divBox.topLeft().x() + xDelta,
-      newTop = divBox.topLeft().y() + yDelta,
-      newBox = glift.orientation.bbox.fromSides(
-          new glift.Point(newLeft, newTop), newWidth, newHeight);
+      divBox.width(),
+      divBox.height(),
+      cropbox
+    ),
+    newWidth = newDims.width,
+    newHeight = newDims.height,
+    xDiff = divBox.width() - newWidth,
+    yDiff = divBox.height() - newHeight,
+    // These are used to center the box.  However, it's not always the case
+    // that we really do want to center the box.
+    xDelta = alignment === aligns.RIGHT ? xDiff : xDiff / 2,
+    yDelta = alignment === aligns.TOP ? 0 : yDiff / 2,
+    newLeft = divBox.topLeft().x() + xDelta,
+    newTop = divBox.topLeft().y() + yDelta,
+    newBox = glift.orientation.bbox.fromSides(
+      new glift.Point(newLeft, newTop),
+      newWidth,
+      newHeight
+    );
   return newBox;
 };
 
@@ -39,11 +43,11 @@ glift.displays.getResizedBox = function(divBox, cropbox, opt_alignment) {
  * @param {!glift.displays.DisplayCropBox} cropbox.
  * @return {{height: number, width: number}}
  */
-glift.displays.getCropDimensions = function(width, height, cropbox) {
+glift.displays.getCropDimensions = function (width, height, cropbox) {
   var origRatio = height / width,
-      cropRatio = cropbox.heightIntersections() / cropbox.widthIntersections(),
-      newHeight = height,
-      newWidth = width;
+    cropRatio = cropbox.heightIntersections() / cropbox.widthIntersections(),
+    newHeight = height,
+    newWidth = width;
   if (origRatio > cropRatio) {
     newHeight = width * cropRatio;
   } else if (origRatio < cropRatio) {
@@ -51,6 +55,6 @@ glift.displays.getCropDimensions = function(width, height, cropbox) {
   }
   return {
     height: newHeight,
-    width: newWidth
+    width: newWidth,
   };
 };

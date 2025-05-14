@@ -40,7 +40,7 @@ glift.rules.problems = {
    * @param {!glift.rules.ProblemConditions} conditions
    * @return {glift.enums.problemResults}
    */
-  positionCorrectness: function(movetree, conditions) {
+  positionCorrectness: function (movetree, conditions) {
     var problemResults = glift.enums.problemResults;
     if (movetree.properties().matches(conditions)) {
       return problemResults.CORRECT;
@@ -71,16 +71,19 @@ glift.rules.problems = {
         }
       }
 
-      if (successTracker[problemResults.CORRECT] &&
-          !successTracker[problemResults.INCORRECT]) {
+      if (
+        successTracker[problemResults.CORRECT] &&
+        !successTracker[problemResults.INCORRECT]
+      ) {
         if (movetree.properties().matches(conditions)) {
           return problemResults.CORRECT;
         } else {
           return problemResults.INDETERMINATE;
         }
       } else if (
-          successTracker[problemResults.CORRECT] &&
-          successTracker[problemResults.INCORRECT]) {
+        successTracker[problemResults.CORRECT] &&
+        successTracker[problemResults.INCORRECT]
+      ) {
         return problemResults.INDETERMINATE;
       } else {
         return problemResults.INCORRECT;
@@ -96,18 +99,20 @@ glift.rules.problems = {
    * @param {!glift.rules.ProblemConditions} conditions
    * @return {!Array<!glift.rules.Move>} An array of correct next moves.
    */
-  correctNextMoves: function(movetree, conditions) {
+  correctNextMoves: function (movetree, conditions) {
     var nextMoves = movetree.nextMoves();
     var INCORRECT = glift.enums.problemResults.INCORRECT;
     var correctNextMoves = [];
     for (var i = 0; i < nextMoves.length; i++) {
       movetree.moveDown(i);
-      if (glift.rules.problems.positionCorrectness(movetree, conditions)
-          !== INCORRECT) {
+      if (
+        glift.rules.problems.positionCorrectness(movetree, conditions) !==
+        INCORRECT
+      ) {
         correctNextMoves.push(nextMoves[i]);
       }
       movetree.moveUp(); // reset the position
     }
     return correctNextMoves;
-  }
+  },
 };

@@ -1,6 +1,6 @@
 // Util functions for running QUnit Tests
 var testUtil = {
-  ptlistToMap: function(list) {
+  ptlistToMap: function (list) {
     var outMap = {};
     for (var i = 0; i < list.length; i++) {
       var item = list[i];
@@ -13,15 +13,19 @@ var testUtil = {
     return outMap;
   },
 
-  assertFullDiv: function(divId) {
+  assertFullDiv: function (divId) {
     // really this is just non-empty...
-    ok(glift.dom.elem(divId).html().length > 0, "Div should contain contents."
-       + "  Was: " + glift.dom.elem(divId).html());
+    ok(
+      glift.dom.elem(divId).html().length > 0,
+      'Div should contain contents.' + '  Was: ' + glift.dom.elem(divId).html()
+    );
   },
 
-  assertEmptyDiv: function(divId) {
+  assertEmptyDiv: function (divId) {
     var contents = glift.dom.elem(divId).html();
-    ok(contents.toString().length === 0,
-        'Div should not contain contents. Instead was [' + contents + ']');
-  }
+    ok(
+      contents.toString().length === 0,
+      'Div should not contain contents. Instead was [' + contents + ']'
+    );
+  },
 };

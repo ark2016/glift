@@ -1,4 +1,4 @@
-(function() {
+(function () {
   module('glift.parse.pandanetTest');
 
   var testfile = [
@@ -37,13 +37,13 @@
     '[mayeck][mdcl][nekocat][Nilatarion][ojisanshac]',
     '[Oni][pempu][prodi][puerhista][RUBENDARIO]',
     '[Sadiker][sakugo][siskin][Taksimies][Tantares]',
-    ')'
+    ')',
   ].join('\n');
 
-  test('Test parse testfile', function() {
+  test('Test parse testfile', function () {
     var oldLog = glift.util.logz;
     var parseErrors = [];
-    var testLogger = function(msg) {
+    var testLogger = function (msg) {
       parseErrors.push(msg);
     };
     // Patch in a testing logger.

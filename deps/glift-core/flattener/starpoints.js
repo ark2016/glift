@@ -6,17 +6,25 @@ glift.flattener.starpoints = {
    * @private
    */
   pts_: {
-    9: [[4,4]],
+    9: [[4, 4]],
     13: [
-          [3,3], [3,9],
-             [6,6],
-          [9,3], [9,9],
-        ],
+      [3, 3],
+      [3, 9],
+      [6, 6],
+      [9, 3],
+      [9, 9],
+    ],
     19: [
-          [3,3],  [3,9],  [3,15],
-          [9,3],  [9,9],  [9,15],
-          [15,3], [15,9], [15,15],
-        ],
+      [3, 3],
+      [3, 9],
+      [3, 15],
+      [9, 3],
+      [9, 9],
+      [9, 15],
+      [15, 3],
+      [15, 9],
+      [15, 15],
+    ],
   },
 
   /**
@@ -30,7 +38,7 @@ glift.flattener.starpoints = {
    * @param {number} size
    * @return {boolean} Whether the point is a starpoint.
    */
-  isPt: function(pt, size) {
+  isPt: function (pt, size) {
     var map = glift.flattener.starpoints.map_[size];
     if (!map) {
       var newmap = {};
@@ -49,7 +57,7 @@ glift.flattener.starpoints = {
    * @return {!Array<!glift.Point>} All the points that should be considered
    * starpoints.
    */
-  allPts: function(size) {
+  allPts: function (size) {
     /** @type {!Array<glift.Point>} */
     var out = [];
     var ptz = glift.flattener.starpoints.pts_[size] || [];

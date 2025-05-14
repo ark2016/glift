@@ -1,17 +1,25 @@
-(function() {
+(function () {
   module('glift.displays.svg.idsTest');
   var idGen = glift.displays.svg.ids.gen('foo');
   var pt = glift.util.point(0, 1);
   var name = 'start';
 
-  test('Testing to ensure all groups are defined', function() {
+  test('Testing to ensure all groups are defined', function () {
     deepEqual(idGen.svg(), 'foo_svg', 'svg');
     deepEqual(idGen.board(), 'foo_board', 'board');
     deepEqual(idGen.stoneGroup(), 'foo_stone_container', 'stonegroup');
     deepEqual(idGen.stone(pt), 'foo_stone_0_1', 'stone');
-    deepEqual(idGen.stoneShadowGroup(), 'foo_stone_shadow_container', 'shadow gp');
+    deepEqual(
+      idGen.stoneShadowGroup(),
+      'foo_stone_shadow_container',
+      'shadow gp'
+    );
     deepEqual(idGen.stoneShadow(pt), 'foo_stone_shadow_0_1', 'shadow');
-    deepEqual(idGen.starpointGroup(), 'foo_starpoint_container', 'starpoint gp');
+    deepEqual(
+      idGen.starpointGroup(),
+      'foo_starpoint_container',
+      'starpoint gp'
+    );
     deepEqual(idGen.starpoint(pt), 'foo_starpoint_0_1', 'starpoint');
     deepEqual(idGen.buttonGroup(), 'foo_button_container', 'button group');
     deepEqual(idGen.button(pt), 'foo_button_0_1', 'button');

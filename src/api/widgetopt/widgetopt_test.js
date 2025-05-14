@@ -1,4 +1,4 @@
-(function() {
+(function () {
   module('glift.api.widgetopt');
 
   // List of supported widget types in the Options rewrite.
@@ -12,20 +12,20 @@
   ];
 
   var keys = [
-   'controllerFunc',
-   'enableMousewheel',
-   'icons',
-   'keyMappings',
-   'markLastMove',
-   'problemConditions',
-   'showVariations',
-   'statusBarIcons',
-   'stoneClick',
-   'stoneMouseout',
-   'stoneMouseover',
+    'controllerFunc',
+    'enableMousewheel',
+    'icons',
+    'keyMappings',
+    'markLastMove',
+    'problemConditions',
+    'showVariations',
+    'statusBarIcons',
+    'stoneClick',
+    'stoneMouseout',
+    'stoneMouseover',
   ];
 
-  test('widgetopt: Testing availability', function() {
+  test('widgetopt: Testing availability', function () {
     for (var i = 0; i < supportedList.length; i++) {
       var widgetType = supportedList[i];
       var wfn = glift.api.widgetopt[widgetType];

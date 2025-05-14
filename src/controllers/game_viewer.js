@@ -7,11 +7,12 @@ goog.require('glift.controllers.BaseController');
  *
  * @type {!glift.controllers.ControllerFunc}
  */
-glift.controllers.gameViewer = function(sgfOptions) {
+glift.controllers.gameViewer = function (sgfOptions) {
   var ctrl = glift.controllers;
   var baseController = glift.util.beget(ctrl.base());
-  var newController = /** @type {!glift.controllers.BaseController} */
-      (glift.util.setMethods(baseController, ctrl.GameViewer.prototype));
+  var newController =
+    /** @type {!glift.controllers.BaseController} */
+    (glift.util.setMethods(baseController, ctrl.GameViewer.prototype));
   if (!sgfOptions) {
     throw new Error('SGF Options was not defined, but must be defined');
   }
@@ -25,8 +26,7 @@ glift.controllers.gameViewer = function(sgfOptions) {
  * @extends {glift.controllers.BaseController}
  * @constructor
  */
-glift.controllers.GameViewer = function() {
-};
+glift.controllers.GameViewer = function () {};
 
 glift.controllers.GameViewer.prototype = {
   /**
@@ -36,14 +36,14 @@ glift.controllers.GameViewer.prototype = {
    * treepath.  This allows us to 'remember' the last variation taken by the
    * player, which seems to be the standard behavior.
    */
-  extraOptions: function() {},
+  extraOptions: function () {},
 
   /**
    * Find the variation associated with the played move.
    *
    * Returns null if the addStone operation isn't possible.
    */
-  addStone: function(point, color) {
+  addStone: function (point, color) {
     var possibleMap = this.possibleNextMoves_();
     var key = point.toString() + '-' + color;
     if (possibleMap[key] === undefined) {
@@ -62,7 +62,7 @@ glift.controllers.GameViewer.prototype = {
    *
    * Returns null in the case that we're at the root already.
    */
-  previousCommentOrBranch: function(maxMovesPrevious) {
+  previousCommentOrBranch: function (maxMovesPrevious) {
     var displayDataList = [];
     var displayData = null;
     var movesSeen = 0;
@@ -89,7 +89,7 @@ glift.controllers.GameViewer.prototype = {
    *
    * Returns null in the case that we're at the root already.
    */
-  nextCommentOrBranch: function(maxMovesNext) {
+  nextCommentOrBranch: function (maxMovesNext) {
     var displayData = null;
     var movesSeen = 0;
     do {
@@ -100,27 +100,29 @@ glift.controllers.GameViewer.prototype = {
       if (maxMovesNext && movesSeen === maxMovesNext) {
         break;
       }
-    } while (displayData && !comment && numChildern <= 1); 
+    } while (displayData && !comment && numChildern <= 1);
     return this.flattenedState();
   },
 
   /**
    * Move up what variation will be next retrieved.
    */
-  moveUpVariations: function() {
-    return this.setNextVariation((this.nextVariationNumber() + 1)
-        % this.movetree.node().numChildren());
+  moveUpVariations: function () {
+    return this.setNextVariation(
+      (this.nextVariationNumber() + 1) % this.movetree.node().numChildren()
+    );
   },
 
   /**
    * Move down  what variation will be next retrieved.
    */
-  moveDownVariations: function() {
+  moveDownVariations: function () {
     // Module is defined incorrectly for negative numbers.  So, we need to add n
     // to the result.
-    return this.setNextVariation((this.nextVariationNumber() - 1 +
-        + this.movetree.node().numChildren())
-        % this.movetree.node().numChildren());
+    return this.setNextVariation(
+      (this.nextVariationNumber() - 1 + +this.movetree.node().numChildren()) %
+        this.movetree.node().numChildren()
+    );
   },
 
   /**
@@ -133,16 +135,16 @@ glift.controllers.GameViewer.prototype = {
    *
    * @private
    */
-  possibleNextMoves_: function() {
+  possibleNextMoves_: function () {
     var possibleMap = {};
     var nextMoves = this.movetree.nextMoves();
     for (var i = 0; i < nextMoves.length; i++) {
       var move = nextMoves[i];
-      var firstString = move.point !== undefined
-          ? move.point.toString() : 'PASS'
-      var key = firstString + '-' + (move.color);
+      var firstString =
+        move.point !== undefined ? move.point.toString() : 'PASS';
+      var key = firstString + '-' + move.color;
       possibleMap[key] = i;
     }
     return possibleMap;
-  }
+  },
 };

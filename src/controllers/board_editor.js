@@ -7,7 +7,7 @@ goog.require('glift.controllers.BaseController');
  *
  * @type {!glift.controllers.ControllerFunc}
  */
-glift.controllers.boardEditor = function(sgfOptions) {
+glift.controllers.boardEditor = function (sgfOptions) {
   var ctrl = glift.controllers;
   var baseController = glift.util.beget(ctrl.base());
   glift.util.setMethods(baseController, ctrl.BoardEditor.prototype);
@@ -24,15 +24,14 @@ glift.controllers.boardEditor = function(sgfOptions) {
  * @extends {glift.controllers.BaseController}
  * @constructor
  */
-glift.controllers.BoardEditor = function() {
-};
+glift.controllers.BoardEditor = function () {};
 
 glift.controllers.BoardEditor.prototype = {
   /**
    * Called during initialization, after the goban/movetree have been
    * initializied.
    */
-  extraOptions: function() {
+  extraOptions: function () {
     // _initLabelTrackers creates:
     //
     // this._alphaLabels: An array of available alphabetic labels.
@@ -54,14 +53,14 @@ glift.controllers.BoardEditor.prototype = {
    * this._numericLabels: An array of available numeric labels (as numbers).
    * this._ptTolabelMap: A map from pt (string) to {label + optional data}.
    */
-  _initLabelTrackers: function() {
+  _initLabelTrackers: function () {
     var prop = glift.rules.prop;
     var marks = glift.enums.marks;
     var numericLabelMap = {}; // number-string to 'true'
     var alphaLabelMap = {}; // alphabetic label to 'true'
     this._ptTolabelMap = {}; // pt string to {label + optional data}
     for (var i = 0; i < 100; i++) {
-      numericLabelMap[(i + 1)] = true;
+      numericLabelMap[i + 1] = true;
     }
     for (var i = 0; i < 26; i++) {
       var label = '' + String.fromCharCode('A'.charCodeAt(0) + i);
@@ -73,7 +72,7 @@ glift.controllers.BoardEditor.prototype = {
       marks.LABEL,
       marks.SQUARE,
       marks.TRIANGLE,
-      marks.XMARK
+      marks.XMARK,
     ];
     var alphaRegex = /^[A-Z]$/;
     var digitRegex = /^\d*$/;
@@ -99,8 +98,12 @@ glift.controllers.BoardEditor.prototype = {
           }
           var pt = glift.util.pointFromSgfCoord(splat[0]);
           this._ptTolabelMap[pt.toString()] = markData;
-          if (numericLabelMap[lbl]) { delete numericLabelMap[lbl]; }
-          if (alphaLabelMap[lbl]) { delete alphaLabelMap[lbl]; }
+          if (numericLabelMap[lbl]) {
+            delete numericLabelMap[lbl];
+          }
+          if (alphaLabelMap[lbl]) {
+            delete alphaLabelMap[lbl];
+          }
         }
       }
     }
@@ -114,7 +117,7 @@ glift.controllers.BoardEditor.prototype = {
    * maps from either number => true or alpha char => true, where the keys
    * represent unused labels.
    */
-  _convertLabelMap: function(map) {
+  _convertLabelMap: function (map) {
     var base = [];
     var digitRegex = /^\d+$/;
     for (var key in map) {
@@ -125,7 +128,9 @@ glift.controllers.BoardEditor.prototype = {
       }
     }
     if (base.length > 0 && glift.util.typeOf(base[0]) === 'number') {
-      base.sort(function(a, b) { return a - b });
+      base.sort(function (a, b) {
+        return a - b;
+      });
       base.reverse();
     } else {
       base.sort().reverse();
@@ -137,15 +142,17 @@ glift.controllers.BoardEditor.prototype = {
    * Retrieve the current alphabetic mark. Returns null if there are no more
    * labels available.
    */
-  currentAlphaMark: function() {
-    return this._alphaLabels.length > 0 ?
-        this._alphaLabels[this._alphaLabels.length - 1] : null;
+  currentAlphaMark: function () {
+    return this._alphaLabels.length > 0
+      ? this._alphaLabels[this._alphaLabels.length - 1]
+      : null;
   },
 
   /** Retrieve the current numeric mark as a string. */
-  currentNumericMark: function() {
-    return this._numericLabels.length > 0 ?
-        this._numericLabels[this._numericLabels.length - 1] + '': null;
+  currentNumericMark: function () {
+    return this._numericLabels.length > 0
+      ? this._numericLabels[this._numericLabels.length - 1] + ''
+      : null;
   },
 
   /**
@@ -158,7 +165,7 @@ glift.controllers.BoardEditor.prototype = {
    *  If there's no mark at the point:
    *    null
    */
-  getMark: function(pt) {
+  getMark: function (pt) {
     return this._ptTolabelMap[pt.toString()] || null;
   },
 
@@ -166,9 +173,11 @@ glift.controllers.BoardEditor.prototype = {
    * Use the current alpha mark (as a string). This removes the mark frome the
    * available alphabetic labels. Returns null if no mark is available.
    */
-  _useCurrentAlphaMark: function() {
+  _useCurrentAlphaMark: function () {
     var label = this._alphaLabels.pop();
-    if (!label) { return null; }
+    if (!label) {
+      return null;
+    }
     return label;
   },
 
@@ -176,9 +185,11 @@ glift.controllers.BoardEditor.prototype = {
    * Use the current numeric mark (as a string). This removes the mark from the
    * available numeric labels. Returns null if no mark is available.
    */
-  _useCurrentNumericMark: function() {
+  _useCurrentNumericMark: function () {
     var label = this._numericLabels.pop() + ''; // Ensure a string.
-    if (!label) { return null; }
+    if (!label) {
+      return null;
+    }
     return label;
   },
 
@@ -186,12 +197,12 @@ glift.controllers.BoardEditor.prototype = {
    * Determine whether a mark is supported for adding. As you would expect,
    * returns true or false in the obvious way.
    */
-  isSupportedMark: function(mark) {
+  isSupportedMark: function (mark) {
     var supportedMap = {
       LABEL_ALPHA: true,
       LABEL_NUMERIC: true,
       SQUARE: true,
-      TRIANGLE: true
+      TRIANGLE: true,
     };
     return supportedMap[mark] || false;
   },
@@ -199,13 +210,17 @@ glift.controllers.BoardEditor.prototype = {
   /**
    * Add a mark to the Go board.
    */
-  addMark: function(point, mark) {
+  addMark: function (point, mark) {
     var marks = glift.enums.marks;
     var curProps = this.movetree.node().properties();
-    if (!this.isSupportedMark(mark)) { return null; }
+    if (!this.isSupportedMark(mark)) {
+      return null;
+    }
 
     // Remove the mark instead, since the point already has a mark.
-    if (this.getMark(point)) { return this.removeMark(point); }
+    if (this.getMark(point)) {
+      return this.removeMark(point);
+    }
 
     var markData = { mark: mark };
     var data = null;
@@ -228,26 +243,33 @@ glift.controllers.BoardEditor.prototype = {
   },
 
   /** Remove a mark from the board. */
-  removeMark: function(point) {
+  removeMark: function (point) {
     var marks = glift.enums.marks;
     var markData = this.getMark(point);
-    if (!markData) { return null; }
+    if (!markData) {
+      return null;
+    }
 
     delete this._ptTolabelMap[point.toString()];
     var sgfProp = glift.sgf.markToProperty(markData.mark);
     if (markData.mark === marks.LABEL_NUMERIC) {
       this._numericLabels.push(parseInt(markData.data, 10));
-      this._numericLabels.sort(function(a, b) { return a - b }).reverse();
-      this.movetree.properties()
-          .removeOneValue(sgfProp, point.toSgfCoord() + ':' + markData.data);
+      this._numericLabels
+        .sort(function (a, b) {
+          return a - b;
+        })
+        .reverse();
+      this.movetree
+        .properties()
+        .removeOneValue(sgfProp, point.toSgfCoord() + ':' + markData.data);
     } else if (markData.mark === marks.LABEL_ALPHA) {
       this._alphaLabels.push(markData.data);
-      this.movetree.properties()
-          .removeOneValue(sgfProp, point.toSgfCoord() + ':' + markData.data);
+      this.movetree
+        .properties()
+        .removeOneValue(sgfProp, point.toSgfCoord() + ':' + markData.data);
       this._alphaLabels.sort().reverse();
     } else {
-      this.movetree.properties()
-          .removeOneValue(sgfProp, point.toSgfCoord());
+      this.movetree.properties().removeOneValue(sgfProp, point.toSgfCoord());
     }
     return this.flattenedState();
   },
@@ -257,7 +279,7 @@ glift.controllers.BoardEditor.prototype = {
    *
    * Returns: partial data to apply
    */
-  addStone: function(point, color) {
+  addStone: function (point, color) {
     if (!this.canAddStone(point, color)) {
       return null;
     }
@@ -266,9 +288,9 @@ glift.controllers.BoardEditor.prototype = {
     var addResult = this.goban.addStone(point, color);
 
     this.movetree.addNode();
-    this.movetree.properties().add(
-        glift.sgf.colorToToken(color),
-        point.toSgfCoord());
+    this.movetree
+      .properties()
+      .add(glift.sgf.colorToToken(color), point.toSgfCoord());
     return this.flattenedState();
   },
 
@@ -276,7 +298,7 @@ glift.controllers.BoardEditor.prototype = {
    * Add a stone placement.  These are properties indicated by AW and AB.  They
    * do not indicate a change in move number.
    */
-  addPlacement: function(point, color) {
+  addPlacement: function (point, color) {
     var prop = glift.sgf.colorToPlacement(color);
     var oppColor = glift.util.colors.oppositeColor(color);
     var oppProp = glift.sgf.colorToPlacement(oppColor);
@@ -284,8 +306,9 @@ glift.controllers.BoardEditor.prototype = {
     if (result.successful) {
       this.movetree.properties().add(prop, point.toSgfCoord());
       for (var i = 0; i < result.captures.length; i++) {
-        this.movetree.properties().removeOneValue(
-            oppProp, result.captures[i].toSgfCoord());
+        this.movetree
+          .properties()
+          .removeOneValue(oppProp, result.captures[i].toSgfCoord());
       }
       var captures = {};
       captures[oppColor] = result.captures;
@@ -294,6 +317,10 @@ glift.controllers.BoardEditor.prototype = {
     return this.flattenedState();
   },
 
-  pass: function() { throw new Error('Not implemented'); },
-  clearStone: function() { throw new Error('Not implemented'); }
+  pass: function () {
+    throw new Error('Not implemented');
+  },
+  clearStone: function () {
+    throw new Error('Not implemented');
+  },
 };

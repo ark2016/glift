@@ -13,8 +13,15 @@ goog.provide('glift.widgets.BaseWidget');
  *
  * @constructor @final @struct
  */
-glift.widgets.BaseWidget = function(
-    divId, sgfOptions, displayOptions, iconActions, stoneActions, manager, hooks) {
+glift.widgets.BaseWidget = function (
+  divId,
+  sgfOptions,
+  displayOptions,
+  iconActions,
+  stoneActions,
+  manager,
+  hooks
+) {
   /** @type {string} */
   // We split the wrapper div, but here we record the original reference.
   this.wrapperDivId = divId;
@@ -66,14 +73,14 @@ glift.widgets.BaseWidget = function(
 
 glift.widgets.BaseWidget.prototype = {
   /** Draws the widget. */
-  draw: function() {
+  draw: function () {
     this.controller = this.sgfOptions.controllerFunc(this.sgfOptions);
     this.initialMoveNumber = this.controller.currentMoveNumber();
     this.initialPlayerColor = this.controller.getCurrentPlayer();
 
     var intersections = this.controller.getIntersections();
     var boardRegion =
-        this.sgfOptions.boardRegion === glift.enums.boardRegions.AUTO
+      this.sgfOptions.boardRegion === glift.enums.boardRegions.AUTO
         ? this.controller.getQuadCropFromBeginning()
         : this.sgfOptions.boardRegion;
 
@@ -82,45 +89,58 @@ glift.widgets.BaseWidget.prototype = {
     // entire widget is re-drawn.
     var parentDivBbox = glift.displays.bboxFromDiv(this.internalWrapperDivId);
     if (parentDivBbox.width() === 0 || parentDivBbox.height() === 0) {
-      throw new Error('Div for Glift has has invalid dimensions. ' +
+      throw new Error(
+        'Div for Glift has has invalid dimensions. ' +
           'Bounding box had ' +
-          'width: ' + parentDivBbox.width() +
-          ', height: ' + parentDivBbox.height());
+          'width: ' +
+          parentDivBbox.width() +
+          ', height: ' +
+          parentDivBbox.height()
+      );
     }
 
-    var positioning = glift.displays.position.positioner(
+    var positioning = glift.displays.position
+      .positioner(
         parentDivBbox,
         boardRegion,
         intersections,
         this.getUiComponents_(this.sgfOptions),
         this.displayOptions.oneColumnSplits,
-        this.displayOptions.twoColumnSplits).calcWidgetPositioning();
+        this.displayOptions.twoColumnSplits
+      )
+      .calcWidgetPositioning();
 
     var divIds = this.createDivsForPositioning_(
-        positioning, this.internalWrapperDivId);
+      positioning,
+      this.internalWrapperDivId
+    );
 
     var displayTheme = glift.themes.get(this.displayOptions.theme);
 
     if (this.displayOptions.goBoardBackground) {
       glift.themes.setGoBoardBackground(
-          displayTheme, this.displayOptions.goBoardBackground);
+        displayTheme,
+        this.displayOptions.goBoardBackground
+      );
     }
 
     this.display = glift.displays.create(
-        divIds[glift.BoardComponent.BOARD],
-        positioning.mustGetBbox(glift.BoardComponent.BOARD),
-        displayTheme,
-        boardRegion,
-        intersections,
-        this.sgfOptions.rotation,
-        this.displayOptions.drawBoardCoords);
+      divIds[glift.BoardComponent.BOARD],
+      positioning.mustGetBbox(glift.BoardComponent.BOARD),
+      displayTheme,
+      boardRegion,
+      intersections,
+      this.sgfOptions.rotation,
+      this.displayOptions.drawBoardCoords
+    );
 
     if (divIds[glift.BoardComponent.COMMENT_BOX]) {
       this.commentBox = glift.displays.commentbox.create(
-          divIds[glift.BoardComponent.COMMENT_BOX],
-          positioning.mustGetBbox(glift.BoardComponent.COMMENT_BOX),
-          displayTheme,
-          this.displayOptions.useMarkdown);
+        divIds[glift.BoardComponent.COMMENT_BOX],
+        positioning.mustGetBbox(glift.BoardComponent.COMMENT_BOX),
+        displayTheme,
+        this.displayOptions.useMarkdown
+      );
     }
 
     if (divIds[glift.BoardComponent.ICONBAR]) {
@@ -132,7 +152,8 @@ glift.widgets.BaseWidget.prototype = {
       if (this.manager.hasPrevSgf()) {
         icons.unshift(this.displayOptions.previousSgfIcon);
       }
-      this.iconBar = glift.displays.icons.bar({
+      this.iconBar = glift.displays.icons
+        .bar({
           divId: divIds[glift.BoardComponent.ICONBAR],
           positioning: positioning.mustGetBbox(glift.BoardComponent.ICONBAR),
           icons: icons,
@@ -140,7 +161,8 @@ glift.widgets.BaseWidget.prototype = {
           theme: displayTheme,
           allDivIds: divIds,
           allPositioning: positioning,
-      }).draw();
+        })
+        .draw();
     }
     divIds.ICONBAR && this.iconBar.initIconActions(this, this.iconActions);
 
@@ -148,7 +170,8 @@ glift.widgets.BaseWidget.prototype = {
       // TODO(kashomon): Move this logic into a helper.
       /** @type {!Array<string>} */
       var statusBarIcons = glift.util.simpleClone(
-          this.sgfOptions.statusBarIcons || []);
+        this.sgfOptions.statusBarIcons || []
+      );
       if (this.manager.fullscreenDivId) {
         glift.array.replace(statusBarIcons, 'fullscreen', 'unfullscreen');
       }
@@ -156,24 +179,25 @@ glift.widgets.BaseWidget.prototype = {
         statusBarIcons.splice(0, 0, 'widget-page');
       }
       var statusBarIconBar = glift.displays.icons.bar({
-          divId: divIds[glift.BoardComponent.STATUS_BAR],
-          positioning: positioning.mustGetBbox(
-              glift.BoardComponent.STATUS_BAR),
-          icons: statusBarIcons,
-          parentBbox: parentDivBbox,
-          theme: displayTheme,
-          allDivIds: divIds,
-          allPositioning: positioning
+        divId: divIds[glift.BoardComponent.STATUS_BAR],
+        positioning: positioning.mustGetBbox(glift.BoardComponent.STATUS_BAR),
+        icons: statusBarIcons,
+        parentBbox: parentDivBbox,
+        theme: displayTheme,
+        allDivIds: divIds,
+        allPositioning: positioning,
       });
-      this.statusBar = glift.displays.statusbar.create({
+      this.statusBar = glift.displays.statusbar
+        .create({
           iconBarPrototype: statusBarIconBar,
           theme: displayTheme,
           allPositioning: positioning,
-          widget: this
-      }).draw();
+          widget: this,
+        })
+        .draw();
     }
-    divIds.STATUS_BAR && this.statusBar.iconBar.initIconActions(
-        this, this.iconActions);
+    divIds.STATUS_BAR &&
+      this.statusBar.iconBar.initIconActions(this, this.iconActions);
 
     this.initStoneActions_(this.stoneActions);
     this.initKeyHandlers_();
@@ -190,7 +214,7 @@ glift.widgets.BaseWidget.prototype = {
    * @return {!Array<glift.BoardComponent>}
    * @private
    */
-  getUiComponents_: function(sgfOptions) {
+  getUiComponents_: function (sgfOptions) {
     /** @type {!Array<glift.BoardComponent>} */
     var base = sgfOptions.uiComponents;
     base = base.slice(0, base.length); // make a shallow copy.
@@ -199,12 +223,12 @@ glift.widgets.BaseWidget.prototype = {
      * @param {!Array<glift.BoardComponent>} arr
      * @param {glift.BoardComponent} key
      */
-    var rmItem = function(arr, key) {
+    var rmItem = function (arr, key) {
       var idx = arr.indexOf(key);
       if (idx > -1) {
         arr.splice(idx, 1);
       }
-    }
+    };
     var bc = glift.BoardComponent;
     sgfOptions.disableStatusBar && rmItem(base, bc.STATUS_BAR);
     sgfOptions.disableBoard && rmItem(base, bc.BOARD);
@@ -213,7 +237,6 @@ glift.widgets.BaseWidget.prototype = {
     return base;
   },
 
-
   /**
    * Create an internal wrapper div to contain the whole go board. This sets
    * position relative on the internal div. Also, sets the minHeight and
@@ -221,12 +244,12 @@ glift.widgets.BaseWidget.prototype = {
    *
    * @private
    */
-  createInternalWrapperDiv_: function() {
+  createInternalWrapperDiv_: function () {
     var wrapDiv = glift.dom.newDiv(this.internalWrapperDivId);
     var cssObj = {
       height: '100%',
       width: '100%',
-      position: 'relative'
+      position: 'relative',
     };
     if (this.displayOptions.minHeight) {
       cssObj['min-height'] = this.displayOptions.minHeight;
@@ -245,11 +268,12 @@ glift.widgets.BaseWidget.prototype = {
    *    name to the div Id.
    * @private
    */
-  createDivsForPositioning_: function(positioning, intWrapperDivId) {
+  createDivsForPositioning_: function (positioning, intWrapperDivId) {
     // Map from component to ID.
     var out = {};
-    var createDiv = function(bbox) {
-      var newId = intWrapperDivId + '_internal_div_' + glift.widgets.idGenerator.next();
+    var createDiv = function (bbox) {
+      var newId =
+        intWrapperDivId + '_internal_div_' + glift.widgets.idGenerator.next();
       var newDiv = glift.dom.newDiv(newId);
       var cssObj = {
         top: bbox.top() + 'px',
@@ -257,14 +281,14 @@ glift.widgets.BaseWidget.prototype = {
         width: bbox.width() + 'px',
         height: bbox.height() + 'px',
         position: 'absolute',
-        cursor: 'default'
+        cursor: 'default',
       };
       newDiv.css(cssObj);
       glift.dom.elem(intWrapperDivId).append(newDiv);
       glift.dom.ux.setNotSelectable(newId);
       return newId;
     };
-    positioning.map(function(key, bbox) {
+    positioning.map(function (key, bbox) {
       out[key] = createDiv(bbox);
     });
     return out;
@@ -275,7 +299,7 @@ glift.widgets.BaseWidget.prototype = {
    * @param {!glift.api.StoneActions} baseActions
    * @private
    */
-  initStoneActions_: function(baseActions) {
+  initStoneActions_: function (baseActions) {
     var actions = {};
     actions.mouseover = baseActions.mouseover;
     actions.mouseout = baseActions.mouseout;
@@ -287,18 +311,19 @@ glift.widgets.BaseWidget.prototype = {
       actions.mouseout = this.sgfOptions.stoneMouseout;
     }
 
-    var wrapAction = function(func) {
-      return function(event, pt) {
+    var wrapAction = function (func) {
+      return function (event, pt) {
         this.manager.setActive();
         func(event, this, pt);
       }.bind(this);
     }.bind(this);
-    if (actions.mouseover &&
-        actions.mouseout &&
-        !glift.platform.isMobile()) {
-      this.display.intersections().setHoverHandlers(
+    if (actions.mouseover && actions.mouseout && !glift.platform.isMobile()) {
+      this.display
+        .intersections()
+        .setHoverHandlers(
           wrapAction(actions.mouseover),
-          wrapAction(actions.mouseout));
+          wrapAction(actions.mouseout)
+        );
     }
     if (actions.click) {
       var actionName = 'click';
@@ -306,8 +331,9 @@ glift.widgets.BaseWidget.prototype = {
         // Kinda a hack, but necessary to avoid the 300ms delay.
         actionName = 'touchend';
       }
-      this.display.intersections().setEvent(
-          actionName, wrapAction(actions.click));
+      this.display
+        .intersections()
+        .setEvent(actionName, wrapAction(actions.click));
     }
   },
 
@@ -315,13 +341,12 @@ glift.widgets.BaseWidget.prototype = {
    * Assign Key actions to some other action.
    * @private
    */
-  initKeyHandlers_: function() {
+  initKeyHandlers_: function () {
     if (!this.displayOptions.enableKeyboardShortcuts) {
       return;
     }
 
-    var keyMappings = glift.util.simpleClone(
-        this.sgfOptions.keyMappings || {});
+    var keyMappings = glift.util.simpleClone(this.sgfOptions.keyMappings || {});
     if (this.manager.fullscreenDivId) {
       // We're fullscreened.  Add ESC to escape =)
       keyMappings['ESCAPE'] = 'iconActions.unfullscreen.click';
@@ -330,9 +355,10 @@ glift.widgets.BaseWidget.prototype = {
     for (var keyName in keyMappings) {
       var iconPathOrFunc = keyMappings[keyName];
       glift.keyMappings.registerKeyAction(
-          this.manager.id,
-          keyName,
-          iconPathOrFunc);
+        this.manager.id,
+        keyName,
+        iconPathOrFunc
+      );
     }
     // Lazy initialize the key mappings. Only really runs once.
     glift.keyMappings.initKeybindingListener(this.wrapperDivId);
@@ -348,7 +374,7 @@ glift.widgets.BaseWidget.prototype = {
    * @param {string} boardId The id of the board div, which we'll apply the
    *    listener to.
    */
-  initMousewheel_: function(boardId) {
+  initMousewheel_: function (boardId) {
     if (!this.sgfOptions.enableMousewheel) {
       return;
     }
@@ -357,8 +383,10 @@ glift.widgets.BaseWidget.prototype = {
       // wheel is the standard event. Since it's supported in all major browsers
       // now, it's now worth the caveats here; Mousewheel support is an
       // incremental improvement anyway.
-      console.warn('Glift: Standard mouse wheel not supported. ' +
-          'Not adding wheel functionality.');
+      console.warn(
+        'Glift: Standard mouse wheel not supported. ' +
+          'Not adding wheel functionality.'
+      );
       return;
     }
 
@@ -366,7 +394,7 @@ glift.widgets.BaseWidget.prototype = {
      * Simple handler that goes forward/backward in the gam.
      * @param {!WheelEvent} e Standard dom event.
      */
-    var handler = function(e) {
+    var handler = function (e) {
       if (!this.controller) {
         // It's possible that we should make sure that the widget type is only
         // a game viewer type.
@@ -384,29 +412,32 @@ glift.widgets.BaseWidget.prototype = {
     }.bind(this);
 
     var elem = document.getElementById(boardId);
-    elem.addEventListener('wheel', handler)
+    elem.addEventListener('wheel', handler);
   },
 
   /**
    * Initialize properties based on problem type.
    * @private
    */
-  initProblemData_: function() {
-    if (this.sgfOptions.widgetType ===
-        glift.WidgetType.CORRECT_VARIATIONS_PROBLEM) {
+  initProblemData_: function () {
+    if (
+      this.sgfOptions.widgetType === glift.WidgetType.CORRECT_VARIATIONS_PROBLEM
+    ) {
       var correctNext = this.controller.getCorrectNextMoves();
       // A Set: i.e., a map of points to true
       this.correctNextSet = this.correctNextSet || {};
       this.numCorrectAnswers = this.numCorrectAnswers || 0;
-      this.totalCorrectAnswers = this.totalCorrectAnswers
-          || this.sgfOptions.totalCorrectVariationsOverride
-          || correctNext.length;
+      this.totalCorrectAnswers =
+        this.totalCorrectAnswers ||
+        this.sgfOptions.totalCorrectVariationsOverride ||
+        correctNext.length;
       // TODO(kashomon): Remove this hack: The icon should be specified with
       // some sort of options.
       this.iconBar.addTempText(
-          'multiopen-boxonly',
-          this.numCorrectAnswers + '/' + this.totalCorrectAnswers,
-          { fill: 'black', stroke: 'black'});
+        'multiopen-boxonly',
+        this.numCorrectAnswers + '/' + this.totalCorrectAnswers,
+        { fill: 'black', stroke: 'black' }
+      );
     }
   },
 
@@ -414,7 +445,7 @@ glift.widgets.BaseWidget.prototype = {
    * Gets the initialized hooks or set them.
    * @return {!glift.api.HookOptions} the hooks.
    */
-  hooks: function() {
+  hooks: function () {
     return this.externalHooks_;
   },
 
@@ -425,11 +456,10 @@ glift.widgets.BaseWidget.prototype = {
    * @param {?glift.flattener.Flattened} flattened The flattened representation
    *    of the board.
    */
-  applyBoardData: function(flattened) {
+  applyBoardData: function (flattened) {
     if (flattened) {
       this.setCommentBox(flattened);
-      this.statusBar &&
-          this.statusBar.setMoveNumber(flattened.baseMoveNum())
+      this.statusBar && this.statusBar.setMoveNumber(flattened.baseMoveNum());
       this.display.updateBoard(flattened);
     }
   },
@@ -440,7 +470,7 @@ glift.widgets.BaseWidget.prototype = {
    * comment.
    * @return {!glift.widgets.BaseWidget} the current instance.
    */
-  setCommentBox: function(flattened) {
+  setCommentBox: function (flattened) {
     var text = flattened.comment();
     var collisions = flattened.collisions();
     if (this.commentBox === undefined) {
@@ -463,7 +493,7 @@ glift.widgets.BaseWidget.prototype = {
    * Reload the problem.  Note: This is too problem specific and probably needs
    * to be rethought.
    */
-  reload: function() {
+  reload: function () {
     if (this.correctness !== undefined) {
       this.correctNextSet = undefined;
       this.numCorrectAnswers = undefined;
@@ -476,22 +506,24 @@ glift.widgets.BaseWidget.prototype = {
    * Gets the current state of the widget, so what we can accurately redraw the
    * widget.
    */
-  getCurrentState: function() {
+  getCurrentState: function () {
     // TODO(kashomon): Type this.
     return {
       // For games, the treepath is the only state information that's necessary.
       // We can reconstruct all other data.
-      currentTreepath: this.controller.pathToCurrentPosition()
+      currentTreepath: this.controller.pathToCurrentPosition(),
     };
   },
 
   /**
    * Set the widget state from a state object and redraws.
    */
-  applyState: function(stateObj) {
+  applyState: function (stateObj) {
     var types = glift.WidgetType;
-    if (this.sgfOptions.widgetType === types.REDUCED_GAME_VIEWER ||
-        this.sgfOptions.widgetType === types.GAME_VIEWER) {
+    if (
+      this.sgfOptions.widgetType === types.REDUCED_GAME_VIEWER ||
+      this.sgfOptions.widgetType === types.GAME_VIEWER
+    ) {
       var treepath = stateObj.currentTreepath;
       this.controller.initialize(treepath);
       this.applyBoardData(this.controller.flattenedState());
@@ -503,7 +535,7 @@ glift.widgets.BaseWidget.prototype = {
    * Redraw the widget.  This also resets the widget state in perhaps confusing
    * ways.
    */
-  redraw: function() {
+  redraw: function () {
     this.destroy();
     var state = this.getCurrentState();
     this.draw();
@@ -511,12 +543,12 @@ glift.widgets.BaseWidget.prototype = {
   },
 
   /** remove the widget and do various cleanups. */
-  destroy: function() {
+  destroy: function () {
     var managerId = this.manager.id;
     glift.keyMappings.unregisterInstance(managerId);
     glift.dom.elem(this.wrapperDivId) &&
-        glift.dom.elem(this.wrapperDivId).empty();
+      glift.dom.elem(this.wrapperDivId).empty();
     this.correctness = undefined;
     this.display = undefined;
-  }
+  },
 };

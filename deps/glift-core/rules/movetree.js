@@ -40,7 +40,7 @@ glift.rules.movetree = {
    * @param {number=} opt_intersections Optional intersections. Defaults to 19.
    * @return {!glift.rules.MoveTree} New movetree instance.
    */
-  getInstance: function(opt_intersections) {
+  getInstance: function (opt_intersections) {
     var mt = new glift.rules.MoveTree(glift.rules.movenode());
     if (opt_intersections !== undefined) {
       mt.setIntersections_(opt_intersections);
@@ -57,12 +57,14 @@ glift.rules.movetree = {
    * @param {glift.parse.parseType=} opt_parseType
    * @return {!glift.rules.MoveTree}
    */
-  getFromSgf: function(sgfString, opt_initPosition, opt_parseType) {
+  getFromSgf: function (sgfString, opt_initPosition, opt_parseType) {
     var initPosition = opt_initPosition || []; // treepath.
     var parseType = parseType || glift.parse.parseType.SGF;
 
-    if (glift.util.typeOf(initPosition) === 'string' ||
-        glift.util.typeOf(initPosition) === 'number') {
+    if (
+      glift.util.typeOf(initPosition) === 'string' ||
+      glift.util.typeOf(initPosition) === 'number'
+    ) {
       initPosition = glift.rules.treepath.parseInitialPath(initPosition);
     }
 
@@ -84,7 +86,7 @@ glift.rules.movetree = {
    * @param {!glift.rules.MoveTree} moveTree
    * @param {function(!glift.rules.MoveTree)} func
    */
-  searchMoveTreeDFS: function(moveTree, func) {
+  searchMoveTreeDFS: function (moveTree, func) {
     func(moveTree);
     for (var i = 0; i < moveTree.node().numChildren(); i++) {
       var mtz = moveTree.newTreeRef();
@@ -97,7 +99,7 @@ glift.rules.movetree = {
    * @param {!glift.rules.MoveTree} mt
    * @return {!glift.rules.MoveTree} The initialized movetree.
    */
-  initRootProperties: function(mt) {
+  initRootProperties: function (mt) {
     var root = mt.getTreeFromRoot();
     var props = root.properties();
     var prop = glift.rules.prop;
@@ -138,7 +140,7 @@ glift.rules.movetree = {
     // Note: we don't set ST because it's a dumb option. (Style of
     // variation-showing).
     return mt;
-  }
+  },
 };
 
 /**
@@ -155,7 +157,7 @@ glift.rules.movetree = {
  *
  * @constructor @final @struct
  */
-glift.rules.MoveTree = function(rootNode, opt_currentNode, opt_metadata) {
+glift.rules.MoveTree = function (rootNode, opt_currentNode, opt_metadata) {
   /** @private {!glift.rules.MoveNode} */
   this.rootNode_ = rootNode;
   /** @private {!glift.rules.MoveNode} */
@@ -183,7 +185,7 @@ glift.rules.MoveTree.prototype = {
    * Get the current node -- that is, the node at the current position.
    * @return {!glift.rules.MoveNode}
    */
-  node: function() {
+  node: function () {
     return this.currentNode_;
   },
 
@@ -191,7 +193,7 @@ glift.rules.MoveTree.prototype = {
    * Get the properties object on the current node.
    * @return {!glift.rules.Properties}
    */
-  properties: function() {
+  properties: function () {
     return this.node().properties();
   },
 
@@ -199,7 +201,7 @@ glift.rules.MoveTree.prototype = {
    * Gets global movetree metadata.
    * @return {Object}
    */
-  metadata: function() {
+  metadata: function () {
     return this.metadata_;
   },
 
@@ -208,7 +210,7 @@ glift.rules.MoveTree.prototype = {
    * @param {Object} data
    * @return {!glift.rules.MoveTree} this
    */
-  setMetdata: function(data) {
+  setMetdata: function (data) {
     this.metadata_ = data;
     return this;
   },
@@ -219,7 +221,7 @@ glift.rules.MoveTree.prototype = {
    * @param {number=} opt_variationNum
    * @return {!glift.rules.MoveTree} this
    */
-  moveDown: function(opt_variationNum) {
+  moveDown: function (opt_variationNum) {
     var num = opt_variationNum || 0;
     var child = this.node().getChild(num);
     if (child != null) {
@@ -233,9 +235,11 @@ glift.rules.MoveTree.prototype = {
    * At the root node, movetree.moveUp().moveUp() == movetree.moveUp();
    * @return {!glift.rules.MoveTree} this
    */
-  moveUp: function() {
+  moveUp: function () {
     var parent = this.currentNode_.getParent();
-    if (parent) { this.currentNode_ = parent; }
+    if (parent) {
+      this.currentNode_ = parent;
+    }
     return this;
   },
 
@@ -243,9 +247,9 @@ glift.rules.MoveTree.prototype = {
    * Get the current player as a color.
    * @return {!glift.enums.states}
    */
-  getCurrentPlayer: function() {
+  getCurrentPlayer: function () {
     var states = glift.enums.states;
-    var tokenMap = {W: 'WHITE', B: 'BLACK'};
+    var tokenMap = { W: 'WHITE', B: 'BLACK' };
     var curNode = this.currentNode_;
 
     // The PL property is a short circuit. Usually only used on the root node.
@@ -278,9 +282,12 @@ glift.rules.MoveTree.prototype = {
    * changed.
    * @return {!glift.rules.MoveTree}
    */
-  newTreeRef: function() {
+  newTreeRef: function () {
     return new glift.rules.MoveTree(
-        this.rootNode_, this.currentNode_, this.metadata_);
+      this.rootNode_,
+      this.currentNode_,
+      this.metadata_
+    );
   },
 
   /**
@@ -293,7 +300,7 @@ glift.rules.MoveTree.prototype = {
    * @param {!glift.rules.MoveNode} node
    * @return {!glift.rules.MoveTree} New movetree reference.
    */
-  getFromNode: function(node) {
+  getFromNode: function (node) {
     return new glift.rules.MoveTree(node, node, this.metadata_);
   },
 
@@ -305,11 +312,14 @@ glift.rules.MoveTree.prototype = {
    * @param {!glift.rules.Treepath=} treepath
    * @return {!glift.rules.MoveTree} New movetree reference.
    */
-  getTreeFromRoot: function(treepath) {
+  getTreeFromRoot: function (treepath) {
     var mt = this.getFromNode(this.rootNode_);
     if (treepath && glift.util.typeOf(treepath) === 'array') {
-      for (var i = 0, len = treepath.length;
-           i < len && mt.node().numChildren() > 0; i++) {
+      for (
+        var i = 0, len = treepath.length;
+        i < len && mt.node().numChildren() > 0;
+        i++
+      ) {
         mt.moveDown(treepath[i]);
       }
     }
@@ -320,10 +330,10 @@ glift.rules.MoveTree.prototype = {
   // Other methods, in Alpha Order //
   ///////////////////////////////////
   /**
-   * Add a new Node to the cur position and move to that position. 
+   * Add a new Node to the cur position and move to that position.
    * @return {!glift.rules.MoveTree} this
    */
-  addNode: function() {
+  addNode: function () {
     this.node().addChild();
     this.moveDown(this.node().numChildren() - 1);
     return this;
@@ -331,7 +341,9 @@ glift.rules.MoveTree.prototype = {
 
   /** Delete the current node and move up */
   // TODO(kashomon): Finish this.
-  deleteNode: function() { throw "Unfinished"; },
+  deleteNode: function () {
+    throw 'Unfinished';
+  },
 
   /**
    * Given a point and a color, find the variation number corresponding to the
@@ -342,14 +354,14 @@ glift.rules.MoveTree.prototype = {
    * @param {glift.enums.states} color Color of the move.
    * @return {number|null} either the number or null if no such number exists.
    */
-  findNextMove: function(point, color) {
+  findNextMove: function (point, color) {
     var nextNodes = this.node().children,
-        token = glift.sgf.colorToToken(color),
-        ptSet = {};
+      token = glift.sgf.colorToToken(color),
+      ptSet = {};
     for (var i = 0; i < nextNodes.length; i++) {
       var node = nextNodes[i];
       if (node.properties().contains(token)) {
-        if (node.properties().getOneValue(token) == "") {
+        if (node.properties().getOneValue(token) == '') {
           // This is a 'PASS'.  Ignore
         } else {
           ptSet[node.properties().getAsPoint(token).toString()] =
@@ -365,12 +377,12 @@ glift.rules.MoveTree.prototype = {
   },
 
   /**
-   * Get the intersections number of the go board, by looking at the props. 
+   * Get the intersections number of the go board, by looking at the props.
    * @return {number}
    */
-  getIntersections: function() {
+  getIntersections: function () {
     var mt = this.getTreeFromRoot(),
-        prop = glift.rules.prop;
+      prop = glift.rules.prop;
     if (mt.properties().contains(prop.SZ)) {
       var ints = parseInt(mt.properties().getAllValues(prop.SZ), 10);
       return ints;
@@ -391,7 +403,7 @@ glift.rules.MoveTree.prototype = {
    *    illustration (AW,AB).
    * @return {?glift.rules.Move}
    */
-  getLastMove: function() {
+  getLastMove: function () {
     return this.properties().getMove();
   },
 
@@ -402,7 +414,7 @@ glift.rules.MoveTree.prototype = {
    * @return {number} The number of moves to get to the mainline branch and 0 if
    *    already on the mainline branch.
    */
-  movesToMainline: function() {
+  movesToMainline: function () {
     var mt = this.newTreeRef();
     for (var n = 0; !mt.onMainline() && mt.node().getParent(); n++) {
       mt.moveUp();
@@ -415,7 +427,7 @@ glift.rules.MoveTree.prototype = {
    *
    * @return {!glift.rules.MoveNode}
    */
-  getMainlineNode: function() {
+  getMainlineNode: function () {
     var mt = this.newTreeRef();
     while (!mt.onMainline()) {
       mt.moveUp();
@@ -431,7 +443,7 @@ glift.rules.MoveTree.prototype = {
    *
    * @return {!Array<!glift.rules.Move>}
    */
-  nextMoves: function() {
+  nextMoves: function () {
     var curNode = this.node();
     var nextMoves = [];
     for (var i = 0; i < curNode.numChildren(); i++) {
@@ -449,7 +461,7 @@ glift.rules.MoveTree.prototype = {
    * otherwise.
    * @return {boolean}
    */
-  onMainline: function() {
+  onMainline: function () {
     if (!this.markedMainline_) {
       var mt = this.getTreeFromRoot();
       mt.node().mainline_ = true;
@@ -469,13 +481,13 @@ glift.rules.MoveTree.prototype = {
    *
    * @return {!glift.rules.MoveTree} Entirely new movetree.
    */
-  rebase: function() {
+  rebase: function () {
     var path = this.treepathToHere();
     var oldMt = this.getTreeFromRoot();
     var oldCurrentPlayer = this.getCurrentPlayer();
 
     var mt = glift.rules.movetree.getInstance();
-    var propMap = { 'BLACK': 'AB', 'WHITE': 'AW' };
+    var propMap = { BLACK: 'AB', WHITE: 'AW' };
     for (var i = 0; i <= path.length; i++) {
       var stones = oldMt.properties().getAllStones();
       for (var color in stones) {
@@ -494,24 +506,28 @@ glift.rules.MoveTree.prototype = {
     }
 
     // Recursive function for copying data.
-    var copier = function(oldnode, newnode) {
+    var copier = function (oldnode, newnode) {
       for (var prop in oldnode.properties().propMap) {
         if (newnode.getNodeNum() === 0 && (prop === 'AB' || prop === 'AW')) {
           continue; // Ignore. We've already copied stones on the root.
         }
-        newnode.properties().set(prop,
-            glift.util.simpleClone(oldnode.properties().getAllValues(prop)));
+        newnode
+          .properties()
+          .set(
+            prop,
+            glift.util.simpleClone(oldnode.properties().getAllValues(prop))
+          );
       }
       for (var i = 0; i < oldnode.children.length; i++) {
         var oldChild = oldnode.getChild(i);
         var newChild = newnode.addChild().getChild(i);
         copier(oldChild, newChild);
       }
-    }
+    };
     copier(oldMt.node(), mt.node());
 
     // Ensure the current player remains the same.
-    var tokenmap = {BLACK: 'B', WHITE: 'W'};
+    var tokenmap = { BLACK: 'B', WHITE: 'W' };
     var mtCurPlayer = mt.getCurrentPlayer();
     if (mtCurPlayer !== oldCurrentPlayer) {
       mt.properties().add(glift.rules.prop.PL, tokenmap[oldCurrentPlayer]);
@@ -523,15 +539,15 @@ glift.rules.MoveTree.prototype = {
    * Recursive over the movetree. func is called on the movetree.
    * @param {function(glift.rules.MoveTree)} func
    */
-  recurse: function(func) {
+  recurse: function (func) {
     glift.rules.movetree.searchMoveTreeDFS(this, func);
   },
 
   /**
-   * Recursive over the movetree from root. func is called on the movetree. 
+   * Recursive over the movetree from root. func is called on the movetree.
    * @param {function(glift.rules.MoveTree)} func
    */
-  recurseFromRoot: function(func) {
+  recurseFromRoot: function (func) {
     glift.rules.movetree.searchMoveTreeDFS(this.getTreeFromRoot(), func);
   },
 
@@ -539,8 +555,8 @@ glift.rules.MoveTree.prototype = {
    * Convert this movetree to an SGF.
    * @return {string}
    */
-  toSgf: function() {
-    return this.toSgfBuffer_(this.getTreeFromRoot().node(), []).join("");
+  toSgf: function () {
+    return this.toSgfBuffer_(this.getTreeFromRoot().node(), []).join('');
   },
 
   /**
@@ -549,7 +565,7 @@ glift.rules.MoveTree.prototype = {
    *
    * @return {!glift.rules.Treepath} A treepath (an array of variation numbers);
    */
-  treepathToHere: function() {
+  treepathToHere: function () {
     var newTreepath = [];
     var movetree = this.newTreeRef();
     while (movetree.node().getParent()) {
@@ -568,11 +584,11 @@ glift.rules.MoveTree.prototype = {
    * @return {glift.rules.MoveTree} this object.
    * @private
    */
-  setIntersections_: function(intersections) {
+  setIntersections_: function (intersections) {
     var mt = this.getTreeFromRoot(),
-        prop = glift.rules.prop;
+      prop = glift.rules.prop;
     if (!mt.properties().contains(prop.SZ)) {
-      this.properties().add(prop.SZ, intersections + "");
+      this.properties().add(prop.SZ, intersections + '');
     }
     return this;
   },
@@ -584,14 +600,14 @@ glift.rules.MoveTree.prototype = {
    * @return {!Array<string>} the built buffer
    * @private
    */
-  toSgfBuffer_: function(node, builder) {
+  toSgfBuffer_: function (node, builder) {
     if (node.getParent()) {
       // Don't add a \n if we're at the root node
       builder.push('\n');
     }
 
     if (!node.getParent() || node.getParent().numChildren() > 1) {
-      builder.push("(");
+      builder.push('(');
     }
 
     builder.push(';');
@@ -602,7 +618,7 @@ glift.rules.MoveTree.prototype = {
         for (var i = 0; i < values.length; i++) {
           // Ensure a string and escape right brackets.
           var val = glift.parse.sgfEscape(values[i]);
-          out += '[' + val + ']'
+          out += '[' + val + ']';
         }
       } else {
         out += '[]';
@@ -622,6 +638,6 @@ glift.rules.MoveTree.prototype = {
     if (!node.getParent() || node.getParent().numChildren() > 1) {
       builder.push(')');
     }
-    return builder
-  }
+    return builder;
+  },
 };

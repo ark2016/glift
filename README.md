@@ -1,5 +1,4 @@
-Glift
-=====
+# Glift
 
 [![Travis Build Status](https://travis-ci.org/Kashomon/glift.svg?branch=master)](https://travis-ci.org/Kashomon/glift)
 
@@ -10,20 +9,21 @@ Glift is a modern javascript client for the game
 Glift was created to be a modern Go UI that supports mobile and desktop alike.
 It was built from the beginning to support:
 
-   - Viewing games
-   - Studying go problems
-   - Constructing complex go lessons
+- Viewing games
+- Studying go problems
+- Constructing complex go lessons
 
 ### Example
 
 Here's a simple example, to create a game viewer for a game in div.
 
 ```javascript
-      glift.create({
-        divId: 'myId',
-        sgf: 'mysgfs/lee_sedol_vs_gu_li.sgf'
-      });
+glift.create({
+  divId: 'myId',
+  sgf: 'mysgfs/lee_sedol_vs_gu_li.sgf',
+});
 ```
+
 See [GliftGo.com](http://www.gliftgo.com) if you want to see Glift in action and
 lots of code samples!
 
@@ -38,18 +38,18 @@ the board.
 The complied Glift JavaScript is completely self-contained and supports the
 following browsers:
 
-   - Chrome
-   - Chrome on Android
-   - IE 9+
-   - Firefox
-   - Opera
-   - Safari
-   - Safari on iOS
+- Chrome
+- Chrome on Android
+- IE 9+
+- Firefox
+- Opera
+- Safari
+- Safari on iOS
 
 Unsupported browsers
 
-   - IE 6-8
-   - Native Android Browser
+- IE 6-8
+- Native Android Browser
 
 ### APIs
 
@@ -62,26 +62,26 @@ that are on track to become supported have been marked @api(beta).
 
 The currently supported methods support @api(1.0):
 
-   * `glift.create({options})` - Create a Glift instance.
+- `glift.create({options})` - Create a Glift instance.
 
 And the following options (see [src/widgets/options/base_options.js](/src/widgets/options/base_options.js))
 
-   * `divId` - ID of the container div.
-   * `sgf` - String, url, or object, with options from sgfDefaults.
-   * `sgfCollection` - Array of SGFs
-   * `initialIndex` - Where to start in the SGF collection
-   * `sgfDefaults`
-      * `sgfString` - String for the SGF. Only specified in sgf objects.
-      * `url` - URL of the sgf. Only specified in sgf objects.
-      * `widgetType` - The type of the Glift widget. Defaults to GAME_VIEWER.
-      * `initialPosition` - Where to start initially.
-      * `boardRegion` - The region of the borad to display. Defaults to AUTO.
-      * `problemConditions` - The conditions for getting a problem correct.
-      * `uiComponents` - UI components to use.
-   * `display` - Display variables
-      * `goBoardBackground` - URL for a go board background image.
-      * `theme` - The Glift theme
-      * `drawBoardCoords` - Whether or not to draw go board coordinates.
+- `divId` - ID of the container div.
+- `sgf` - String, url, or object, with options from sgfDefaults.
+- `sgfCollection` - Array of SGFs
+- `initialIndex` - Where to start in the SGF collection
+- `sgfDefaults`
+  - `sgfString` - String for the SGF. Only specified in sgf objects.
+  - `url` - URL of the sgf. Only specified in sgf objects.
+  - `widgetType` - The type of the Glift widget. Defaults to GAME_VIEWER.
+  - `initialPosition` - Where to start initially.
+  - `boardRegion` - The region of the borad to display. Defaults to AUTO.
+  - `problemConditions` - The conditions for getting a problem correct.
+  - `uiComponents` - UI components to use.
+- `display` - Display variables
+  - `goBoardBackground` - URL for a go board background image.
+  - `theme` - The Glift theme
+  - `drawBoardCoords` - Whether or not to draw go board coordinates.
 
 ### Development
 
@@ -90,9 +90,9 @@ these development docs assume a POSIX toolchain.
 
 Glift uses Glup and Nodejs. Before you begin, make sure you've installed:
 
-* [Nodejs (LTS)](https://nodejs.org/en/)
-* [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
-* [Java](https://java.com/en/download/) - For using the JSCompiler
+- [Nodejs (LTS)](https://nodejs.org/en/)
+- [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
+- [Java](https://java.com/en/download/) - For using the JSCompiler
 
 #### Gulp Instructions
 
@@ -128,14 +128,15 @@ gulp compile
 
 **Automated Build+Testing**
 
-To both build *and* run the tests, run:
+To both build _and_ run the tests, run:
+
 ```shell
 gulp build-test
 ```
 
 This is the command run by the Travis continuous integration suite.
 
-####  Editing documentation
+#### Editing documentation
 
 If you find yourself editing the Markdown docs, I use the node script [Markdown
 Preview](https://www.npmjs.com/package/markdown-preview). It's then used via the

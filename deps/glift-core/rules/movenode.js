@@ -10,7 +10,7 @@ goog.provide('glift.rules.MoveNode');
  *  varNum: number
  * }}
  */
-glift.rules.NodeId
+glift.rules.NodeId;
 
 /**
  * Creates a new MoveNode.
@@ -21,10 +21,18 @@ glift.rules.NodeId
  * @param {!glift.rules.MoveNode=} opt_parentNode
  *
  */
-glift.rules.movenode = function(
-    opt_properties, opt_children, opt_nodeId, opt_parentNode) {
+glift.rules.movenode = function (
+  opt_properties,
+  opt_children,
+  opt_nodeId,
+  opt_parentNode
+) {
   return new glift.rules.MoveNode(
-       opt_properties, opt_children, opt_nodeId, opt_parentNode);
+    opt_properties,
+    opt_children,
+    opt_nodeId,
+    opt_parentNode
+  );
 };
 
 /**
@@ -38,8 +46,12 @@ glift.rules.movenode = function(
  * @package
  * @constructor @final @struct
  */
-glift.rules.MoveNode = function(
-    opt_properties, opt_children, opt_nodeId, opt_parentNode) {
+glift.rules.MoveNode = function (
+  opt_properties,
+  opt_children,
+  opt_nodeId,
+  opt_parentNode
+) {
   /** @private {!glift.rules.Properties} */
   this.properties_ = opt_properties || glift.rules.properties();
   /** @type {!Array<!glift.rules.MoveNode>} */
@@ -62,7 +74,9 @@ glift.rules.MoveNode.prototype = {
    * Returns the properties.
    * @return {!glift.rules.Properties}
    */
-  properties: function() { return this.properties_; },
+  properties: function () {
+    return this.properties_;
+  },
 
   /**
    * Set the NodeId. Each node has an ID based on the depth and variation
@@ -75,7 +89,7 @@ glift.rules.MoveNode.prototype = {
    * @param {number} varNum
    * @private
    */
-  setNodeId_: function(nodeNum, varNum) {
+  setNodeId_: function (nodeNum, varNum) {
     this.nodeId_ = { nodeNum: nodeNum, varNum: varNum };
     return this;
   },
@@ -85,31 +99,40 @@ glift.rules.MoveNode.prototype = {
    * without non-stone data to be 'moves', although this is relatively rare.
    * @return {number}
    */
-  getNodeNum: function() { return this.nodeId_.nodeNum; },
+  getNodeNum: function () {
+    return this.nodeId_.nodeNum;
+  },
 
   /**
    * Gets the variation number.
    * @return {number}
    */
-  getVarNum: function() { return this.nodeId_.varNum; },
+  getVarNum: function () {
+    return this.nodeId_.varNum;
+  },
 
   /**
    * Gets the number of children.
    * @return {number}
    */
-  numChildren: function() { return this.children.length; },
+  numChildren: function () {
+    return this.children.length;
+  },
 
   /**
    * Add a new child node.
    * @return {!glift.rules.MoveNode} this
    * @package
    */
-  addChild: function() {
-    this.children.push(glift.rules.movenode(
-      glift.rules.properties(),
-      [], // children
-      { nodeNum: this.getNodeNum() + 1, varNum: this.numChildren() },
-      this));
+  addChild: function () {
+    this.children.push(
+      glift.rules.movenode(
+        glift.rules.properties(),
+        [], // children
+        { nodeNum: this.getNodeNum() + 1, varNum: this.numChildren() },
+        this
+      )
+    );
     return this;
   },
 
@@ -118,7 +141,7 @@ glift.rules.MoveNode.prototype = {
    * movetree.
    * @return {?glift.rules.MoveNode} The node or null if it doesn't exist.
    */
-  getChild: function(variationNum) {
+  getChild: function (variationNum) {
     variationNum = variationNum || 0;
     if (this.children.length > 0) {
       return this.children[variationNum];
@@ -131,17 +154,19 @@ glift.rules.MoveNode.prototype = {
    * Return the parent node. Returns null if no parent node exists.
    * @return {?glift.rules.MoveNode}
    */
-  getParent: function() { return this.parentNode_; },
+  getParent: function () {
+    return this.parentNode_;
+  },
 
   /**
    * Renumber the nodes.  Useful for when nodes are deleted during SGF editing.
    * Note: This performs the renumbering recursively
    * @return {!glift.rules.MoveNode} this
    */
-  renumber: function() {
+  renumber: function () {
     glift.rules.numberMoves_(this, this.nodeId_.nodeNum, this.nodeId_.varNum);
     return this;
-  }
+  },
 };
 
 /**
@@ -151,7 +176,7 @@ glift.rules.MoveNode.prototype = {
  * @param {number} varNum
  * @private
  */
-glift.rules.numberMoves_ = function(move, nodeNum, varNum) {
+glift.rules.numberMoves_ = function (move, nodeNum, varNum) {
   move.setNodeId_(nodeNum, varNum);
   for (var i = 0; i < move.children.length; i++) {
     var next = move.children[i];

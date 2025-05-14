@@ -27,10 +27,11 @@ glift.flattener.labels = {
    */
   // TODO(kashomon): Support symbols? Ex: Black Triangle.
   inlineLabelRegex: new RegExp(
-      '(Black|White) ' +
+    '(Black|White) ' +
       '([A-Z]|([0-9]{1,3})|(\\(([A-Za-z]|[0-9]{1,3})\\)))' +
       '(?=($|\\n|\\r|\\s|["\',:;.$?~`<>{}\\[\\]()!@_-]))',
-      ''),
+    ''
+  ),
 
   /**
    * Global version of the above. Must be defined lazily due the dependence on
@@ -57,13 +58,15 @@ glift.flattener.labels = {
    *    - Label (ex: 10)
    * @return {string} processed text
    */
-  replaceInline: function(text, fn) {
+  replaceInline: function (text, fn) {
     if (!glift.flattener.labels.inlineLabelRegexGlobal_) {
       glift.flattener.labels.inlineLabelRegexGlobal_ = new RegExp(
-          glift.flattener.labels.inlineLabelRegex.source, 'g');
+        glift.flattener.labels.inlineLabelRegex.source,
+        'g'
+      );
     }
     var reg = glift.flattener.labels.inlineLabelRegexGlobal_;
-    return text.replace(reg, function(full, player, label) {
+    return text.replace(reg, function (full, player, label) {
       // Handle the case like 'Black (123)' so that we just pass the label and
       // not the (123)
       if (label.charAt(0) === '(' && label.charAt(label.length - 1) === ')') {
@@ -82,9 +85,8 @@ glift.flattener.labels = {
    * @param {!glift.flattener.Flattened} flattened
    * @return {string}
    */
-  createCollisionLabel: function(flattened) {
-    return glift.flattener.labels.labelFromCollisions(
-        flattened.collisions());
+  createCollisionLabel: function (flattened) {
+    return glift.flattener.labels.labelFromCollisions(flattened.collisions());
   },
 
   /**
@@ -101,12 +103,13 @@ glift.flattener.labels = {
    * @param {!glift.flattener.Flattened} flattened
    * @return {string}
    */
-  createFullLabel: function(flattened) {
+  createFullLabel: function (flattened) {
     return glift.flattener.labels.fullLabelFromCollisions(
-        flattened.collisions(),
-        flattened.isOnMainPath(),
-        flattened.startingMoveNum(),
-        flattened.endingMoveNum());
+      flattened.collisions(),
+      flattened.isOnMainPath(),
+      flattened.startingMoveNum(),
+      flattened.endingMoveNum()
+    );
   },
 
   /**
@@ -117,8 +120,13 @@ glift.flattener.labels = {
    * @return {string} the processed move label or an empty string if no label
    *    should be created.
    */
-  fullLabelFromCollisions: function(collisions, isOnMainPath, startNum, endNum) {
-    var label = ''
+  fullLabelFromCollisions: function (
+    collisions,
+    isOnMainPath,
+    startNum,
+    endNum
+  ) {
+    var label = '';
     if (isOnMainPath) {
       label += glift.flattener.labels.constructMoveLabel(startNum, endNum);
     }
@@ -137,9 +145,9 @@ glift.flattener.labels = {
    *
    * @param {number} startNum
    * @param {number} endNum
-   * @return {string} the processed move label or an empty string if it 
+   * @return {string} the processed move label or an empty string if it
    */
-  constructMoveLabel: function(startNum, endNum) {
+  constructMoveLabel: function (startNum, endNum) {
     var baseLabel = '';
     // If we're on the mainline branch, construct a label that's like:
     // (Moves: 1-12)
@@ -163,7 +171,7 @@ glift.flattener.labels = {
    * @param {!Array<!glift.flattener.Collision>} collisions
    * @return {string} the processed collisions label.
    */
-  labelFromCollisions: function(collisions) {
+  labelFromCollisions: function (collisions) {
     var baseLabel = '';
 
     // No Collisions! Woohoo
@@ -193,7 +201,7 @@ glift.flattener.labels = {
     // Black 13, White 16, Black 19 at White (a)
     // Black 14, White 17, Black 21 at Black 3
     /** @type {!Array<string>} */
-    var allRows = []
+    var allRows = [];
     for (var k = 0; k < labelOrdering.length; k++) {
       var label = labelOrdering[k];
       var colArr = labelToColArr[label];
@@ -204,8 +212,8 @@ glift.flattener.labels = {
         row.push(color + ' ' + c.mvnum);
       }
       var colStoneColor = labelToColStoneColor[label];
-      colStoneColor = (colStoneColor === glift.enums.states.BLACK ?
-          'Black' : 'White');
+      colStoneColor =
+        colStoneColor === glift.enums.states.BLACK ? 'Black' : 'White';
 
       // In the rare case where we construct labels, convert a to (a) so it can
       // be inline-rendered more easily. This has the downside that it makes
@@ -217,7 +225,9 @@ glift.flattener.labels = {
       var rowString = row.join(', ') + ' at ' + colStoneColor + ' ' + label;
       allRows.push(rowString);
     }
-    if (baseLabel) { baseLabel += '\n'; }
+    if (baseLabel) {
+      baseLabel += '\n';
+    }
 
     if (allRows.length >= 4) {
       // This means there are collisions at 4 separate locations, so to reduce
@@ -242,14 +252,14 @@ glift.flattener.labels = {
    * @param {!Array<string>} collisionRows
    * @return {!Array<string>}
    */
-  compactifyLabels_: function(collisionRows) {
+  compactifyLabels_: function (collisionRows) {
     var out = [];
     var buffer = null;
     // Here we overload the usage of replaceInline to count the number labels in
     // a row.
-    var numInlineLabels = function(row) {
+    var numInlineLabels = function (row) {
       var count = 0;
-      glift.flattener.labels.replaceInline(row, function(full, player, label) {
+      glift.flattener.labels.replaceInline(row, function (full, player, label) {
         count += 1;
         return full;
       });
@@ -283,5 +293,5 @@ glift.flattener.labels = {
       out.push(buffer);
     }
     return out;
-  }
+  },
 };

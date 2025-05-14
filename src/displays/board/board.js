@@ -12,8 +12,8 @@ glift.displays.board = {};
  * @param {!glift.themes.base} theme A Glift theme.
  * @param {!glift.enums.rotations} rotation Rotation enum
  */
-glift.displays.board.create = function(elemId, env, theme, rotation) {
-  return new glift.displays.board.Display(elemId,env, theme, rotation).draw();
+glift.displays.board.create = function (elemId, env, theme, rotation) {
+  return new glift.displays.board.Display(elemId, env, theme, rotation).draw();
 };
 
 /**
@@ -28,7 +28,12 @@ glift.displays.board.create = function(elemId, env, theme, rotation) {
  * @constructor @struct @final
  * @package
  */
-glift.displays.board.Display = function(elemId, environment, theme, opt_rotation) {
+glift.displays.board.Display = function (
+  elemId,
+  environment,
+  theme,
+  opt_rotation
+) {
   /** @private {string} */
   this.elemId_ = elemId;
 
@@ -62,23 +67,41 @@ glift.displays.board.Display = function(elemId, environment, theme, opt_rotation
 };
 
 glift.displays.board.Display.prototype = {
-  boardPoints: function() { return this.environment_.boardPoints; },
+  boardPoints: function () {
+    return this.environment_.boardPoints;
+  },
   /** @return {string} */
-  boardRegion: function() { return this.environment_.boardRegion; },
+  boardRegion: function () {
+    return this.environment_.boardRegion;
+  },
   /** @return {string} */
-  divId: function() { return this.elemId_; },
+  divId: function () {
+    return this.elemId_;
+  },
   /** @return {number} */
-  numIntersections: function() { return this.environment_.intersections; },
+  numIntersections: function () {
+    return this.environment_.intersections;
+  },
   /** @return {?glift.displays.board.Intersections} */
-  intersections: function() { return this.intersections_; },
+  intersections: function () {
+    return this.intersections_;
+  },
   /** @return {!glift.enums.rotations} */
-  rotation: function() { return this.rotation_; },
+  rotation: function () {
+    return this.rotation_;
+  },
   /** @return {boolean} */
-  drawBoardCoords: function() { return this.environment_.drawBoardCoords; },
+  drawBoardCoords: function () {
+    return this.environment_.drawBoardCoords;
+  },
   /** @return {number} */
-  width: function() { return this.environment_.goBoardBox.width() },
+  width: function () {
+    return this.environment_.goBoardBox.width();
+  },
   /** @return {number} */
-  height: function() { return this.environment_.goBoardBox.height() },
+  height: function () {
+    return this.environment_.goBoardBox.height();
+  },
 
   /**
    * Initialize the SVG This allows us to create a base display object without
@@ -86,7 +109,7 @@ glift.displays.board.Display.prototype = {
    *
    * @return {!glift.displays.board.Display}
    */
-  init: function() {
+  init: function () {
     if (!this.svg_) {
       this.destroy(); // make sure everything is cleared out of the div.
       this.svg_ = glift.svg.svg({
@@ -94,7 +117,7 @@ glift.displays.board.Display.prototype = {
         width: '100%',
         position: 'float',
         top: 0,
-        id: this.divId() + '_svgboard'
+        id: this.divId() + '_svgboard',
       });
     }
     this.environment_.init();
@@ -105,7 +128,7 @@ glift.displays.board.Display.prototype = {
    * Draws the GoBoard!
    * @return {!glift.displays.board.Display}
    */
-  draw:  function() {
+  draw: function () {
     this.init();
     var board = glift.displays.board;
     var env = this.environment_;
@@ -129,7 +152,6 @@ glift.displays.board.Display.prototype = {
     board.boardBase(svg, idGen, goBox, theme);
     board.initBlurFilter(divId, svg); // in boardBase.  Should be moved.
 
-
     var intGrp = svglib.group().setId(idGen.intersections());
     svg.append(intGrp);
 
@@ -144,7 +166,12 @@ glift.displays.board.Display.prototype = {
     board.buttons(intGrp, idGen, boardPoints);
 
     this.intersections_ = new glift.displays.board.Intersections(
-        divId, intGrp, boardPoints, theme, this.rotation());
+      divId,
+      intGrp,
+      boardPoints,
+      theme,
+      this.rotation()
+    );
 
     this.flush();
     return this; // required
@@ -157,15 +184,16 @@ glift.displays.board.Display.prototype = {
    * @param {!glift.flattener.Flattened} flattened
    * @return {!glift.displays.board.Display} this
    */
-  updateBoard: function(flattened) {
+  updateBoard: function (flattened) {
     this.intersections().clearMarks();
     this.intersections().clearHover();
 
-    var diffArr = this.flattened_.board().differ(
-        flattened.board(), glift.flattener.board.displayDiff);
+    var diffArr = this.flattened_
+      .board()
+      .differ(flattened.board(), glift.flattener.board.displayDiff);
 
     var symb = glift.flattener.symbols;
-    var marks = glift.enums.marks
+    var marks = glift.enums.marks;
     var symbolStoneToState = glift.flattener.symbolStoneToState;
     var symbolMarkToMark = glift.flattener.symbolMarkToMark;
 
@@ -175,19 +203,23 @@ glift.displays.board.Display.prototype = {
       if (diffPt.newValue.stone() !== diffPt.prevValue.stone()) {
         var newStoneStr = diffPt.newValue.stone();
         this.intersections().setStoneColor(
-            diffPt.boardPt, symbolStoneToState[newStoneStr]);
+          diffPt.boardPt,
+          symbolStoneToState[newStoneStr]
+        );
       }
-      if (diffPt.newValue.mark() !== 0) { // We've already cleared empty marks.
+      if (diffPt.newValue.mark() !== 0) {
+        // We've already cleared empty marks.
         var newMark = diffPt.newValue.mark();
         var enumMark = symbolMarkToMark[newMark];
         var lbl = null;
-        if (enumMark === marks.LABEL ||
-            enumMark === marks.VARIATION_MARKER ||
-            enumMark === marks.CORRECT_VARIATION) {
+        if (
+          enumMark === marks.LABEL ||
+          enumMark === marks.VARIATION_MARKER ||
+          enumMark === marks.CORRECT_VARIATION
+        ) {
           lbl = diffPt.newValue.textLabel();
         }
-        this.intersections().addMarkPt(
-            diffPt.boardPt, enumMark, lbl);
+        this.intersections().addMarkPt(diffPt.boardPt, enumMark, lbl);
       }
     }
     this.flattened_ = flattened;
@@ -195,7 +227,7 @@ glift.displays.board.Display.prototype = {
   },
 
   /** @return {!glift.displays.board.Display} this */
-  flush: function() {
+  flush: function () {
     if (this.svg_) {
       glift.displays.svg.dom.attachToParent(this.svg_, this.divId());
     }
@@ -208,11 +240,11 @@ glift.displays.board.Display.prototype = {
    *
    * @return {!glift.displays.board.Display} this
    */
-  destroy: function() {
+  destroy: function () {
     glift.dom.elem(this.divId()).empty();
     this.svg_ = null;
     this.flattened_ = glift.flattener.emptyFlattened(this.numIntersections());
     this.intersections_ = null;
     return this;
-  }
+  },
 };
