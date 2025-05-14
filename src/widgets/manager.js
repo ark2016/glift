@@ -1,238 +1,233 @@
-goog.provide('glift.widgets.WidgetManager');
+/**
+ * Класс для управления виджетами Glift.
+ * 
+ * @module widgets/manager
+ */
+
+import { BaseWidget } from './base_widget.js';
+import { idGenerator } from './id_generator.js';
+import * as ajax from '../ajax/index.js';
+import * as global from '../global.js';
+import { SgfOptions } from '../api/sgf_options.js';
+import * as util from '../util/index.js';
+import * as dom from '../dom/index.js';
 
 /**
- * The Widget Manager manages state across widgets.  When widgets are created,
- * they are always created in the context of a Widget Manager.
- *
- * @param {glift.api.Options} options Options Template for Glift API Options.
- *
- * @constructor @final @struct
+ * Менеджер виджетов управляет состоянием виджетов. Когда виджеты создаются,
+ * они всегда создаются в контексте менеджера виджетов.
  */
-glift.widgets.WidgetManager = function (options) {
+export class WidgetManager {
   /**
-   * Globally unique ID, at least across all glift instances in the current
-   * page. In theory, the divId should be globally unique, but might as well be
-   * absolutely sure.
-   * @type {string}
+   * @param {Object} options Опции для создания менеджера виджетов
    */
-  this.id = options.divId + '-glift-' + glift.widgets.idGenerator.next();
+  constructor(options) {
+    /**
+     * Глобально уникальный ID, уникальный для всех экземпляров Glift на странице.
+     * @type {string}
+     */
+    this.id = options.divId + '-glift-' + idGenerator.next();
 
-  // Register the instance. Maybe should be its own method.
-  glift.global.instanceRegistry[this.id] = this;
+    // Регистрируем экземпляр
+    global.instanceRegistry[this.id] = this;
 
-  // Set as active, if the active instance hasn't already been set. You can only
-  // have one Glift instance per page that's active.
-  !glift.global.activeInstanceId && this.setActive();
+    // Устанавливаем как активный, если активный экземпляр еще не установлен
+    !global.activeInstanceId && this.setActive();
+
+    /**
+     * Исходный div id.
+     * @type {string}
+     */
+    this.divId = options.divId;
+
+    /**
+     * ID div для полноэкранного режима.
+     * @type {string|null}
+     */
+    this.fullscreenDivId = null;
+    
+    /**
+     * Позиция прокрутки страницы перед переходом в полноэкранный режим.
+     * @type {number|null}
+     */
+    this.prevScrollTop = null;
+    
+    /**
+     * Если мы установили обработчик изменения размера окна, сохраняем старый обработчик.
+     * @type {Function|null}
+     */
+    this.oldWindowResize = null;
+
+    /**
+     * Коллекция SGF файлов.
+     * @type {Array<Object|string>}
+     */
+    this.sgfCollection = [];
+
+    /**
+     * URL для получения всей коллекции SGF.
+     * @type {string|null}
+     */
+    this.sgfCollectionUrl = null;
+
+    // Инициализируем коллекцию SGF
+    this._initSgfCollection(options);
+
+    /**
+     * Кэш SGF. Полезно для уменьшения количества AJAX запросов.
+     * Карта от имени SGF к содержимому строки.
+     * @type {Object<string, string>}
+     */
+    this.sgfCache = options.sgfMapping || {};
+
+    /**
+     * Индекс в коллекции SGF.
+     * @type {number}
+     */
+    this.sgfColIndex = options.initialIndex || 0;
+
+    /** 
+     * Разрешить циклический переход при навигации по коллекции.
+     * @type {boolean} 
+     */
+    this.allowWrapAround = !!options.allowWrapAround;
+
+    /**
+     * Шаблон настроек SGF по умолчанию.
+     * @type {Object}
+     */
+    this.sgfDefaults = options.sgfDefaults || {};
+    
+    /**
+     * Опции отображения
+     * @type {Object}
+     */
+    this.displayOptions = options.display || {};
+
+    /**
+     * Действия для иконок
+     * @type {Object}
+     */
+    this.iconActions = options.iconActions || {};
+
+    /**
+     * Действия для камней
+     * @type {Object}
+     */
+    this.stoneActions = options.stoneActions || {};
+
+    /**
+     * Загружать ли SGF в фоновом режиме.
+     * @type {boolean}
+     */
+    this.loadColInBack = options.loadCollectionInBackground !== undefined ? 
+      options.loadCollectionInBackground : true;
+    
+    /**
+     * Было ли начато фоновое загрузка.
+     * @type {boolean}
+     */
+    this.initBackgroundLoading = false;
+
+    /**
+     * Основной рабочий механизм: базовый виджет Glift.
+     * @type {BaseWidget|undefined}
+     */
+    this.currentWidget = undefined;
+    
+    /**
+     * Временный виджет для особых случаев.
+     * @type {BaseWidget|undefined}
+     */
+    this.temporaryWidget = undefined;
+
+    /**
+     * Глобальные метаданные для этого экземпляра менеджера.
+     * @type {Object|undefined}
+     */
+    this.metadata = options.metadata;
+
+    /**
+     * Внешние хуки, предоставленные пользователями.
+     * @type {Object}
+     */
+    this.hooks = options.hooks || {};
+  }
 
   /**
-   * The original div id.
-   * @type {string}
+   * Создает экземпляр BaseWidget и вызывает метод draw на базовом виджете.
+   * @return {WidgetManager} Объект менеджера.
    */
-  this.divId = options.divId;
-
-  /**
-   * The fullscreen div id. Only set via the fullscreen button. Necessary to
-   * have for problem collections.
-   * @type {?string}
-   */
-  this.fullscreenDivId = null;
-  /**
-   * The fullscreen div will always be at the top. So we jump up to the top
-   * during fullscreen and jump back afterwards.
-   * @type {?number}
-   */
-  this.prevScrollTop = null;
-  /**
-   * If we set the window resize (done, for ex. in the case of full-screening),
-   * we track the window-resizing function.
-   * @type {?function(?Event)}
-   */
-  this.oldWindowResize = null;
-
-  /**
-   * Note: At creation time of the manager, The param sgfCollection may either
-   * be an array or a string representing a URL.  If the sgfCollection is a
-   * string, then the JSON is requsted at draw-time and passed to
-   * this.sgfCollection
-   *
-   * @type {!Array<!glift.api.SgfOptions|string>}
-   */
-  this.sgfCollection = [];
-
-  /**
-   * URL for getting the entire SGF collection.
-   * @type {?string}
-   */
-  this.sgfCollectionUrl = null;
-
-  // Performs collection initialization (pre ajax-loading).
-  this.initSgfCollection_(options);
-
-  /**
-   * Cache of SGFs.  Useful for reducing the number AJAX calls.
-   * Map from SGF name to String contents.
-   *
-   * @type {!Object<string, string>}
-   */
-  this.sgfCache = options.sgfMapping;
-
-  /**
-   * Index into the SGF Collection, if it exists.
-   * @type {number}
-   */
-  this.sgfColIndex = options.initialIndex;
-
-  /** @type {boolean} */
-  this.allowWrapAround = options.allowWrapAround;
-
-  /**
-   * The SGF Defaults template.
-   * @type {!glift.api.SgfOptions}
-   */
-  this.sgfDefaults = options.sgfDefaults;
-  /**
-   * Display options
-   * @type {!glift.api.DisplayOptions}
-   */
-  this.displayOptions = options.display;
-
-  /**
-   * Actions for the Icons
-   * @type {!glift.api.IconActions}
-   */
-  this.iconActions = options.iconActions;
-
-  /**
-   * Actions for the Stones
-   * @type {!glift.api.StoneActions}
-   */
-  this.stoneActions = options.stoneActions;
-
-  /**
-   * Whether to load SGFs in the background.
-   * @type {boolean}
-   */
-  this.loadColInBack = options.loadCollectionInBackground;
-  /**
-   * Whether or not the background loading has begun.
-   * @type {boolean}
-   */
-  this.initBackgroundLoading = false;
-
-  /**
-   * The main workhorse: The base glift widget. This is the object that handles
-   * all the relevant SGF, controller, and display state.
-   * @type {!glift.widgets.BaseWidget|undefined}
-   */
-  this.currentWidget = undefined;
-  /**
-   * Sometimes it's useful to create a temporary widget and hide the current
-   * widget. The usecase for this is problems, where we define a temporary
-   * results window.
-   * @type {!glift.widgets.BaseWidget|undefined}
-   */
-  this.temporaryWidget = undefined;
-
-  /**
-   * Global metadata for this manager instance.
-   * @type {!Object|undefined}
-   */
-  this.metadata = options.metadata;
-
-  /**
-   * External hooks provided by users.
-   *
-   * A map of hook-name to hook-function.
-   * @type {!glift.api.HookOptions}
-   */
-  this.hooks = options.hooks;
-};
-
-glift.widgets.WidgetManager.prototype = {
-  /**
-   * Creates a BaseWidget instance, and calls draw on the base widget.
-   * @return {!glift.widgets.WidgetManager} The manager object.
-   * @export
-   */
-  draw: function () {
-    var afterCollectionLoad = function () {
+  draw() {
+    const afterCollectionLoad = () => {
       if (!this.initBackgroundLoading && this.loadColInBack) {
-        // Only start background loading once.
+        // Начинаем фоновую загрузку только один раз
         this.initBackgroundLoading = true;
-        this.backgroundLoad_();
+        this._backgroundLoad();
       }
-      var curObj = this.getCurrentSgfObj();
-      this.loadSgfString_(
+      const curObj = this.getCurrentSgfObj();
+      this._loadSgfString(
         curObj,
-        function (sgfObj) {
-          // Prevent flickering by destroying the widget after loading the SGF.
+        (sgfObj) => {
+          // Предотвращаем мерцание, уничтожая виджет после загрузки SGF
           this.destroy();
           this.currentWidget = this.createWidget(sgfObj).draw();
-        }.bind(this)
+        }
       );
-    }.bind(this);
+    };
 
     if (this.sgfCollection.length === 0 && this.sgfCollectionUrl) {
-      glift.ajax.get(
+      ajax.get(
         this.sgfCollectionUrl,
-        function (data) {
-          this.sgfCollection =
-            /** @type {!Array<string|!glift.api.SgfOptions>} */ (
-              JSON.parse(data)
-            );
+        (data) => {
+          this.sgfCollection = JSON.parse(data);
           afterCollectionLoad();
-        }.bind(this)
+        }
       );
     } else {
       afterCollectionLoad();
     }
     return this;
-  },
+  }
 
   /**
-   * Redraws the current widget.
-   * @export
+   * Перерисовывает текущий виджет.
    */
-  redraw: function () {
-    var widget = this.getCurrentWidget();
+  redraw() {
+    const widget = this.getCurrentWidget();
     if (widget) {
       widget.redraw();
     }
-  },
+  }
 
   /**
-   * Set as the active widget in the global registry. Used from icons-land
-   * @export
+   * Устанавливает как активный виджет в глобальном реестре.
    */
-  setActive: function () {
-    glift.global.activeInstanceId = this.id;
-  },
+  setActive() {
+    global.activeInstanceId = this.id;
+  }
 
   /**
-   * Gets the current (active) widget object or undefined if the widget hasn't
-   * been created.
-   * @return {!glift.widgets.BaseWidget|undefined}
+   * Получает текущий (активный) объект виджета или undefined, если виджет не был создан.
+   * @return {BaseWidget|undefined}
    */
-  getCurrentWidget: function () {
+  getCurrentWidget() {
     if (this.temporaryWidget) {
       return this.temporaryWidget;
     } else {
       return this.currentWidget;
     }
-  },
+  }
 
   /**
-   * Initialize the SGF collection / collection URL
-   * @param {!glift.api.Options} options The input-options.
+   * Инициализирует коллекцию SGF / URL коллекции
+   * @param {Object} options Входные опции.
    * @private
    */
-  initSgfCollection_: function (options) {
-    // Process explicitly defined collection arrays.
-    if (glift.util.typeOf(options.sgfCollection) === 'array') {
-      var coll = /** @type {!Array<!glift.api.SgfOptions|string>} */ (
-        options.sgfCollection
-      );
-      for (var i = 0; i < coll.length; i++) {
+  _initSgfCollection(options) {
+    // Обрабатываем явно определенные массивы коллекций
+    if (util.typeOf(options.sgfCollection) === 'array') {
+      const coll = options.sgfCollection;
+      for (let i = 0; i < coll.length; i++) {
         this.sgfCollection.push(coll[i]);
       }
       if (options.sgf && options.sgfCollection.length > 0) {
@@ -241,28 +236,27 @@ glift.widgets.WidgetManager.prototype = {
             'sgf and sgfCollection'
         );
       } else if (options.sgf && options.sgfCollection.length === 0) {
-        // Move the single SGF into the SGF collection.
+        // Перемещаем одиночный SGF в коллекцию SGF
         this.sgfCollection.push(options.sgf);
       } else if (!options.sgf && this.sgfCollection.length === 0) {
-        // Allow the possibility of specifying no sgf to indicate a blank SGF.
+        // Позволяем возможность не указывать SGF для пустого SGF
         this.sgfCollection = [{}];
       }
-    } else if (glift.util.typeOf(options.sgfCollection) === 'string') {
-      // If it's a string, we assume the SGF collection should be loaded via
-      // AJAX.
-      this.sgfCollectionUrl = /** @type {string} */ (options.sgfCollection);
+    } else if (util.typeOf(options.sgfCollection) === 'string') {
+      // Если это строка, мы предполагаем, что коллекция SGF должна быть загружена через AJAX
+      this.sgfCollectionUrl = options.sgfCollection;
     }
-  },
+  }
 
   /**
    * Gets the current SGF Object from the SGF collection.
    */
-  getCurrentSgfObj: function () {
+  getCurrentSgfObj() {
     return this.getSgfObj(this.sgfColIndex);
-  },
+  }
 
   /** @return {boolean} Whether there's a 'next' sgf */
-  hasNextSgf: function () {
+  hasNextSgf() {
     if (
       this.sgfCollection.length &&
       this.sgfColIndex >= 0 &&
@@ -278,10 +272,10 @@ glift.widgets.WidgetManager.prototype = {
     } else {
       return false;
     }
-  },
+  }
 
   /** @return {boolean} Whether there's a previous sgf */
-  hasPrevSgf: function () {
+  hasPrevSgf() {
     if (
       this.sgfCollection.length &&
       this.sgfColIndex > 0 &&
@@ -297,7 +291,7 @@ glift.widgets.WidgetManager.prototype = {
     } else {
       return false;
     }
-  },
+  }
 
   /**
    * Get the current SGF Object from the sgfCollection. Note: If the item in the
@@ -306,7 +300,7 @@ glift.widgets.WidgetManager.prototype = {
    *
    * @return {!glift.api.SgfOptions}
    */
-  getSgfObj: function (index) {
+  getSgfObj(index) {
     if (index < 0 || index > this.sgfCollection.length) {
       throw new Error(
         'Index [' +
@@ -318,8 +312,8 @@ glift.widgets.WidgetManager.prototype = {
     }
     var curSgfObj = this.sgfCollection[index];
     var toProc;
-    if (glift.util.typeOf(curSgfObj) === 'string') {
-      var str = /** @type {string} */ (curSgfObj);
+    if (util.typeOf(curSgfObj) === 'string') {
+      var str = curSgfObj;
       var out = {};
       if (/^\s*\(;/.test(str)) {
         // We assume that this is a standard SGF String.
@@ -330,10 +324,10 @@ glift.widgets.WidgetManager.prototype = {
       }
       toProc = out;
     } else {
-      toProc = /** @type {!Object} */ (curSgfObj);
+      toProc = curSgfObj;
     }
     return this.sgfDefaults.createSgfObj(toProc);
-  },
+  }
 
   /**
    * Gets the SGF Object loaded with the SGF string. Since these can be loaded
@@ -343,26 +337,26 @@ glift.widgets.WidgetManager.prototype = {
    * @param {!function(glift.api.SgfOptions)} callback
    * @private
    */
-  loadSgfString_: function (sgfObj, onSuccess) {
+  _loadSgfString(sgfObj, onSuccess) {
     var toProc;
     if (sgfObj.alias && this.sgfCache[sgfObj.alias]) {
-      toProc = glift.util.simpleClone(sgfObj);
+      toProc = util.simpleClone(sgfObj);
       toProc.sgfString = this.sgfCache[sgfObj.alias];
       onSuccess(toProc);
     } else if (sgfObj.url && this.sgfCache[sgfObj.url]) {
-      toProc = glift.util.simpleClone(sgfObj);
+      toProc = util.simpleClone(sgfObj);
       toProc.sgfString = this.sgfCache[sgfObj.url];
       onSuccess(toProc);
     } else if (sgfObj.url) {
       this.loadSgfWithAjax(sgfObj.url, sgfObj, onSuccess);
     } else {
-      toProc = glift.util.simpleClone(sgfObj);
+      toProc = util.simpleClone(sgfObj);
       if (toProc.alias && toProc.sgfString) {
         this.sgfCache[toProc.alias] = toProc.sgfString;
       }
       onSuccess(toProc);
     }
-  },
+  }
 
   /**
    * Like the above function, but doesn't do XHR -- returns the input SGF object
@@ -377,7 +371,7 @@ glift.widgets.WidgetManager.prototype = {
    *    sgf finished.
    * @export
    */
-  loadSgfStringSync: function (sgfObj) {
+  loadSgfStringSync(sgfObj) {
     var alias = sgfObj.alias;
     var url = sgfObj.url;
     if (alias && this.sgfCache[alias]) {
@@ -391,20 +385,20 @@ glift.widgets.WidgetManager.prototype = {
     } else {
       return sgfObj;
     }
-  },
+  }
 
   /**
    * Get the currentDivId. This is only interesting because it's possible for
    * the current div ID to be the fullscreened div id.
    * @return {string}
    */
-  getDivId: function () {
+  getDivId() {
     if (this.fullscreenDivId) {
       return this.fullscreenDivId;
     } else {
       return this.divId;
     }
-  },
+  }
 
   /**
    * Create a Sgf Widget that actually does the work of fitting together the
@@ -414,8 +408,8 @@ glift.widgets.WidgetManager.prototype = {
    *    point, the widget has not yet been 'drawn'.
    * @export
    */
-  createWidget: function (sgfObj) {
-    return new glift.widgets.BaseWidget(
+  createWidget(sgfObj) {
+    return new BaseWidget(
       this.getDivId(),
       sgfObj,
       this.displayOptions,
@@ -424,7 +418,7 @@ glift.widgets.WidgetManager.prototype = {
       this,
       this.hooks
     );
-  },
+  }
 
   /**
    * Temporarily replace the current widget with another widget. Used in the
@@ -432,27 +426,27 @@ glift.widgets.WidgetManager.prototype = {
    * you want to see an answer, you jump to a separate game viewer widget.
    * @param {!glift.api.SgfOptions} sgfObj
    */
-  createTemporaryWidget: function (sgfObj) {
+  createTemporaryWidget(sgfObj) {
     this.currentWidget && this.currentWidget.destroy();
     var obj = this.sgfDefaults.createSgfObj(sgfObj);
     this.temporaryWidget = this.createWidget(obj).draw();
-  },
+  }
 
   /**
    * Returns from the temporary widget to the original widget.
    */
-  returnToOriginalWidget: function () {
+  returnToOriginalWidget() {
     this.temporaryWidget && this.temporaryWidget.destroy();
     this.temporaryWidget = undefined;
     this.currentWidget.draw();
-  },
+  }
 
   /**
    * Internal implementation of nextSgf/previous sgf.
    * @param {number} indexChange
    * @private
    */
-  nextSgfInternal_: function (indexChange) {
+  nextSgfInternal_(indexChange) {
     if (!this.sgfCollection.length > 1) {
       return; // Nothing to do
     }
@@ -469,7 +463,7 @@ glift.widgets.WidgetManager.prototype = {
       }
     }
     this.draw();
-  },
+  }
 
   /**
    * Load the next SGF. Requires that the collection list be non-empty. Note
@@ -477,17 +471,17 @@ glift.widgets.WidgetManager.prototype = {
    * then redraws the widget.
    * @export
    */
-  nextSgf: function () {
+  nextSgf() {
     this.nextSgfInternal_(1);
-  },
+  }
 
   /**
    * Very similar to nextSgf. Load the previous SGF.
    * @export
    */
-  prevSgf: function () {
+  prevSgf() {
     this.nextSgfInternal_(-1);
-  },
+  }
 
   /**
    * Load a urlOrObject with AJAX.  If the urlOrObject is an object, then we
@@ -497,27 +491,27 @@ glift.widgets.WidgetManager.prototype = {
    * @param {!function(glift.api.SgfOptions)} callback For when the ajax request
    *    completes.
    */
-  loadSgfWithAjax: function (url, sgfObj, callback) {
-    glift.ajax.get(
+  loadSgfWithAjax(url, sgfObj, callback) {
+    ajax.get(
       url,
-      function (data) {
+      (data) => {
         this.sgfCache[url] = data;
         sgfObj.sgfString = data;
         callback(sgfObj);
-      }.bind(this)
+      }
     );
-  },
+  }
 
   /**
    * Load the SGFs in the background.  Try once every 250ms until we get to the
    * end of the SGF collection.
    * @private
    */
-  backgroundLoad_: function () {
+  _backgroundLoad() {
     var loader = function (idx) {
       if (idx < this.sgfCollection.length) {
         var curObj = this.getSgfObj(idx);
-        this.loadSgfString_(curObj, function () {
+        this._loadSgfString(curObj, function () {
           setTimeout(function () {
             loader(idx + 1);
           }, 250); // 250ms
@@ -525,16 +519,16 @@ glift.widgets.WidgetManager.prototype = {
       }
     }.bind(this);
     loader(this.sgfColIndex + 1);
-  },
+  }
 
   /**
    * Whether or not the widget is currently fullscreened.
    * @return {boolean}
    * @export
    */
-  isFullscreen: function () {
+  isFullscreen() {
     return !!this.fullscreenDivId;
-  },
+  }
 
   /**
    * Enable auto-resizing of the glift instance, but only in the case that the
@@ -546,7 +540,7 @@ glift.widgets.WidgetManager.prototype = {
    * window.onresize.
    * @export
    */
-  enableFullscreenAutoResize: function () {
+  enableFullscreenAutoResize() {
     // It might be tempting to write check if we're fullscreened, but currently
     // the enableFullscreenAutoResize is called after widget destruction.
     if (window.onresize) {
@@ -555,26 +549,30 @@ glift.widgets.WidgetManager.prototype = {
     window.onresize = function () {
       this.redraw();
     }.bind(this);
-  },
+  }
 
   /**
    * Disable auto-resizing of the glift instance. Called from the status bar.
    * @export
    */
-  disableFullscreenAutoResize: function () {
+  disableFullscreenAutoResize() {
     window.onresize = this.oldWindowResize;
     this.oldWindowResize = null;
-  },
+  }
 
   /**
-   * Undraw the most recent widget and remove references to it.
-   * @export
+   * Удаляет текущий виджет и освобождает ресурсы.
+   * @return {WidgetManager} this
    */
-  destroy: function () {
-    this.currentWidget && this.currentWidget.destroy();
-    this.currentWidget = undefined;
-    this.temporaryWidget && this.temporaryWidget.destroy();
-    this.temporaryWidget = undefined;
+  destroy() {
+    if (this.currentWidget) {
+      this.currentWidget.destroy();
+      this.currentWidget = undefined;
+    }
+    if (this.temporaryWidget) {
+      this.temporaryWidget.destroy();
+      this.temporaryWidget = undefined;
+    }
     return this;
-  },
-};
+  }
+}

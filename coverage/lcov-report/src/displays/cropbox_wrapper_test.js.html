@@ -1,0 +1,418 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/displays/cropbox_wrapper_test.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/displays</a> cropbox_wrapper_test.js</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/50</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/0</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/4</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/50</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >(<span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
+<span class="cstat-no" title="statement not covered" >  module('glift.displays.cropboxTest');</span>
+  var displays = <span class="cstat-no" title="statement not covered" >glift.displays,</span>
+    boardRegions = <span class="cstat-no" title="statement not covered" >glift.enums.boardRegions,</span>
+    overf = <span class="cstat-no" title="statement not covered" >displays.cropbox.OVERFLOW,</span>
+    ragp = <span class="cstat-no" title="statement not covered" >displays.cropbox.CROP_PAD;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  test('For 19x19', <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
+    var box = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.ALL, 19);</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(box.bbox().topLeft().x(), 0, 'topLeft.x() must be 0, for ALL');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(box.bbox().topLeft().y(), 0, 'topLeft.y() must be 0, for ALL');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      box.bbox().botRight().x(),
+      18,
+      'botRight.x() must be 18, for ALL'
+    );
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      box.bbox().botRight().y(),
+      18,
+      'botRight.y() must be 18, for ALL'
+    );
+  });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  test('For half boards', <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
+    var lbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.LEFT, 19);</span>
+    var rbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.RIGHT, 19);</span>
+    var tbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.TOP, 19);</span>
+    var bbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.BOTTOM, 19);</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(lbox.bbox().botRight().x(), 10, 'right coord for LEFT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      lbox.widthIntersections(),
+      11 + overf + ragp,
+      'width ext for LEFT'
+    );
+<span class="cstat-no" title="statement not covered" >    deepEqual(lbox.heightIntersections(), 19 + overf, 'height for LEFT');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    deepEqual(rbox.bbox().topLeft().x(), 8, 'left coord for RIGHT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(rbox.widthIntersections(), 11 + overf + ragp, 'width for RIGHT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(rbox.heightIntersections(), 19 + overf, 'height for RIGHT');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    deepEqual(tbox.bbox().botRight().y(), 10, 'bottom coord for TOP');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(tbox.heightIntersections(), 11 + overf + ragp, 'height for TOP');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(tbox.widthIntersections(), 19 + overf, 'width for TOP');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    deepEqual(bbox.bbox().topLeft().y(), 8, 'top coord for BOTTOM');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      bbox.heightIntersections(),
+      11 + overf + ragp,
+      'height for BOTTOM'
+    );
+<span class="cstat-no" title="statement not covered" >    deepEqual(bbox.widthIntersections(), 19 + overf, 'width for BOTTOM');</span>
+  });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  test('Cropbox tests for quarter boards', <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
+    var tlbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.TOP_LEFT, 19);</span>
+    var trbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.TOP_RIGHT, 19);</span>
+    var blbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.BOTTOM_LEFT, 19);</span>
+    var brbox = <span class="cstat-no" title="statement not covered" >displays.cropbox.getFromRegion(boardRegions.BOTTOM_RIGHT, 19);</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(tlbox.bbox().botRight().x(), 11, 'right coord for TOP LEFT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(tlbox.bbox().botRight().y(), 10, 'bottom coord for TOP LEFT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      tlbox.widthIntersections(),
+      12 + overf + ragp,
+      'width for TOP LEFT'
+    );
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      tlbox.heightIntersections(),
+      11 + overf + ragp,
+      'height for TOP LEFT'
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    deepEqual(trbox.bbox().topLeft().x(), 7, 'left coord for TOP RIGHT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(trbox.bbox().botRight().y(), 10, 'bottom coord for TOP RIGHT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      trbox.widthIntersections(),
+      12 + overf + ragp,
+      'width for TOP RIGHT'
+    );
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      trbox.heightIntersections(),
+      11 + overf + ragp,
+      'height for TOP RIGHT'
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    deepEqual(blbox.bbox().botRight().x(), 11, 'right coord for BOTTOM LEFT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(blbox.bbox().topLeft().y(), 8, 'top coord for BOTTOM LEFT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      blbox.widthIntersections(),
+      12 + overf + ragp,
+      'width for BOTTOM LEFT'
+    );
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      blbox.heightIntersections(),
+      11 + overf + ragp,
+      'height for BOTTOM LEFT'
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    deepEqual(brbox.bbox().topLeft().x(), 7, 'left coord for BOTTOM RIGHT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(brbox.bbox().topLeft().y(), 8, 'top coord for BOTTOM RIGHT');</span>
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      brbox.widthIntersections(),
+      12 + overf + ragp,
+      'width for BOTTOM RIGHT'
+    );
+<span class="cstat-no" title="statement not covered" >    deepEqual(</span>
+      brbox.heightIntersections(),
+      11 + overf + ragp,
+      'height for BOTTOM RIGHT'
+    );
+  });
+})();
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2025-05-14T16:59:41.242Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

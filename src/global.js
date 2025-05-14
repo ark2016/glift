@@ -1,31 +1,77 @@
-goog.require('glift.global');
+/**
+ * Глобальные настройки и переменные Glift.
+ * 
+ * @module global
+ */
 
 /**
- * Semantic versioning is used to determine API behavior. This is the version of
- * the Glift UI (which most people think of as Glift, anyway.
- *
- * See: http://semver.org/
- *
- * Currently on stable.
+ * ID активного экземпляра Glift.
+ * @type {string|null}
  */
-glift.global.version = '1.2.0-alpha';
+export let activeInstanceId = null;
 
 /**
- * The registry.  Used to determine who has 'ownership' of key-presses.
- * The problem is that key presses have to be captured in a global scope (or
- * at least at the <body> level.
+ * Реестр экземпляров Glift.
+ * @type {Object}
  */
-glift.global.instanceRegistry = {
-  // Map of manager ID (some-div-id-glift-1) to object instance.
+export const instanceRegistry = {};
+
+/**
+ * Возвращает активный экземпляр Glift или null, если нет активного экземпляра.
+ * @return {Object|null} Активный экземпляр Glift
+ */
+export const activeInstance = () => {
+  if (activeInstanceId && instanceRegistry[activeInstanceId]) {
+    return instanceRegistry[activeInstanceId];
+  }
+  return null;
 };
 
 /**
- * ID of the active Glift instance.
+ * Глобальные настройки по умолчанию.
+ * @type {Object}
  */
-glift.global.activeInstanceId = null;
+export const settings = {
+  /**
+   * Режим отладки. Если true, выводит дополнительную информацию в консоль.
+   * @type {boolean}
+   */
+  debug: false,
+  
+  /**
+   * Добавлять ли метки (координаты) на доску по умолчанию.
+   * @type {boolean}
+   */
+  drawBoardCoords: true,
+  
+  /**
+   * Тема по умолчанию.
+   * @type {string}
+   */
+  theme: 'DEFAULT'
+};
 
-/** Used to mark whether the zoom has been disabled (for mobile). */
-glift.global.disabledZoom = false;
+/**
+ * Включает режим отладки.
+ */
+export const enableDebug = () => {
+  settings.debug = true;
+};
 
-/** Added CSS classes (we only want to do this once). */
-glift.global.addedCssClasses = false;
+/**
+ * Отключает режим отладки.
+ */
+export const disableDebug = () => {
+  settings.debug = false;
+};
+
+/**
+ * Выводит отладочное сообщение, если включен режим отладки.
+ * @param {string} message Сообщение для вывода
+ * @param {...*} args Дополнительные аргументы
+ */
+export const log = (message, ...args) => {
+  if (settings.debug) {
+    console.log(`[Glift] ${message}`, ...args);
+  }
+};

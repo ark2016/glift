@@ -1,240 +1,200 @@
-goog.provide('glift.themes.base');
+/**
+ * Базовая тема для модуля отображения Glift.
+ * Содержит основные настройки отображения для всех компонентов.
+ */
 
 /**
- * @typedef {!Object}
+ * Базовая тема, которая используется как основа для всех других тем.
+ * @type {Object}
  */
-// TODO(kashomon): Provide real type
-// glift.themes.base; // Удалено
-
-/**
- * Base theme from which all others extend. All possible options should be
- * placed here.
- */
-glift.themes.baseTemplate = {
-  board: {
-    fill: '#f5be7e',
-    stroke: '#000000',
-    // imagefill -- defined on loading
-    'stroke-width': 1,
-  },
-
-  starPoints: {
-    sizeFraction: 0.15, // As a fraction of the spacing.
-    fill: 'black',
-  },
-
-  lines: {
-    stroke: 'black',
-    'stroke-width': 0.5,
-  },
-
-  boardCoordLabels: {
-    fill: 'black',
-    stroke: 'black',
-    opacity: '0.6',
-    'font-family': 'sans-serif',
-    'font-size': '0.6',
-  },
-
+export const baseTheme = {
+  /**
+   * Настройки отображения камней.
+   */
   stones: {
-    shadows: {
-      stroke: 'none',
-      fill: 'none',
-    },
-
-    marks: {
-      'font-family': 'sans-serif',
-      'font-size': '0.7',
-    },
-
-    EMPTY: {
-      fill: 'blue',
-      opacity: 0,
-      marks: {
-        fill: 'black',
-        stroke: 'black',
-        VARIATION_MARKER: {
-          stroke: '#A22',
-          fill: '#A22',
-        },
-        CORRECT_VARIATION: {
-          stroke: '#22D',
-          fill: '#22D',
-        },
-      },
-    },
-
+    /**
+     * Черные камни.
+     */
     BLACK: {
       fill: 'black',
-      opacity: 1,
-      'stroke-width': 1, // The default value
       stroke: 'black',
-      marks: {
-        fill: 'white',
-        stroke: 'white',
-        STONE_MARKER: {
-          fill: '#CCF',
-          opacity: 0.6,
-        },
-        VARIATION_MARKER: {
-          stroke: '#A22',
-          fill: '#A22',
-        },
-      },
+      opacity: 1.0,
+      'stroke-width': 1
     },
-    // TODO(kashomon): This is a direct copy of most of the properties of BLACK
-    // stones and is an ugly hack because I'm not doing inheritance right for
-    // these blocks.
-    BLACK_HOVER: {
-      fill: 'black',
-      opacity: 0.5,
-      'stroke-width': 1, // The default value
-      stroke: 'black',
-      marks: {
-        fill: 'white',
-        stroke: 'white',
-        STONE_MARKER: {
-          fill: '#CCF',
-          opacity: 0.6,
-        },
-        VARIATION_MARKER: {
-          stroke: '#A22',
-          fill: '#A22',
-        },
-      },
-    },
+    
+    /**
+     * Белые камни.
+     */
     WHITE: {
-      stroke: 'black',
       fill: 'white',
-      opacity: 1,
-      'stroke-width': 1, // The default value
-      marks: {
-        fill: 'black',
-        stroke: 'black',
-        STONE_MARKER: {
-          fill: '#33F',
-          opacity: 0.6,
-        },
-        VARIATION_MARKER: {
-          stroke: '#A22',
-          fill: '#A22',
-        },
-      },
+      stroke: '#303030',
+      opacity: 1.0,
+      'stroke-width': 1
     },
-    // TODO(kashomon): This is a direct copy of most of the properties of WHITE
-    // stones and is an ugly hack because I'm not doing inheritance right for
-    // these blocks.
-    WHITE_HOVER: {
-      fill: 'white',
-      stroke: 'black',
-      opacity: 0.5,
-      'stroke-width': 1, // The default value
-      marks: {
-        fill: 'black',
-        stroke: 'black',
-        STONE_MARKER: {
-          fill: '#33F',
-          opacity: 0.6,
-        },
-        VARIATION_MARKER: {
-          stroke: '#A22',
-          fill: '#A22',
-        },
-      },
-    },
+    
+    /**
+     * Радиус камня относительно размера пересечения.
+     */
+    radius: 0.48,
+    
+    /**
+     * Отображать ли тень для камней.
+     */
+    shadow: false
   },
-
-  icons: {
-    // Vertical margin in pixels.
-    vertMargin: 5,
-    // Minimum horizontal margin in pixels.
-    horzMargin: 5,
-
-    DEFAULT: {
-      fill: '#000',
-      stroke: 'black',
-      // fill: "90-#337-#55B"
-    },
-
-    DEFAULT_HOVER: {
-      fill: '#AAA',
-      stroke: '#AAA',
-      // fill: "90-#337-#55D"
-    },
-
-    tooltips: {
-      padding: '5px',
-      background: '#555',
-      color: '#EEE',
-      webkitBorderRadius: '10px',
-      MozBorderRadius: '10px',
-      'border-radius': '10px',
-      // fontSize: '16px',
-      // fontFamily: 'Palatino'
-    },
-
-    tooltipTimeout: 1200, // milliseconds
+  
+  /**
+   * Настройки отображения доски.
+   */
+  board: {
+    /**
+     * Цвет фона доски.
+     */
+    fill: '#f5be7f',
+    
+    /**
+     * Цвет границы доски.
+     */
+    borderColor: '#654b32',
+    
+    /**
+     * Ширина границы доски, в процентах от размера доски.
+     */
+    borderWidth: 0.04,
+    
+    /**
+     * Скругление углов доски.
+     */
+    cornerRadius: 0.02,
+    
+    /**
+     * Отступ от края доски до внешней линии.
+     */
+    edgePadding: 0.05,
+    
+    /**
+     * Изображение фона доски (если используется).
+     */
+    imagefill: null,
+    
+    /**
+     * Отображать ли тень для доски.
+     */
+    shadow: false
   },
-
+  
+  /**
+   * Настройки отображения линий доски.
+   */
+  lines: {
+    /**
+     * Цвет линий.
+     */
+    stroke: '#000000',
+    
+    /**
+     * Толщина линий.
+     */
+    strokeWidth: 0.02,
+    
+    /**
+     * Ширина внешней границы сетки.
+     */
+    borderWidth: 0.03
+  },
+  
+  /**
+   * Настройки отображения звездных точек (хоси).
+   */
+  starPoints: {
+    /**
+     * Цвет звездных точек.
+     */
+    fill: '#000000',
+    
+    /**
+     * Радиус звездных точек.
+     */
+    radius: 0.025
+  },
+  
+  /**
+   * Настройки отображения меток.
+   */
+  marks: {
+    /**
+     * Цвет меток.
+     */
+    color: '#000000',
+    
+    /**
+     * Размер шрифта для текстовых меток.
+     */
+    fontSize: 0.3
+  },
+  
+  /**
+   * Настройки отображения комментариев.
+   */
+  comment: {
+    /**
+     * Фон блока комментариев.
+     */
+    background: '#ffffff',
+    
+    /**
+     * Цвет текста комментариев.
+     */
+    textColor: '#000000',
+    
+    /**
+     * Размер шрифта комментариев.
+     */
+    fontSize: 14
+  },
+  
+  /**
+   * Настройки отображения статусной панели.
+   */
   statusBar: {
-    fullscreen: {
-      'background-color': '#FFF',
-    },
-
-    gameInfo: {
-      textDiv: {
-        'background-color': 'rgba(0,0,0,0.75)',
-        'border-radius': '25px',
-      },
-      text: {
-        fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-        color: '#FFF',
-      },
-      textBody: {
-        'margin-bottom': '0.5em',
-      },
-      textTitle: {
-        'margin-bottom': '1em',
-      },
-    },
-
-    icons: {
-      vertMargin: 4,
-      horzMargin: 5,
-
-      DEFAULT: {
-        fill: '#000',
-        stroke: '#000',
-        opacity: 1.0,
-      },
-
-      DEFAULT_HOVER: {
-        fill: '#AAA',
-        stroke: '#AAA',
-      },
-
-      tooltips: {
-        padding: '5px',
-        background: '#555',
-        color: '#EEE',
-        webkitBorderRadius: '10px',
-        MozBorderRadius: '10px',
-        borderRadius: '10px',
-      },
-
-      tooltipTimeout: 1200, // milliseconds
-    },
+    /**
+     * Фон статусной панели.
+     */
+    background: '#f5f5f5',
+    
+    /**
+     * Цвет текста статусной панели.
+     */
+    textColor: '#000000',
+    
+    /**
+     * Размер шрифта для статусной панели.
+     */
+    fontSize: 14
   },
-
-  commentBox: {
-    css: {
-      background: 'none',
-      padding: '10px',
-      margin: '0px',
-    },
-  },
-
-  defs: {
-    // TODO(kashomon): Support SVG Defs
-  },
+  
+  /**
+   * Настройки отображения кнопок.
+   */
+  buttons: {
+    /**
+     * Фон кнопок.
+     */
+    background: '#4a86e8',
+    
+    /**
+     * Цвет текста кнопок.
+     */
+    textColor: '#ffffff',
+    
+    /**
+     * Радиус скругления углов кнопок.
+     */
+    borderRadius: 4,
+    
+    /**
+     * Отступы внутри кнопок.
+     */
+    padding: 8
+  }
 };

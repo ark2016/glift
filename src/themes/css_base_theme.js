@@ -1,75 +1,80 @@
 goog.provide('glift.themes.cssBaseTheme');
 goog.provide('glift.themes.CssDef');
 
-goog.scope(function () {
+/**
+ * CSS Definition class for storing CSS properties and extra metadata.
+ */
+class CssDef {
   /**
-   * @param {!Object<string>} css Core css
-   * @param {!Object<(string|number)>} extra Extra properties
-   * @constructor @struct @final
+   * @param {!Object<string, string>} css Core CSS properties
+   * @param {!Object<string, (string|number)>=} extra Optional extra properties
    */
-  glift.themes.CssDef = function (css, extra) {
+  constructor(css, extra = {}) {
     /**
-     * @type {!Object<string>} Base CSS Properties
+     * Base CSS Properties (stroke, fill, etc.)
+     * @type {!Object<string, string>}
      */
     this.css = css;
+    
     /**
-     * @type {!Object<string, (string|number)>} Extra properties sometimes
-     *    necessary for construction.
+     * Extra properties sometimes necessary for construction
+     * @type {!Object<string, (string|number)>}
      */
     this.extra = extra;
-  };
+  }
+}
 
+// Export class to namespace
+glift.themes.CssDef = CssDef;
+
+/**
+ * Base CSS theme for Glift components.
+ * @type {!Object<glift.themes.classes, !glift.themes.CssDef>}
+ */
+glift.themes.cssBaseTheme = (() => {
+  const theme = {};
+  const classes = glift.themes.classes;
+  
   /**
-   * @type {!Object<glift.themes.classes, !glift.themes.CssDef>}
+   * Helper for creating CSS definitions
+   * @param {!Object<string, string>} css CSS properties
+   * @param {!Object<string, (string|number)>=} extra Optional extra properties
+   * @return {!glift.themes.CssDef} The created CSS definition
    */
-  glift.themes.cssBaseTheme = {};
-
-  var base = glift.themes.cssBaseTheme;
-  var classes = glift.themes.classes;
-  /**
-   * @param {!Object<string>} css
-   * @param {!Object<string, (string|number)>=} opt_extra
-   * Helper for construction css definitions
-   */
-  var cssDef = function (css, opt_extra) {
-    return new glift.themes.CssDef(css, opt_extra || {});
-  };
-
-  // CSS For the bas board.
-  base[classes.BOARD] = cssDef({
+  const cssDef = (css, extra) => new CssDef(css, extra);
+  
+  // Board styling
+  theme[classes.BOARD] = cssDef({
     fill: '#f5be7e',
     stroke: '#000000',
     'stroke-width': '1',
   });
-
-  base[classes.STARPOINTS] = cssDef(
+  
+  // Star points
+  theme[classes.STARPOINTS] = cssDef(
     {
       fill: 'black',
     },
     {
-      // extra propetries //
+      // Settings for star point rendering
       sizeFraction: 0.15, // As a fraction of spacing
     }
   );
-
-  base[classes.BOARD_LINES] = cssDef({
+  
+  // Board lines
+  theme[classes.BOARD_LINES] = cssDef({
     stroke: 'black',
     'stroke-width': 0.5,
   });
-
-  base[classes.BOARD_COORD_LABELS] = cssDef({
+  
+  // Coordinate labels
+  theme[classes.BOARD_COORD_LABELS] = cssDef({
     fill: 'black',
     stroke: 'black',
     opacity: '0.6',
     'font-family': 'sans-serif',
     'font-size': '0.6',
   });
-
-  base[classes.BOARD_COORD_LABELS] = cssDef({
-    fill: 'black',
-    stroke: 'black',
-    opacity: '0.6',
-    'font-family': 'sans-serif',
-    'font-size': '0.6',
-  });
-});
+  
+  return theme;
+})();

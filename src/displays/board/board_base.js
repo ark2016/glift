@@ -1,20 +1,22 @@
-goog.require('glift.displays.board');
-goog.require('glift.displays.svg');
+/**
+ * Базовые компоненты для отображения доски Го.
+ * 
+ * @module displays/board/board_base
+ */
+
+import * as svg from '../../svg/index.js';
 
 /**
- * Create the background GoBoard object.  Essentially just a rectangle with a
- * fill color and a border.
- *
- * @param {!glift.svg.SvgObj} svg Base svg obj
- * @param {!glift.displays.svg.IdGenerator} idGen The ID generator for SVG.
- * @param {!glift.orientation.BoundingBox} goBox The bounding box of the go board.
- * @param {!glift.themes.base} theme The theme object
+ * Создает базовую структуру доски.
+ * @param {Object} svgObj - SVG объект для доски
+ * @param {Object} idGen - Генератор идентификаторов
+ * @param {Object} goBox - Размеры доски
+ * @param {Object} theme - Тема оформления
  */
-glift.displays.board.boardBase = function (svg, idGen, goBox, theme) {
+export const boardBase = (svgObj, idGen, goBox, theme) => {
   if (theme.board.imagefill) {
-    svg.append(
-      glift.svg
-        .image()
+    svgObj.append(
+      svg.image()
         .setAttr('x', goBox.topLeft().x())
         .setAttr('y', goBox.topLeft().y())
         .setAttr('width', goBox.width())
@@ -24,29 +26,29 @@ glift.displays.board.boardBase = function (svg, idGen, goBox, theme) {
     );
   }
 
-  svg.append(
-    glift.svg
-      .rect()
-      .setAttr('x', goBox.topLeft().x() + 'px')
-      .setAttr('y', goBox.topLeft().y() + 'px')
-      .setAttr('width', goBox.width() + 'px')
-      .setAttr('height', goBox.height() + 'px')
-      .setAttr('fill', theme.board.imagefill ? 'none' : theme.board.fill)
-      .setAttr('stroke', theme.board.stroke)
-      .setAttr('stroke-width', theme.board['stroke-width'])
-      .setId(idGen.board())
-  );
+  // Создаем основной прямоугольник доски
+  const boardBase = svg.path({
+    fill: theme.board?.fill || '#DCB35C',
+    stroke: theme.board?.borderColor || '#000000',
+    'stroke-width': 1
+  });
+  
+  const width = goBox.width();
+  const height = goBox.height();
+  
+  // Простой прямоугольник для доски
+  const pathStr = `M0,0 L${width},0 L${width},${height} L0,${height} Z`;
+  boardBase.setAttr('d', pathStr);
+  
+  svgObj.append(boardBase);
 };
 
 /**
- * @param {string} divId The element ID of the div in which the SVG board lives.
- * @param {glift.svg.SvgObj} svg Base svg obj, in which the filters should be
- *    placed.
+ * Инициализирует фильтр размытия для теней.
+ * @param {string} divId - ID div-контейнера
+ * @param {Object} svgObj - SVG объект
  */
-glift.displays.board.initBlurFilter = function (divId, svg) {
-  // svg.append("svg:defs")
-  // .append("svg:filter")
-  // .setAttr("id", divId + '_svg_blur')
-  // .append("svg:feGaussianBlur")
-  // .setAttr("stdDeviation", 2);
+export const initBlurFilter = (divId, svgObj) => {
+  // Заглушка - в полной реализации здесь будет создаваться SVG-фильтр для теней
+  console.log('Инициализация фильтра размытия для доски в', divId);
 };

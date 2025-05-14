@@ -1,51 +1,63 @@
-goog.provide('glift.api');
+/**
+ * Модуль API для библиотеки Glift.
+ * Предоставляет основные методы для создания и управления виджетами.
+ * 
+ * @module api
+ */
+
+// Импортируем необходимые зависимости
+import { Options } from './options.js';
+import { WidgetManager } from '../widgets/manager.js';
+import { init } from '../init.js';
 
 /**
- * Namespace for API-related methods. Not all of these are meant to be exposed
- * as public methods.
+ * Создает и рисует экземпляр Glift.
+ * Основная точка входа для библиотеки.
+ *
+ * @param {Object} inOptions Объект с опциями Glift (обычно определяется как литерал объекта).
+ *    См. api.Options. 
+ * @return {Object} Экземпляр виджета
  */
-glift.api = {
-  /**
-   * Returns a widgetManager and draw the widget. Users should not use this
-   * method directly, instead peferring 'glift.create(<options>)'.
-   *
-   * @package
-   * @param {!Object} inOptions A Glift's options obj (typically specified as an object
-   *    literal). See glift.api.Options. We don't technically specify the type
-   *    her as glift.api.Options because the expectation is that the object will
-   *    be an object literal rather than a constructed obj.
-   * @return {glift.widgets.WidgetManager}
-   */
-  create: function (inOptions) {
-    var manager = glift.api.createNoDraw(inOptions);
+export const create = (inOptions) => {
+  const manager = createNoDraw(inOptions);
 
-    glift.init(manager.displayOptions.disableZoomForMobile, manager.divId);
+  // Инициализируем библиотеку перед отрисовкой
+  init(manager.displayOptions.disableZoomForMobile, manager.divId);
 
-    manager.draw();
-    return manager;
-  },
-
-  /**
-   * Create a widgetManager without performing 'draw'.  This also has the
-   * side effect of avoiding init code.
-   *
-   * This is public because it's sometimes useful to create a Glift instance
-   * this way.
-   *
-   * @param {!Object} inOptions
-   * @return {glift.widgets.WidgetManager}
-   */
-  createNoDraw: function (inOptions) {
-    var options = new glift.api.Options(
-      /** @type {!glift.api.Options} */ (inOptions)
-    );
-    return new glift.widgets.WidgetManager(options);
-  },
+  // Отрисовываем виджет
+  manager.draw();
+  return manager;
 };
 
 /**
- * The primary entry point for Glift. Creates and draws a glift instance.
+ * Создает менеджер виджетов без выполнения отрисовки.
+ * Также имеет побочный эффект в виде пропуска кода инициализации.
  *
- * api:1.0
+ * Этот метод публичный, поскольку иногда полезно создать экземпляр Glift
+ * без немедленной отрисовки (например, для отложенной инициализации).
+ *
+ * @param {Object} inOptions Объект с опциями для Glift
+ * @return {Object} Менеджер виджетов без отрисовки
  */
-glift.create = glift.api.create;
+export const createNoDraw = (inOptions) => {
+  const options = new Options(inOptions);
+  return new WidgetManager(options);
+};
+
+/**
+ * Примеры использования:
+ * ```
+ * // Простое создание доски
+ * const gliftInstance = glift.create({
+ *   divId: 'glift-container',
+ *   sgf: 'path/to/game.sgf'
+ * });
+ * 
+ * // Создание проблемы
+ * glift.create({
+ *   divId: 'problem-container',
+ *   sgf: 'path/to/problem.sgf',
+ *   widgetType: 'STANDARD_PROBLEM'
+ * });
+ * ```
+ */

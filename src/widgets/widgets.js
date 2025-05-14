@@ -1,7 +1,12 @@
 goog.provide('glift.widgets');
 
 /**
- * Widgets are toplevel objects, which combine display and
- * controller/rules bits together.
+ * Core widgets module for Glift.
+ * 
+ * Widgets are top-level objects that combine display components with
+ * controllers and game logic. They provide the primary interface between
+ * the user and the Go board.
+ * 
+ * @namespace
  */
 glift.widgets = {};

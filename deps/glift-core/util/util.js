@@ -1,142 +1,74 @@
-goog.provide('glift.util');
+/**
+ * Базовые утилиты для Glift Core.
+ * @module util
+ */
 
-goog.require('glift');
+/**
+ * Преобразует координаты в строковый формат точки.
+ * @param {number} x - Координата X
+ * @param {number} y - Координата Y
+ * @return {string} Строка в формате 'x,y'
+ */
+export const coordToString = (x, y) => {
+  return `${x},${y}`;
+};
 
-glift.util = {
-  /**
-   * Log a message. Allows the for the possibility of overwriting for tests.
-   * @param {*} msg
-   */
-  logz: function (msg) {
-    console.log(msg);
-  },
+/**
+ * Преобразует строковую точку в объект точки.
+ * @param {string} str - Строка точки в формате 'x,y'
+ * @return {import('./point.js').Point} Точка
+ * @throws {Error} Если строка не может быть преобразована
+ */
+export const stringToCoord = (str) => {
+  try {
+    const split = str.split(',');
+    const x = parseInt(split[0], 10);
+    const y = parseInt(split[1], 10);
+    
+    // Импортируем Point из модуля point.js
+    const { Point } = require('./point.js');
+    return new Point(x, y);
+  } catch (e) {
+    throw new Error(`Ошибка разбора! Не удалось преобразовать точку из: ${str}`);
+  }
+};
 
-  /**
-   * Via Crockford / StackOverflow: Determine the type of a value in robust way.
-   * @param {*} value
-   * @return {string}
-   */
-  typeOf: function (value) {
-    var s = typeof value;
-    if (s === 'object') {
-      if (value) {
-        if (value instanceof Array) {
-          s = 'array';
-        }
-      } else {
-        s = 'null';
-      }
-    }
-    return s;
-  },
+/**
+ * Синоним для stringToCoord.
+ */
+export const pointFromString = stringToCoord;
 
-  /**
-   * Checks to make sure a number is inbounds.  In other words, whether a number
-   * is between 0 (inclusive) and bounds (exclusive).
-   * @param {number} num
-   * @param {number} bounds
-   * @return {boolean}
-   */
-  inBounds: function (num, bounds) {
-    return num < bounds && num >= 0;
-  },
+/**
+ * Преобразует координату SGF (например, 'mc') в точку.
+ * SGF индексируются от верхнего левого угла:
+ *    _  _  _
+ *   |aa ba ca ...
+ *   |ab bb
+ *   |.
+ *   |.
+ *   |.
+ * 
+ * @param {string} str - Строка точки SGF
+ * @return {import('./point.js').Point} Готовая точка
+ * @throws {Error} Если формат строки неверный
+ */
+export const pointFromSgfCoord = (str) => {
+  if (str.length !== 2) {
+    throw new Error(`Неизвестная длина SGF-координаты: ${str.length} для свойства ${str}`);
+  }
+  const a = 'a'.charCodeAt(0);
+  
+  // Импортируем Point из модуля point.js
+  const { Point } = require('./point.js');
+  return new Point(str.charCodeAt(0) - a, str.charCodeAt(1) - a);
+};
 
-  /**
-   * Checks to make sure a number is out-of-bounds
-   * returns true if a number is outside a bounds (inclusive) or negative
-   * @param {number} num
-   * @param {number} bounds
-   * @return {boolean}
-   */
-  outBounds: function (num, bounds) {
-    return num >= bounds || num < 0;
-  },
-
-  // Init a key if the obj is undefined at the key with the given value.
-  // Return the value
-  getKeyWithDefault: function (obj, key, value) {
-    if (obj[key] === undefined) {
-      obj[key] = value;
-    }
-    return obj[key];
-  },
-
-  /*
-   * Get the size of an object
-   */
-  sizeOf: function (obj) {
-    var size = 0;
-    for (var key in obj) {
-      size += 1;
-    }
-    return size;
-  },
-
-  /**
-   * Set methods in the base object.  Usually used in conjunction with beget.
-   * @param {!Object} base
-   * @param {!Object} methods
-   * @return {!Object}
-   */
-  setMethods: function (base, methods) {
-    for (var key in methods) {
-      base[key] = methods[key].bind(base);
-    }
-    return base;
-  },
-
-  /**
-   * A utility method -- for prototypal inheritence.
-   *
-   * @param {T} o
-   * @return {T}
-   *
-   * @template T
-   */
-  beget: function (o) {
-    /** @constructor */
-    var F = function () {};
-    F.prototype = o;
-    return new F();
-  },
-
-  /**
-   * Simple Clone creates copies for all string, number, boolean, date and array
-   * types.  It does not copy functions (which it leaves alone), nor does it
-   * address problems with recursive objects.
-   *
-   * @param {T} obj
-   * @return {T}
-   *
-   * @template T
-   */
-  simpleClone: function (obj) {
-    // Handle immutable types (null, Boolean, Number, String) and functions.
-    if (
-      glift.util.typeOf(obj) !== 'array' &&
-      glift.util.typeOf(obj) !== 'object'
-    )
-      return obj;
-    if (obj instanceof Date) {
-      var copy = new Date();
-      copy.setTime(obj.getTime());
-      return copy;
-    }
-    if (glift.util.typeOf(obj) === 'array') {
-      var copy = [];
-      for (var i = 0, len = obj.length; i < len; i++) {
-        copy[i] = glift.util.simpleClone(obj[i]);
-      }
-      return copy;
-    }
-    if (glift.util.typeOf(obj) === 'object') {
-      var copy = {};
-      for (var attr in obj) {
-        if (obj.hasOwnProperty(attr))
-          copy[attr] = glift.util.simpleClone(obj[attr]);
-      }
-      return copy;
-    }
-    throw new Error("Unable to copy obj! Its type isn't supported.");
-  },
+/**
+ * Проверяет, выходит ли координата за пределы доски.
+ * @param {number} coord - Координата для проверки
+ * @param {number} max - Максимальное значение координаты
+ * @return {boolean} true, если координата вне границ
+ */
+export const outBounds = (coord, max) => {
+  return coord < 0 || coord >= max;
 };

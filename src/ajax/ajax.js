@@ -1,47 +1,75 @@
 goog.provide('glift.ajax');
 
 /**
- * Ajax/XHR wrapper.
+ * Ajax/XHR and fetch utilities.
+ * @namespace
  */
 glift.ajax = {
   /**
-   * @param {string} url
-   * @param {function(string)} successCallback
-   * @param {function(number, string)=} opt_failureCallback
+   * Performs an HTTP GET request to the specified URL using fetch API.
+   * 
+   * @param {string} url URL to request
+   * @param {function(string)} successCallback Callback for successful request
+   * @param {function(number, string)=} opt_failureCallback Optional failure callback
    */
-  get: function (url, successCallback, opt_failureCallback) {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
-      if (request.readyState === 4) {
-        if (request.status === 200 || request.status === 304) {
-          successCallback(request.responseText);
-        } else {
-          if (opt_failureCallback) {
-            opt_failureCallback(request.status, request.responseText);
-          } else {
-            // We reached our target server, but it returned an error
-            console.error('(' + request.status + ') Error retrieving ' + url);
-          }
+  get(url, successCallback, opt_failureCallback) {
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      }
-    };
-    request.onerror = function () {
-      if (opt_failureCallback) {
-        opt_failureCallback(request.status, request.responseText);
-      } else {
-        // We reached our target server, but it returned an error
-        console.error(
-          '(' +
-            request.status +
-            ') Error retrieving ' +
-            url +
-            '. ' +
-            request.responseText
-        );
-      }
-      // There was a connection error of some sort.
-    };
-    request.open('GET', url, true);
-    request.send();
+        return response.text();
+      })
+      .then(data => {
+        successCallback(data);
+      })
+      .catch(error => {
+        if (opt_failureCallback) {
+          const status = error.response?.status || 0;
+          const text = error.message || `Error fetching ${url}`;
+          opt_failureCallback(status, text);
+        } else {
+          console.error(`Error retrieving ${url}: ${error.message}`);
+        }
+      });
   },
+
+  /**
+   * Promise-based version of the GET request.
+   * 
+   * @param {string} url URL to request
+   * @return {!Promise<string>} Promise that resolves with the response text
+   */
+  getPromise(url) {
+    return fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+      });
+  },
+
+  /**
+   * Performs an HTTP POST request to the specified URL.
+   * 
+   * @param {string} url URL to request
+   * @param {Object} data JSON data to send
+   * @return {!Promise<string>} Promise that resolves with the response text
+   */
+  post(url, data) {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.text();
+    });
+  }
 };

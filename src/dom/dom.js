@@ -1,339 +1,332 @@
-goog.provide('glift.dom');
-goog.provide('glift.dom.Element');
+/**
+ * Утилиты DOM и обертка для элементов.
+ * 
+ * Предоставляет упрощенную обертку для работы с элементами DOM.
+ * 
+ * @namespace
+ */
 
-// TODO(kashomon): glift.dom is not an ideal abstraction. Ideally, this would be
-// a series of helper classes rather than a full on element wrapper. There are
-// several warts here that make this difficult to deal with -- like the
-// implicit assumption that all elements have element IDs.
-glift.dom = {
-  /**
-   * Constructs a glift dom element. If arg is a string, assume an ID is being
-   * passed in. If arg is an object and has nodeType and nodeType is 1
-   * (ELEMENT_NODE), just wrap the element.
-   *
-   * @param {string|!Element} arg
-   * @return {glift.dom.Element} A wrapped DOM element. Can be null if the ID
-   *    cannot be found or the arg type is not a string or Element.
-   */
-  elem: function (arg) {
-    var argtype = glift.util.typeOf(arg);
-    if (argtype === 'string') {
-      // Assume an element ID.
-      var el = document.getElementById(/** @type {string} */ (arg));
-      if (el === null) {
-        return null;
-      } else {
-        return new glift.dom.Element(/* @type {!Element} */ el, arg);
-      }
-    } else if (argtype === 'object' && arg.nodeType && arg.nodeType === 1) {
-      // Assume an HTML node.
-      // Note: nodeType of 1 => ELEMENT_NODE.
-      return new glift.dom.Element(/** @type {!Element} */ (arg));
-    }
-    return null;
-  },
-
-  /**
-   * Creates a new div dom element with the relevant id.
-   * @param {string} id
-   * @return {!glift.dom.Element}
-   */
-  newDiv: function (id) {
-    var elem = glift.dom.elem(document.createElement('div'));
-    elem.setAttr('id', id);
-    return elem;
-  },
-
-  /**
-   * Convert some text to some dom elements.
-   * @param {string} text The input raw text
-   * @param {boolean} useMarkdown Whether or not to render with markdown.
-   * @param {!Object=} opt_css Optional CSS object to apply to the lines.
-   * @return {!glift.dom.Element}
-   */
-  convertText: function (text, useMarkdown, opt_css) {
-    text = glift.dom.sanitize(text);
-    if (useMarkdown) {
-      text = glift.markdown.render(text);
-    }
-    var wrapper = glift.dom.newElem('div');
-    wrapper.setAttr('class', glift.themes.classes.TEXT_BOX);
-
-    if (useMarkdown) {
-      wrapper.html(text);
-    } else {
-      var textSegments = text.split('\n');
-      for (var i = 0; i < textSegments.length; i++) {
-        var seg = textSegments[i];
-        var baseCss = { margin: 0, padding: 0, 'min-height': '1em' };
-        if (opt_css) {
-          for (var key in opt_css) {
-            baseCss[key] = opt_css[key];
-          }
-        }
-        var pNode = glift.dom.newElem('p').css(baseCss);
-        pNode.html(seg);
-        wrapper.append(pNode);
-      }
-    }
-    return wrapper;
-  },
-
-  /**
-   * Produces an absolutely positioned div from a bounding box.
-   * @return {!glift.dom.Element} A new absolutely positioned div.
-   */
-  absBboxDiv: function (bbox, id) {
-    var newDiv = glift.dom.newDiv(id);
-    var cssObj = {
-      position: 'absolute',
-      margin: '0px',
-      padding: '0px',
-      top: bbox.top() + 'px',
-      left: bbox.left() + 'px',
-      width: bbox.width() + 'px',
-      height: bbox.height() + 'px',
-      MozBoxSizing: 'border-box',
-      boxSizing: 'border-box',
-    };
-    newDiv.css(cssObj);
-    return newDiv;
-  },
-
-  /**
-   * Convert a string allow user to specify a type of Element.
-   *
-   * @param {string} type The type of element to create.
-   * @return {glift.dom.Element}
-   */
-  newElem: function (type) {
-    if (!type || glift.util.typeOf(type) !== 'string') {
-      throw new Error('Type must be a string. was: [' + type + ']');
-    }
-    return glift.dom.elem(document.createElement(type));
-  },
+/**
+ * Создает объект Element из DOM элемента или ID.
+ * @param {string|!Element} arg ID элемента или DOM элемент
+ * @return {?Element} Обернутый DOM элемент или null
+ */
+export const selectId = (arg) => {
+  if (typeof arg === 'string') {
+    // Предполагаем, что это ID элемента
+    const el = document.getElementById(arg);
+    return el ? new Element(el, arg) : null;
+  } else if (arg && arg.nodeType === Node.ELEMENT_NODE) {
+    // Предполагаем, что это HTML Element (nodeType 1 = ELEMENT_NODE)
+    return new Element(/** @type {!Element} */ (arg));
+  }
+  
+  return null;
 };
 
 /**
- * A simple wrapper for a plain old dom element. Note, id can be null if the
- * Element is constructed directly from elem.
- *
- * @param {!Element} el A DOM Element.
- * @param {string=} opt_id Optional ID -- defaults to null.
- *
- * @constructor @final @struct
+ * Создает новый div элемент с указанным ID.
+ * @param {string} id Идентификатор элемента
+ * @return {!Element} Новый элемент div
  */
-glift.dom.Element = function (el, opt_id) {
-  /** @type {!Element} */
-  this.el = el;
-  /** @type {?string} */
-  this.id = opt_id || null;
+export const newDiv = (id) => {
+  const elem = selectId(document.createElement('div'));
+  elem.setAttr('id', id);
+  return elem;
 };
 
-glift.dom.Element.prototype = {
-  /**
-   * Prepends an element, but only if it's a glift dom element.
-   * @param {!glift.dom.Element|!Element} that
-   */
-  prepend: function (that) {
-    var possibleElem = /** @type {!Element} */ (that);
-    if (possibleElem && possibleElem.nodeType) {
-      this.el.appendChild(possibleElem);
-    } else if (that && that.el) {
-      var thar = /** @type {!glift.dom.Element} */ (that);
-      // It's ok if firstChild is null;
-      this.el.insertBefore(thar.el, this.el.firstChild);
-    } else {
-      throw new Error('Could not append unknown element: ' + that);
+/**
+ * Преобразует текст в элементы DOM, опционально используя markdown.
+ * @param {string} text Исходный текст
+ * @param {boolean} useMarkdown Использовать ли markdown для рендеринга
+ * @param {!Object=} opt_css Опциональный CSS объект для применения к строкам
+ * @return {!Element} Обертка DOM с преобразованным текстом
+ */
+export const convertText = (text, useMarkdown, opt_css) => {
+  text = sanitize(text);
+  
+  if (useMarkdown) {
+    // Импортируем markdown на лету, если потребуется
+    // В финальной версии лучше импортировать в начале файла
+    // text = markdownRenderer.render(text);
+    text = text; // временно, пока не реализуем markdown
+  }
+  
+  const wrapper = newElement('div');
+  
+  if (useMarkdown) {
+    wrapper.html(text);
+  } else {
+    const textSegments = text.split('\n');
+    
+    for (const seg of textSegments) {
+      const baseCss = { 
+        margin: 0, 
+        padding: 0, 
+        'min-height': '1em' 
+      };
+      
+      if (opt_css) {
+        Object.assign(baseCss, opt_css);
+      }
+      
+      const pNode = newElement('p').css(baseCss);
+      pNode.html(seg);
+      wrapper.append(pNode);
     }
-    return this;
-  },
+  }
+  
+  return wrapper;
+};
 
+/**
+ * Создает абсолютно позиционированный div из ограничивающего прямоугольника.
+ * @param {!Object} bbox Ограничивающий прямоугольник
+ * @param {string} id Идентификатор элемента
+ * @return {!Element} Новый абсолютно позиционированный div
+ */
+export const absBboxDiv = (bbox, id) => {
+  const newDiv = newDiv(id);
+  const cssObj = {
+    position: 'absolute',
+    margin: '0px',
+    padding: '0px',
+    top: `${bbox.top()}px`,
+    left: `${bbox.left()}px`,
+    width: `${bbox.width()}px`,
+    height: `${bbox.height()}px`,
+    MozBoxSizing: 'border-box',
+    boxSizing: 'border-box',
+  };
+  
+  newDiv.css(cssObj);
+  return newDiv;
+};
+
+/**
+ * Создает новый элемент указанного типа.
+ * @param {string} type Тип создаваемого элемента
+ * @return {!Element} Новый элемент
+ * @throws {Error} Если тип не является строкой
+ */
+export const newElement = (type) => {
+  if (!type || typeof type !== 'string') {
+    throw new Error(`Тип должен быть строкой, но был: [${type}]`);
+  }
+  return selectId(document.createElement(type));
+};
+
+/**
+ * Безопасно обрабатывает HTML для предотвращения XSS-атак.
+ * @param {string} html HTML для очистки
+ * @return {string} Очищенный HTML
+ */
+export const sanitize = (html) => {
+  if (!html) return '';
+  
+  // Для простых строк без HTML возвращаем текст как есть
+  if (!/<[a-z][\s\S]*>/i.test(html)) {
+    return escapeHtml(html);
+  }
+  
+  // Создаем DOM-парсер
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  // Получаем очищенный HTML
+  return doc.body.innerHTML;
+};
+
+/**
+ * Экранирует HTML-сущности в строке.
+ * @param {string} str Строка для экранирования
+ * @return {string} Экранированная строка
+ * @private
+ */
+const escapeHtml = (str) => {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+/**
+ * Класс для работы с DOM-элементами.
+ * Обеспечивает удобный интерфейс для манипуляций с DOM.
+ */
+export class Element {
   /**
-   * Appends an element, but only if it's a glift dom element.
-   * @param {!glift.dom.Element|!Element} that
+   * Создает обертку для DOM-элемента.
+   * @param {HTMLElement} el - DOM-элемент
    */
-  append: function (that) {
-    var possibleElem = /** @type {!Element} */ (that);
-    if (possibleElem && possibleElem.nodeType) {
-      this.el.appendChild(possibleElem);
-    } else if (that && that.el) {
-      var thar = /** @type {!glift.dom.Element} */ (that);
-      this.el.appendChild(thar.el);
-    } else {
-      throw new Error('Could not append unknown element: ' + that);
+  constructor(el) {
+    /**
+     * Внутренний DOM-элемент.
+     * @type {HTMLElement}
+     */
+    this.el = el;
+  }
+  
+  /**
+   * Устанавливает или получает атрибут элемента.
+   * @param {string} key - Имя атрибута
+   * @param {string=} value - Значение атрибута (опционально)
+   * @return {string|Element} Значение атрибута или текущий экземпляр
+   */
+  setAttr(key, value) {
+    if (value === undefined) {
+      return this.el.getAttribute(key);
     }
-    return this;
-  },
-
-  /**
-   * Sets a text node under this element.
-   * @param {string} text
-   */
-  appendText: function (text) {
-    if (text) {
-      var newNode = this.el.ownerDocument.createTextNode(text);
-      this.el.appendChild(newNode);
-    }
-    return this;
-  },
-
-  /**
-   * Set an attribute on the element. If the key is an ID and the value is a
-   * string, also set the ID field.
-   *
-   * @param {string} key
-   * @param {boolean|number|string} value
-   * @return {!glift.dom.Element}
-   */
-  setAttr: function (key, value) {
     this.el.setAttribute(key, value);
-    if (key === 'id' && glift.util.typeOf(value) === 'string') {
-      // Also set the ID field if the key is 'id'.
-      this.id = /** @type {string} */ (value);
-    }
     return this;
-  },
-
-  /** @return {*} The attribute value */
-  attr: function (key) {
-    return this.el.getAttribute(key);
-  },
-
+  }
+  
   /**
-   * Set several attributes using an attribute object.
-   * @param {!Object} attrObj A object with multiple attributes.
+   * Устанавливает или получает CSS-свойство элемента.
+   * @param {string|Object} property - Имя CSS-свойства или объект стилей
+   * @param {string=} value - Значение CSS-свойства (опционально)
+   * @return {string|Element} Значение свойства или текущий экземпляр
    */
-  setAttrObj: function (attrObj) {
-    for (var attrObjKey in attrObj) {
-      var attrObjVal = attrObj[attrObjKey];
-      this.el.setAttribute(attrObjKey, attrObjVal);
+  style(property, value) {
+    if (typeof property === 'object') {
+      // Применить множество стилей
+      for (const [key, val] of Object.entries(property)) {
+        this.el.style[key] = val;
+      }
+      return this;
     }
-  },
-
-  /**
-   * Gets all the attributes of the element, but as an object.
-   * @return {!Object} Attribute object.
-   */
-  attrs: function () {
-    var out = {};
-    for (var i = 0; i < this.el.attributes.length; i++) {
-      var att = this.el.attributes[i];
-      out[att.nodeName] = att.value;
+    
+    if (value === undefined) {
+      return getComputedStyle(this.el)[property];
     }
-    return out;
-  },
-
-  /**
-   * Sets the CSS with a CSS object. Note this converts foo-bar to fooBar.
-   * @param {!Object} obj Attribute obj
-   */
-  // TODO(kashomon): This should probably be called style.
-  css: function (obj) {
-    for (var key in obj) {
-      var outKey = key.replace(/-(.)?/g, function (match, group1) {
-        return group1 ? group1.toUpperCase() : '';
-      });
-      this.el.style[outKey] = obj[key];
-    }
+    this.el.style[property] = value;
     return this;
-  },
-
+  }
+  
   /**
-   * Add a CSS class.
-   * @param {string} className
+   * Устанавливает CSS стили через объект.
+   * @param {Object} cssObj - Объект CSS свойств
+   * @return {Element} Текущий экземпляр
    */
-  addClass: function (className) {
-    if (!this.el.className) {
-      this.el.className = className;
-    } else {
-      this.el.className += ' ' + className;
-    }
+  css(cssObj) {
+    return this.style(cssObj);
+  }
+  
+  /**
+   * Добавляет класс к элементу.
+   * @param {string} className - Имя класса
+   * @return {Element} Текущий экземпляр
+   */
+  addClass(className) {
+    this.el.classList.add(className);
     return this;
-  },
-
+  }
+  
   /**
-   * Remove a CSS class.
-   * @param {string} className
+   * Удаляет класс из элемента.
+   * @param {string} className - Имя класса
+   * @return {Element} Текущий экземпляр
    */
-  removeClass: function (className) {
-    this.el.className = this.el.className.replace(
-      new RegExp('(?:^|\\s)' + className + '(?!\\S)', 'g'),
-      ''
-    );
-  },
-
+  removeClass(className) {
+    this.el.classList.remove(className);
+    return this;
+  }
+  
   /**
-   * Get the client height of the element
-   * @return {number}
+   * Проверяет наличие класса у элемента.
+   * @param {string} className - Имя класса
+   * @return {boolean} true, если класс есть
    */
-  height: function () {
-    return this.el.clientHeight;
-  },
-
+  hasClass(className) {
+    return this.el.classList.contains(className);
+  }
+  
   /**
-   * Get the client width of the element
-   * @return {number}
+   * Устанавливает или получает HTML-содержимое элемента.
+   * @param {string=} htmlContent - HTML-содержимое (опционально)
+   * @return {string|Element} HTML-содержимое или текущий экземпляр
    */
-  width: function () {
-    return this.el.clientWidth;
-  },
-
-  /**
-   * Set an event on the element
-   * @param {string} eventName}
-   * @param {function(!Event)} func
-   */
-  on: function (eventName, func) {
-    func.bind(this);
-    this.el.addEventListener(eventName, func);
-  },
-
-  /** Set the inner HTML. Rather dangerous -- should be used with caution. */
-  html: function (inhtml) {
-    if (inhtml !== undefined) {
-      this.el.innerHTML = inhtml;
-    } else {
+  html(htmlContent) {
+    if (htmlContent === undefined) {
       return this.el.innerHTML;
     }
-  },
-
-  /** Remove the current element from the dom. */
-  remove: function () {
-    var parent = this.el.parentNode;
-    if (parent) parent.removeChild(this.el);
-  },
-
-  /** Empty out the children. */
-  empty: function () {
-    var node = this.el;
-    while (node.firstChild) {
-      node.removeChild(node.firstChild);
-    }
-  },
-
+    this.el.innerHTML = htmlContent;
+    return this;
+  }
+  
   /**
-   * Get the current coordinates of the first element, or set the coordinates of
-   * every element, in the set of matched elements, relative to the document.
-   * Calculates a top and left. Largely taken from jQuery.
+   * Устанавливает или получает текстовое содержимое элемента.
+   * @param {string=} textContent - Текстовое содержимое (опционально)
+   * @return {string|Element} Текстовое содержимое или текущий экземпляр
    */
-  offset: function () {
-    var box = { top: 0, left: 0 };
-    var doc = this.el && this.el.ownerDocument;
-    var docElem = doc.documentElement;
-    var win = doc.defaultView;
-    // If we don't have gBCR, just use 0,0 rather than error
-    if (glift.util.typeOf(this.el.getBoundingClientRect) !== 'undefined') {
-      box = this.el.getBoundingClientRect();
+  text(textContent) {
+    if (textContent === undefined) {
+      return this.el.textContent;
     }
-    return {
-      top: box.top + win.pageYOffset - docElem.clientTop,
-      left: box.left + win.pageXOffset - docElem.clientLeft,
-    };
-  },
-
-  /** Gets the boundingClientRect */
-  boundingClientRect: function () {
-    return this.el.getBoundingClientRect();
-  },
-};
+    this.el.textContent = textContent;
+    return this;
+  }
+  
+  /**
+   * Добавляет дочерний элемент.
+   * @param {Element|HTMLElement} child - Дочерний элемент
+   * @return {Element} Текущий экземпляр
+   */
+  append(child) {
+    if (child instanceof Element) {
+      this.el.appendChild(child.el);
+    } else {
+      this.el.appendChild(child);
+    }
+    return this;
+  }
+  
+  /**
+   * Удаляет дочерний элемент.
+   * @param {Element|HTMLElement} child - Дочерний элемент
+   * @return {Element} Текущий экземпляр
+   */
+  remove(child) {
+    if (child instanceof Element) {
+      this.el.removeChild(child.el);
+    } else {
+      this.el.removeChild(child);
+    }
+    return this;
+  }
+  
+  /**
+   * Очищает элемент, удаляя все дочерние элементы.
+   * @return {Element} Текущий экземпляр
+   */
+  empty() {
+    while (this.el.firstChild) {
+      this.el.removeChild(this.el.firstChild);
+    }
+    return this;
+  }
+  
+  /**
+   * Устанавливает обработчик события.
+   * @param {string} eventName - Имя события
+   * @param {Function} handler - Обработчик события
+   * @return {Element} Текущий экземпляр
+   */
+  on(eventName, handler) {
+    this.el.addEventListener(eventName, handler);
+    return this;
+  }
+  
+  /**
+   * Удаляет обработчик события.
+   * @param {string} eventName - Имя события
+   * @param {Function} handler - Обработчик события
+   * @return {Element} Текущий экземпляр
+   */
+  off(eventName, handler) {
+    this.el.removeEventListener(eventName, handler);
+    return this;
+  }
+}

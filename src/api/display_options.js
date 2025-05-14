@@ -1,152 +1,160 @@
 goog.provide('glift.api.DisplayOptions');
+goog.provide('glift.api.themes');
 
 /**
- * Miscellaneous options for display.
- * api:1.0
- *
- * @param {glift.api.DisplayOptions=} opt_o Optional display options obj.
- *
- * @constructor @final @struct
+ * Доступные темы оформления
+ * @enum {string}
+ * @const
  */
-glift.api.DisplayOptions = function (opt_o) {
-  var o = opt_o || {};
+glift.api.themes = Object.freeze({
+  /** Стандартная тема с обычными камнями */
+  DEFAULT: 'DEFAULT',
+  
+  /** Камни с тенями для объемного эффекта */
+  DEPTH: 'DEPTH',
+  
+  /** Серый фон, камни без контура */
+  MOODY: 'MOODY',
+  
+  /** Прозрачная доска */
+  TRANSPARENT: 'TRANSPARENT',
+  
+  /** Черно-белое оформление */
+  TEXTBOOK: 'TEXTBOOK'
+});
 
+/**
+ * Опции отображения для Glift.
+ * Управляют визуальным отображением и поведением виджетов.
+ * 
+ * @api стабильный
+ */
+class DisplayOptions {
   /**
-   * Specify a background image for the go board.  You can specify an absolute
-   * or a relative path.  As you may expect, you cannot do cross domain
-   * requests.
-   *
-   * Examples:
-   *  'images/kaya.jpg'
-   *  'http://www.mywebbie.com/images/kaya.jpg'
-   *
-   * api:1.0
-   *
-   * @type {string}
-   * @const
+   * @param {!Object=} opt_o Опциональный объект с настройками отображения
    */
-  this.goBoardBackground = o.goBoardBackground || '';
+  constructor(opt_o = {}) {
+    /**
+     * Фоновое изображение доски для игры Го.
+     * Можно указать абсолютный или относительный путь.
+     * Как и ожидается, нельзя делать запросы к другим доменам.
+     *
+     * Примеры:
+     *  'images/kaya.jpg'
+     *  'http://www.example.com/images/kaya.jpg'
+     *
+     * @type {string}
+     */
+    this.goBoardBackground = opt_o.goBoardBackground || '';
 
-  /**
-   * The name of the theme to be used for this instance. Other themes include:
-   *  - DEPTH (stones with shadows)
-   *  - MOODY (gray background, no stone outlines)
-   *  - TRANSPARENT (board is transparent)
-   *  - TEXTBOOK (Everything black and white)
-   * api:1.0
-   *
-   * @type {string}
-   * @const
-   */
-  // TODO(kashomon): Make a proper enum for this.
-  this.theme = o.theme || 'DEFAULT';
+    /**
+     * Имя темы, используемой для этого экземпляра.
+     * Используйте константы из glift.api.themes.
+     * 
+     * @type {string}
+     */
+    this.theme = opt_o.theme || glift.api.themes.DEFAULT;
 
-  /**
-   * On the edges of the board, draw the board coordinates.
-   * - On the left, use the numbers 1-19
-   * - On the bottom, use A-T (all letters minus I)
-   * api:1.0
-   *
-   * @type {boolean}
-   * @const
-   */
-  this.drawBoardCoords = !!o.drawBoardCoords || false;
+    /**
+     * Отображать ли координаты по краям доски.
+     * - Слева используются цифры 1-19
+     * - Снизу используются буквы A-T (все буквы кроме I)
+     *
+     * @type {boolean}
+     */
+    this.drawBoardCoords = !!opt_o.drawBoardCoords;
 
-  /**
-   * The minimum height that Glift will use for the display. In otherwords,
-   * force the enclosing div to have at least this height. Note that users must
-   * supply the units. Ex: 500px
-   *
-   * api:1.0
-   *
-   * @type {string}
-   * @const
-   */
-  this.minHeight = o.minHeight || '';
+    /**
+     * Минимальная высота, которую Glift будет использовать для отображения.
+     * Фактически, заставляет содержащий div иметь как минимум эту высоту.
+     * Обратите внимание, что пользователи должны указать единицы измерения.
+     * Например: '500px'
+     *
+     * @type {string}
+     */
+    this.minHeight = opt_o.minHeight || '';
 
-  /**
-   * Similar to the above, the minimum widththat Glift will use for the display.
-   * As with height, users must specify the units. (Ex: 500px).
-   * api:1.0
-   *
-   * @type {string}
-   * @const
-   */
-  this.minWidth = o.minWidth || '';
+    /**
+     * Аналогично minHeight, минимальная ширина для отображения Glift.
+     * Как и с высотой, пользователи должны указать единицы измерения.
+     * Например: '500px'
+     *
+     * @type {string}
+     */
+    this.minWidth = opt_o.minWidth || '';
 
-  /**
-   * Split percentages to use for a one-column widget format.
-   *
-   * @type {!Object}
-   * @const
-   */
-  // TODO(kashomon): Define proper type for this.
-  this.oneColumnSplits = o.oneColumnSplits || {
-    first: [
-      { component: 'STATUS_BAR', ratio: 0.06 },
-      { component: 'BOARD', ratio: 0.67 },
-      { component: 'COMMENT_BOX', ratio: 0.18 },
-      { component: 'ICONBAR', ratio: 0.09 },
-    ],
-  };
+    /**
+     * Проценты разделения для одноколоночного формата виджета.
+     * Определяет пропорции для различных компонентов интерфейса.
+     *
+     * @type {!Object}
+     */
+    this.oneColumnSplits = opt_o.oneColumnSplits || {
+      first: [
+        { component: 'STATUS_BAR', ratio: 0.06 },
+        { component: 'BOARD', ratio: 0.67 },
+        { component: 'COMMENT_BOX', ratio: 0.18 },
+        { component: 'ICONBAR', ratio: 0.09 },
+      ],
+    };
 
-  /**
-   * Split percentages to use for a two-column widget format.
-   *
-   * @type {!Object}
-   * @const
-   */
-  // TODO(kashomon): Define a proper type for this.
-  this.twoColumnSplits = o.twoColumnSplits || {
-    first: [{ component: 'BOARD', ratio: 1 }],
-    second: [
-      { component: 'STATUS_BAR', ratio: 0.07 },
-      { component: 'COMMENT_BOX', ratio: 0.83 },
-      { component: 'ICONBAR', ratio: 0.1 },
-    ],
-  };
+    /**
+     * Проценты разделения для двухколоночного формата виджета.
+     *
+     * @type {!Object}
+     */
+    this.twoColumnSplits = opt_o.twoColumnSplits || {
+      first: [{ component: 'BOARD', ratio: 1 }],
+      second: [
+        { component: 'STATUS_BAR', ratio: 0.07 },
+        { component: 'COMMENT_BOX', ratio: 0.83 },
+        { component: 'ICONBAR', ratio: 0.1 },
+      ],
+    };
 
-  /**
-   * Previous SGF icon.
-   * @type {string}
-   * @const
-   */
-  this.previousSgfIcon = o.previousSgfIcon || 'chevron-left';
+    /**
+     * Иконка для перехода к предыдущему SGF.
+     * @type {string}
+     */
+    this.previousSgfIcon = opt_o.previousSgfIcon || 'chevron-left';
 
-  /**
-   * Next SGF Icon.
-   * @type {string}
-   * @const
-   */
-  this.nextSgfIcon = o.nextSgfIcon || 'chevron-right';
+    /**
+     * Иконка для перехода к следующему SGF.
+     * @type {string}
+     */
+    this.nextSgfIcon = opt_o.nextSgfIcon || 'chevron-right';
 
-  /**
-   * For convenience: Disable zoom for mobile users.
-   * @type {boolean}
-   * @const
-   */
-  this.disableZoomForMobile = !!o.disableZoomForMobile || false;
+    /**
+     * Отключить масштабирование для мобильных пользователей.
+     * Удобно для предотвращения случайного масштабирования.
+     * 
+     * @type {boolean}
+     */
+    this.disableZoomForMobile = !!opt_o.disableZoomForMobile;
 
-  /**
-   * Whether or not to enable keyboard shortcuts. This currently binds
-   * keypress events to document.body, so it's not unlikely this could
-   * conflict with other applications' keybindings.
-   * Defaults to enabled.
-   * @type {boolean}
-   * @const
-   */
-  this.enableKeyboardShortcuts =
-    o.enableKeyboardShortcuts !== undefined
-      ? !!o.enableKeyboardShortcuts
+    /**
+     * Включить ли сочетания клавиш.
+     * Обратите внимание, что в настоящее время это привязывает события
+     * нажатия клавиш к document.body, поэтому возможен конфликт
+     * с сочетаниями клавиш других приложений.
+     * По умолчанию включено.
+     * 
+     * @type {boolean}
+     */
+    this.enableKeyboardShortcuts = opt_o.enableKeyboardShortcuts !== undefined
+      ? !!opt_o.enableKeyboardShortcuts
       : true;
 
-  /**
-   * Use Markdown for the comment box.  This requires that marked.js be
-   * installed in the global scope. (https://github.com/chjj/marked)
-   * api:experimental
-   *
-   * @type {boolean}
-   * @const
-   */
-  this.useMarkdown = !!o.useMarkdown || false;
-};
+    /**
+     * Использовать Markdown для комментариев.
+     * Это требует, чтобы marked.js был установлен в глобальной области.
+     * (https://github.com/chjj/marked)
+     * 
+     * @type {boolean}
+     */
+    this.useMarkdown = !!opt_o.useMarkdown;
+  }
+}
+
+// Присваиваем класс к пространству имен
+glift.api.DisplayOptions = DisplayOptions;

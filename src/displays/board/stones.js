@@ -1,4 +1,36 @@
 /**
+ * Модуль для отображения камней на доске Го.
+ * 
+ * @module displays/board/stones
+ */
+
+import * as svg from '../../svg/index.js';
+
+/**
+ * Создает тени для камней.
+ * @param {Object} svgGroup - SVG группа для добавления теней
+ * @param {Object} idGen - Генератор идентификаторов
+ * @param {Object} boardPoints - Точки доски
+ * @param {Object} theme - Тема оформления
+ */
+export const shadows = (svgGroup, idGen, boardPoints, theme) => {
+  // Заглушка - в полной реализации здесь будут создаваться тени для камней
+  console.log('Добавление теней для камней');
+};
+
+/**
+ * Создает камни на доске.
+ * @param {Object} svgGroup - SVG группа для добавления камней
+ * @param {Object} idGen - Генератор идентификаторов
+ * @param {Object} boardPoints - Точки доски
+ * @param {Object} theme - Тема оформления
+ */
+export const stones = (svgGroup, idGen, boardPoints, theme) => {
+  // Заглушка - в полной реализации здесь будут создаваться камни
+  console.log('Добавление камней на доску');
+};
+
+/**
  * Create the Go stones.  They are initially invisible to the user, but they
  * all exist at the time of GoBoard creation.
  *

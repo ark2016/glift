@@ -1,15 +1,44 @@
-goog.provide('glift.WidgetType');
-
 /**
- * The types of widgets users can create. Used to link Controllers and Options.
+ * Типы виджетов, которые пользователи могут создать.
+ * Используется для связи контроллеров и опций.
  *
  * @enum {string}
+ * @readonly
  */
-glift.WidgetType = {
+export const WIDGET_TYPE = Object.freeze({
+  /**
+   * Проблема с несколькими правильными вариациями.
+   * Отображает задачу Го, в которой есть несколько правильных решений.
+   */
   CORRECT_VARIATIONS_PROBLEM: 'CORRECT_VARIATIONS_PROBLEM',
+  
+  /**
+   * Простой пример игры.
+   * Отображает SGF-файл в режиме примера, обычно без взаимодействия.
+   */
   EXAMPLE: 'EXAMPLE',
+  
+  /**
+   * Полноценный просмотрщик игры.
+   * Позволяет просматривать SGF-файл с полным набором функций.
+   */
   GAME_VIEWER: 'GAME_VIEWER',
+  
+  /**
+   * Упрощенный просмотрщик игры.
+   * Отображает SGF-файл с ограниченным набором функций.
+   */
   REDUCED_GAME_VIEWER: 'REDUCED_GAME_VIEWER',
+  
+  /**
+   * Стандартная задача Го.
+   * Отображает задачу с одним правильным решением.
+   */
   STANDARD_PROBLEM: 'STANDARD_PROBLEM',
-  BOARD_EDITOR: 'BOARD_EDITOR',
-};
+  
+  /**
+   * Редактор доски.
+   * Позволяет создавать и редактировать позиции на доске.
+   */
+  BOARD_EDITOR: 'BOARD_EDITOR'
+});

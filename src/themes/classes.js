@@ -1,29 +1,40 @@
-goog.provide('glift.themes.clasess');
+goog.provide('glift.themes.classes');
 
 /**
- * Built-in classes used to style Glift.
+ * CSS class names used to style Glift components.
+ * 
+ * These constants are used throughout the application to ensure
+ * consistent class naming and to avoid typos.
  *
- * Q: Should glift ever be styled in two different ways in the page? My gut says
- * that should be allowed, but I can't think of a counter example.
- *
- * @enum{string}
+ * @enum {string}
+ * @readonly
  */
-glift.themes.classes = {
-  /** Css container for generic text boxes. */
+glift.themes.classes = Object.freeze({
+  /** Container for generic text boxes */
   TEXT_BOX: 'glift-text-box',
 
-  /** An elem that's absolutely positioned */
+  /** Element with absolute positioning */
   ABSOLUTE_ELEM: 'glift-absolute-elem',
 
   /// ///////////////////////
   // Basic board elements //
   /// ///////////////////////
 
+  /** The main Go board element */
   BOARD: 'glift-board',
+  
+  /** Star points on the Go board */
   STARPOINTS: 'glift-starpoints',
+  
+  /** Board grid lines */
   BOARD_LINES: 'glift-board-lines',
+  
+  /** Coordinate labels around the board */
   BOARD_COORD_LABELS: 'glift-board-coord-labels',
 
+  /** Shadow effects for stones */
   STONE_SHADOWS: 'glift-stone-shadows',
+  
+  /** Marks on stones (triangles, circles, etc.) */
   STONE_MARKS: 'glift-stone-marks',
-};
+});

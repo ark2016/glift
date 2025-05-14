@@ -1,84 +1,79 @@
-goog.require('glift.displays.board');
+/**
+ * @fileoverview Модуль для отображения линий на доске Го.
+ * 
+ * @module displays/board/lines
+ */
+
+import * as svg from '../../svg/index.js';
+import { Point } from '../../util/index.js';
 
 /**
- * Create the background lines. These are create at each individual intersection
- * rather than as a whole so that we can clear theme out when we to draw marks
- * on the raw board (rather than on stones).
- *
- * @param {!glift.svg.SvgObj} svg Base svg obj
- * @param {!glift.displays.svg.IdGenerator} idGen The ID generator for SVG.
- * @param {!glift.flattener.BoardPoints} boardPoints Board points object.
- * @param {!glift.themes.base} theme The theme object
+ * Создает группу линий на доске.
+ * 
+ * @param {SvgElement} svgObj - SVG объект, куда добавляются линии
+ * @param {IdGenerator} idGen - Генератор идентификаторов
+ * @param {BoardPoints} boardPoints - Точки доски
+ * @param {Object} theme - Тема оформления
+ * @return {SvgElement} Группа линий
  */
-glift.displays.board.lines = function (svg, idGen, boardPoints, theme) {
-  var container = glift.svg.group().setId(idGen.lineGroup());
-  svg.append(container);
+export const lines = (svgObj, idGen, boardPoints, theme) => {
+  const container = svg.group().setId(idGen.lineGroup());
+  svgObj.append(container);
 
-  var data = boardPoints.data();
-  for (var i = 0, ii = data.length; i < ii; i++) {
-    var pt = data[i];
+  const data = boardPoints.data();
+  for (let i = 0, ii = data.length; i < ii; i++) {
+    const pt = data[i];
     container.append(
-      glift.svg
-        .path()
-        .setAttr(
-          'd',
-          glift.displays.board.intersectionLine(
-            pt,
-            boardPoints.radius,
-            boardPoints.numIntersections
-          )
-        )
+      svg.path()
+        .setAttr('d', intersectionLine(
+          pt,
+          boardPoints.radius,
+          boardPoints.numIntersections
+        ))
         .setAttr('stroke', theme.lines.stroke)
         .setAttr('stroke-width', theme.lines['stroke-width'])
         .setAttr('stroke-linecap', 'round')
         .setId(idGen.line(pt.intPt))
     );
   }
+  
+  return container;
 };
 
 /**
- * @param {!glift.flattener.BoardPt} boardPt A
- * @param {!number} radius Size of the space between the lines
- * @param {!number} numIntersections Number of intersecitons on the board.
+ * Создает SVG путь для линий пересечения.
+ * 
+ * @param {BoardPt} boardPt - Точка доски
+ * @param {number} radius - Радиус между линиями
+ * @param {number} numIntersections - Количество пересечений на доске
+ * @return {string} SVG путь
  */
-glift.displays.board.intersectionLine = function (
-  boardPt,
-  radius,
-  numIntersections
-) {
+export const intersectionLine = (boardPt, radius, numIntersections) => {
   // minIntersects: 0 indexed,
   // maxIntersects: 0 indexed,
-  // numIntersections: 1 indexed (it's the number of intersections)
-  var minIntersects = 0,
-    maxIntersects = numIntersections - 1,
-    coordinate = boardPt.coordPt,
-    intersection = boardPt.intPt,
-    svgpath = glift.svg.pathutils;
-  var top =
-    intersection.y() === minIntersects
-      ? coordinate.y()
-      : coordinate.y() - radius;
-  var bottom =
-    intersection.y() === maxIntersects
-      ? coordinate.y()
-      : coordinate.y() + radius;
-  var left =
-    intersection.x() === minIntersects
-      ? coordinate.x()
-      : coordinate.x() - radius;
-  var right =
-    intersection.x() === maxIntersects
-      ? coordinate.x()
-      : coordinate.x() + radius;
-  var line =
-    // Vertical Line
-    svgpath.move(coordinate.x(), top) +
-    ' ' +
-    svgpath.lineAbs(coordinate.x(), bottom) +
-    ' ' +
-    // Horizontal Line
-    svgpath.move(left, coordinate.y()) +
-    ' ' +
-    svgpath.lineAbs(right, coordinate.y());
-  return line;
+  // numIntersections: 1 indexed (количество пересечений)
+  const minIntersects = 0;
+  const maxIntersects = numIntersections - 1;
+  
+  const coordinate = boardPt.coordPt;
+  const intersection = boardPt.intPt;
+  
+  const top = intersection.y() === minIntersects
+    ? coordinate.y()
+    : coordinate.y() - radius;
+    
+  const bottom = intersection.y() === maxIntersects
+    ? coordinate.y()
+    : coordinate.y() + radius;
+    
+  const left = intersection.x() === minIntersects
+    ? coordinate.x()
+    : coordinate.x() - radius;
+    
+  const right = intersection.x() === maxIntersects
+    ? coordinate.x()
+    : coordinate.x() + radius;
+    
+  // Создаем SVG путь
+  return `M ${coordinate.x()},${top} L ${coordinate.x()},${bottom} M ${left},${coordinate.y()} L ${right},${coordinate.y()}`;
 };

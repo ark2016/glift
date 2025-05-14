@@ -8,20 +8,23 @@ goog.require('glift.controllers.BaseController');
  * @type {!glift.controllers.ControllerFunc}
  */
 glift.controllers.gameViewer = function (sgfOptions) {
-  var ctrl = glift.controllers;
-  var baseController = glift.util.beget(ctrl.base());
-  var newController =
-    /** @type {!glift.controllers.BaseController} */
-    (glift.util.setMethods(baseController, ctrl.GameViewer.prototype));
+  const ctrl = glift.controllers;
+  const baseController = glift.util.beget(ctrl.base());
+  
+  const newController = /** @type {!glift.controllers.BaseController} */ (
+    glift.util.setMethods(baseController, ctrl.GameViewer.prototype)
+  );
+  
   if (!sgfOptions) {
     throw new Error('SGF Options was not defined, but must be defined');
   }
+  
   newController.initOptions(sgfOptions);
   return newController;
 };
 
 /**
- * Stub class to be used for inheritance.
+ * Game Viewer controller for navigating SGF game records.
  *
  * @extends {glift.controllers.BaseController}
  * @constructor
@@ -32,49 +35,52 @@ glift.controllers.GameViewer.prototype = {
   /**
    * Called during initOptions, in the BaseController.
    *
-   * This creates a treepath (a persisted treepath) and an index into the
-   * treepath.  This allows us to 'remember' the last variation taken by the
-   * player, which seems to be the standard behavior.
+   * Creates a persisted treepath and an index to remember the last
+   * variation taken by the player.
    */
-  extraOptions: function () {},
+  extraOptions() {},
 
   /**
    * Find the variation associated with the played move.
    *
-   * Returns null if the addStone operation isn't possible.
+   * @param {!glift.Point} point The point where the stone was placed
+   * @param {glift.enums.states} color The stone color
+   * @return {?glift.flattener.Flattened} Flattened state or null if invalid move
    */
-  addStone: function (point, color) {
-    var possibleMap = this.possibleNextMoves_();
-    var key = point.toString() + '-' + color;
+  addStone(point, color) {
+    const possibleMap = this.possibleNextMoves_();
+    const key = `${point.toString()}-${color}`;
+    
     if (possibleMap[key] === undefined) {
       return null;
     }
-    var nextVariationNum = possibleMap[key];
+    
+    const nextVariationNum = possibleMap[key];
     return this.nextMove(nextVariationNum);
   },
 
   /**
    * Go back to the previous branch or comment.
    *
-   * If maxMovesPrevious is defined, then we cap the number of moves at
-   * maxMovesPrevious. Otherwise, we keep going until we hit the beginning of
-   * the game.
-   *
-   * Returns null in the case that we're at the root already.
+   * @param {number=} maxMovesPrevious Maximum number of moves to go back
+   * @return {!glift.flattener.Flattened} Flattened state
    */
-  previousCommentOrBranch: function (maxMovesPrevious) {
-    var displayData = null;
-    var movesSeen = 0;
+  previousCommentOrBranch(maxMovesPrevious) {
+    let displayData = null;
+    let movesSeen = 0;
+    
     do {
       displayData = this.prevMove();
-      var comment = this.movetree.properties().getComment();
-      var numChildern = this.movetree.node().numChildren();
+      const comment = this.movetree.properties().getComment();
+      const numChildren = this.movetree.node().numChildren();
       movesSeen++;
+      
       if (maxMovesPrevious && movesSeen === maxMovesPrevious) {
         break;
       }
-    } while (displayData && !comment && numChildern <= 1);
-    // It's more expected to reset the 'next' variation to zero.
+    } while (displayData && !comment && numChildren <= 1);
+    
+    // Reset the 'next' variation to zero
     this.setNextVariation(0);
     return this.flattenedState();
   },
@@ -82,68 +88,72 @@ glift.controllers.GameViewer.prototype = {
   /**
    * Go to the next branch or comment.
    *
-   * If maxMovesNext is defined, then we cap the number of moves at
-   * maxMovesNext. Otherwise, we keep going until we hit the beginning of
-   * the game.
-   *
-   * Returns null in the case that we're at the root already.
+   * @param {number=} maxMovesNext Maximum number of moves to go forward
+   * @return {!glift.flattener.Flattened} Flattened state
    */
-  nextCommentOrBranch: function (maxMovesNext) {
-    var displayData = null;
-    var movesSeen = 0;
+  nextCommentOrBranch(maxMovesNext) {
+    let displayData = null;
+    let movesSeen = 0;
+    
     do {
       displayData = this.nextMove();
-      var comment = this.movetree.properties().getComment();
-      var numChildern = this.movetree.node().numChildren();
+      const comment = this.movetree.properties().getComment();
+      const numChildren = this.movetree.node().numChildren();
       movesSeen++;
+      
       if (maxMovesNext && movesSeen === maxMovesNext) {
         break;
       }
-    } while (displayData && !comment && numChildern <= 1);
+    } while (displayData && !comment && numChildren <= 1);
+    
     return this.flattenedState();
   },
 
   /**
    * Move up what variation will be next retrieved.
+   * @return {!glift.controllers.GameViewer} this, for chaining
    */
-  moveUpVariations: function () {
+  moveUpVariations() {
+    const numChildren = this.movetree.node().numChildren();
     return this.setNextVariation(
-      (this.nextVariationNumber() + 1) % this.movetree.node().numChildren()
+      (this.nextVariationNumber() + 1) % numChildren
     );
   },
 
   /**
-   * Move down  what variation will be next retrieved.
+   * Move down what variation will be next retrieved.
+   * @return {!glift.controllers.GameViewer} this, for chaining
    */
-  moveDownVariations: function () {
-    // Module is defined incorrectly for negative numbers.  So, we need to add n
-    // to the result.
+  moveDownVariations() {
+    // Module is defined incorrectly for negative numbers.
+    // We need to add n to the result.
+    const numChildren = this.movetree.node().numChildren();
     return this.setNextVariation(
-      (this.nextVariationNumber() - 1 + +this.movetree.node().numChildren()) %
-        this.movetree.node().numChildren()
+      (this.nextVariationNumber() - 1 + numChildren) % numChildren
     );
   },
 
   /**
-   * Get the possible next moves.  Used to verify that a click is actually
-   * reasonable.
+   * Get the possible next moves.
    *
    * Implemented as a map from point-string+color to variationNumber:
-   *  e.g., pt-BLACK : 1.  For pass, we use 'PASS' as the point string.  This is
-   *  sort of a hack and should maybe be rethought.
+   * e.g., "10,10-BLACK" : 1
+   * For pass, we use 'PASS' as the point string.
    *
    * @private
+   * @return {!Object<string, number>} Map of move key to variation number
    */
-  possibleNextMoves_: function () {
-    var possibleMap = {};
-    var nextMoves = this.movetree.nextMoves();
-    for (var i = 0; i < nextMoves.length; i++) {
-      var move = nextMoves[i];
-      var firstString =
-        move.point !== undefined ? move.point.toString() : 'PASS';
-      var key = firstString + '-' + move.color;
+  possibleNextMoves_() {
+    const possibleMap = {};
+    const nextMoves = this.movetree.nextMoves();
+    
+    for (let i = 0; i < nextMoves.length; i++) {
+      const move = nextMoves[i];
+      const pointStr = move.point !== undefined ? move.point.toString() : 'PASS';
+      const key = `${pointStr}-${move.color}`;
       possibleMap[key] = i;
     }
+    
     return possibleMap;
   },
 };

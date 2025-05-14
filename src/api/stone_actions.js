@@ -2,75 +2,90 @@ goog.provide('glift.api.StoneActions');
 goog.provide('glift.api.StoneFn');
 
 /**
- * A typedef representing an action that can be performed by clic
+ * Определение типа для функции обработки действий с камнями.
+ * Представляет действие, которое может быть выполнено при взаимодействии с камнем.
  *
  * @typedef {function(
  *  !Event,
  *  !glift.widgets.BaseWidget,
- *  !glift.Point)
- * }
+ *  !glift.Point
+ * )}
  */
+glift.api.StoneFn;
 
 /**
- * Actions for stones.  If the user specifies his own actions, then the
- * actions specified by the user will take precedence.
- *
- * @param {glift.api.StoneActions=} opt_o
- *
- * @constructor @final @struct
+ * Действия для камней на игровой доске.
+ * Определяет поведение при взаимодействии пользователя с камнями.
+ * Если пользователь указывает свои действия, они имеют приоритет
+ * над встроенными действиями.
  */
-glift.api.StoneActions = function (opt_o) {
-  var o = opt_o || {};
-
-  // Note: We don't add a click function here because a default-click handler
-  // doesn't make sense across widget types.
-
+class StoneActions {
   /**
-   * Add ghost-stone for cursor hovering.
-   *
-   * @type {!glift.api.StoneFn}
+   * @param {!Object=} opt_o Опциональные параметры с функциями действий
    */
-  this.mouseover =
-    o.mouseover ||
-    function (event, widget, pt) {
-      var hoverColors = { BLACK: 'BLACK_HOVER', WHITE: 'WHITE_HOVER' };
-      var currentPlayer = widget.controller.getCurrentPlayer();
+  constructor(opt_o = {}) {
+    /**
+     * Добавляет отображение "призрачного" камня при наведении курсора.
+     * Показывает предварительный просмотр камня, который будет установлен при клике.
+     *
+     * @type {!glift.api.StoneFn}
+     */
+    this.mouseover = opt_o.mouseover || ((event, widget, pt) => {
+      const hoverColors = { 
+        BLACK: 'BLACK_HOVER', 
+        WHITE: 'WHITE_HOVER' 
+      };
+      
+      const currentPlayer = widget.controller.getCurrentPlayer();
+      
       if (widget.controller.canAddStone(pt, currentPlayer)) {
         widget.display
           .intersections()
           .setStoneColor(pt, hoverColors[currentPlayer]);
       }
-    };
+    });
 
-  /**
-   * Ghost-stone removal for cursor hovering.
-   *
-   * @type {!glift.api.StoneFn}
-   */
-  this.mouseout =
-    o.mouseout ||
-    function (event, widget, pt) {
-      var currentPlayer = widget.controller.getCurrentPlayer();
+    /**
+     * Удаляет "призрачный" камень при выходе курсора.
+     * Возвращает пересечение к исходному пустому состоянию.
+     *
+     * @type {!glift.api.StoneFn}
+     */
+    this.mouseout = opt_o.mouseout || ((event, widget, pt) => {
+      const currentPlayer = widget.controller.getCurrentPlayer();
+      
       if (widget.controller.canAddStone(pt, currentPlayer)) {
-        widget.display &&
-          widget.display
-            .intersections()
-            .setStoneColor(pt, glift.enums.states.EMPTY);
+        widget.display?.intersections()
+          .setStoneColor(pt, glift.enums.states.EMPTY);
       }
-    };
+    });
 
-  /**
-   * A basic touchend function that defaults to the normal stone-click handler.
-   * It's possible we may wish to expand this to include guide-lines.
-   *
-   * @type {!glift.api.StoneFn}
-   */
-  // TODO(kashomon): It's not clear if we want this. Revisit later.
-  this.touchend =
-    o.touchend ||
-    function (event, widget, pt) {
-      event.preventDefault && event.preventDefault();
-      event.stopPropagation && event.stopPropagation();
+    /**
+     * Базовая функция для обработки события touchend.
+     * По умолчанию делегирует управление обычному обработчику кликов.
+     * В будущем может быть расширена для включения направляющих линий.
+     *
+     * @type {!glift.api.StoneFn}
+     */
+    this.touchend = opt_o.touchend || ((event, widget, pt) => {
+      // Предотвращаем стандартные действия браузера
+      event.preventDefault?.();
+      event.stopPropagation?.();
+      
+      // Вызываем обработчик кликов для камня
       widget.sgfOptions.stoneClick(event, widget, pt);
-    };
-};
+    });
+    
+    /**
+     * Обработчик клика на камне по умолчанию.
+     * В базовой реализации отсутствует, так как зависит от типа виджета.
+     * Должен быть переопределен в конкретных экземплярах.
+     *
+     * @type {glift.api.StoneFn|undefined}
+     */
+    this.click = opt_o.click;
+  }
+}
+
+// Присваиваем класс к пространству имен
+glift.api.StoneActions = StoneActions;

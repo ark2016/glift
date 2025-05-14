@@ -1,9 +1,13 @@
 goog.provide('glift.controllers');
 
-/*
- * The controllers logical parts (the Brains!) of a Go board widget.  You can
- * use the movetree and rules directly, but it's usually easier to use the
- * controller layer to abstract dealing with the rules.  It's especially useful
- * for testing logic as distinct from UI changes.
+/**
+ * The controllers module provides the logic layer (the "brains") of Go board widgets.
+ * 
+ * Controllers abstract the complexity of working with rules and move trees directly.
+ * You can use movetree and rules directly, but controllers provide a simpler API
+ * for common operations. This separation also makes it easier to test logic
+ * independently from UI changes.
+ * 
+ * @namespace
  */
 glift.controllers = {};

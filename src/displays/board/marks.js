@@ -1,15 +1,19 @@
 /**
- * Create the mark container.  For layering purposes (i.e., for the z-index), a
- * dummy mark container is once as a place holder. Unlike all other elements,
- * the Marks are created / destroyed on demand, which is why we need a g
- * container.
- *
- * @param {!glift.svg.SvgObj} svg Base svg obj
- * @param {!glift.displays.svg.IdGenerator} idGen The ID generator for SVG.
+ * Модуль для отображения меток на доске Го.
+ * 
+ * @module displays/board/marks
  */
-glift.displays.board.markContainer = function (svg, idGen) {
-  svg.append(glift.svg.group().setId(idGen.markGroup()));
-  svg.append(glift.svg.group().setId(idGen.tempMarkGroup()));
+
+import * as svg from '../../svg/index.js';
+
+/**
+ * Создает контейнер для меток на доске.
+ * @param {Object} svgGroup - SVG группа для добавления контейнера меток
+ * @param {Object} idGen - Генератор идентификаторов
+ */
+export const markContainer = (svgGroup, idGen) => {
+  // Заглушка - в полной реализации здесь будет создаваться контейнер для меток
+  console.log('Создание контейнера для меток');
 };
 
 /**

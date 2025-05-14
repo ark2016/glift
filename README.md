@@ -1,153 +1,210 @@
-# Glift
+# Glift: Современная библиотека для игры Го
 
-[![Travis Build Status](https://travis-ci.org/Kashomon/glift.svg?branch=master)](https://travis-ci.org/Kashomon/glift)
+**Glift** - это модульная JavaScript-библиотека для отображения и взаимодействия с игрой Го (бадук, вейци) в браузере.
 
-## The Go Lightweight Frontend
+## Что нового в версии 2.0
 
-Glift is a modern javascript client for the game
-<a href="http://en.wikipedia.org/wiki/Go_(game)">Go</a>
-Glift was created to be a modern Go UI that supports mobile and desktop alike.
-It was built from the beginning to support:
+- Полностью переписана с использованием современных ES-модулей
+- Удалена зависимость от Google Closure Compiler
+- Добавлена поддержка Jest для тестирования
+- Улучшена документация и JSDoc-аннотации
+- Повышена производительность рендеринга SVG
+- Добавлена ​​поддержка современных браузеров и мобильных устройств
 
-- Viewing games
-- Studying go problems
-- Constructing complex go lessons
+## Особенности
 
-### Example
+- Отображение и взаимодействие с SGF-файлами
+- Поддержка различных тем оформления
+- Адаптивный дизайн для различных размеров экрана
+- Возможность создания задач и проблем
+- Поддержка комментариев и вариаций
 
-Here's a simple example, to create a game viewer for a game in div.
+## Установка
+
+```bash
+npm install glift-ui
+```
+
+## Быстрый старт
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Пример Glift</title>
+  <script src="dist/glift.min.js"></script>
+</head>
+<body>
+  <div id="glift_display" style="width: 650px; height: 600px;"></div>
+  <script>
+    glift.create({
+      divId: 'glift_display',
+      sgf: 'path/to/game.sgf',
+      display: {
+        theme: 'DEPTH',
+        drawBoardCoords: true
+      },
+      sgfDefaults: {
+        widgetType: 'GAME_VIEWER'
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+## Модульное использование (ES Modules)
 
 ```javascript
-glift.create({
-  divId: 'myId',
-  sgf: 'mysgfs/lee_sedol_vs_gu_li.sgf',
+import { create } from 'glift-ui';
+
+const player = create({
+  divId: 'glift_display',
+  sgf: 'path/to/game.sgf',
+  display: {
+    theme: 'DEPTH'
+  }
 });
 ```
 
-See [GliftGo.com](http://www.gliftgo.com) if you want to see Glift in action and
-lots of code samples!
+## Основные модули
 
-### How it works:
+### DOM
 
-Glift is an SVG based UI. When you invoke `glift.create`, Glift, looks at the
-div, determines the height and width of the div, and then draws an instance of
-the board.
+Модуль `dom` предоставляет абстракцию над DOM API для облегчения манипуляций с элементами.
 
-### Supported Browsers
+```javascript
+import { dom } from 'glift-ui';
 
-The complied Glift JavaScript is completely self-contained and supports the
-following browsers:
+// Создание элемента
+const container = dom.newDiv('glift-container');
+container.css({
+  width: '400px',
+  height: '400px'
+});
 
-- Chrome
-- Chrome on Android
-- IE 9+
-- Firefox
-- Opera
-- Safari
-- Safari on iOS
+// Добавление в DOM
+document.body.appendChild(container.el);
+```
 
-Unsupported browsers
+### SVG
 
-- IE 6-8
-- Native Android Browser
+Модуль `svg` предоставляет интерфейс для создания и управления SVG элементами.
 
-### APIs
+```javascript
+import { svg } from 'glift-ui';
 
-Glift is now released on a public, stable release!! All methods and options that
-are part of the stable 1.0 API have been marked with 'api: 1.0'. Similarly, if
-an option is available from 1.1 onward, then it will be marked 'api: 1.1'.
+// Создание SVG холста
+const board = svg.svg({
+  width: '400',
+  height: '400',
+  viewBox: '0 0 400 400'
+});
 
-lifetime of the 1.0 release have been marked with api: 1.0. Options/methods
-that are on track to become supported have been marked @api(beta).
+// Добавление черного камня
+const blackStone = svg.circle({
+  cx: '100',
+  cy: '100',
+  r: '15',
+  fill: 'black'
+});
 
-The currently supported methods support @api(1.0):
+board.append(blackStone);
+```
 
-- `glift.create({options})` - Create a Glift instance.
+### Util
 
-And the following options (see [src/widgets/options/base_options.js](/src/widgets/options/base_options.js))
+Модуль `util` содержит вспомогательные функции.
 
-- `divId` - ID of the container div.
-- `sgf` - String, url, or object, with options from sgfDefaults.
-- `sgfCollection` - Array of SGFs
-- `initialIndex` - Where to start in the SGF collection
-- `sgfDefaults`
-  - `sgfString` - String for the SGF. Only specified in sgf objects.
-  - `url` - URL of the sgf. Only specified in sgf objects.
-  - `widgetType` - The type of the Glift widget. Defaults to GAME_VIEWER.
-  - `initialPosition` - Where to start initially.
-  - `boardRegion` - The region of the borad to display. Defaults to AUTO.
-  - `problemConditions` - The conditions for getting a problem correct.
-  - `uiComponents` - UI components to use.
-- `display` - Display variables
-  - `goBoardBackground` - URL for a go board background image.
-  - `theme` - The Glift theme
-  - `drawBoardCoords` - Whether or not to draw go board coordinates.
+```javascript
+import { util } from 'glift-ui';
 
-### Development
+// Генерация уникального ID
+const id = util.uuid();
 
-Although Glift was built for all major browsers, Glift was built on OSX, so
-these development docs assume a POSIX toolchain.
+// Объединение объектов
+const options = util.mergeObjects(defaults, userOptions);
+```
 
-Glift uses Glup and Nodejs. Before you begin, make sure you've installed:
+## Документация API
 
-- [Nodejs (LTS)](https://nodejs.org/en/)
-- [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md)
-- [Java](https://java.com/en/download/) - For using the JSCompiler
+### Основные методы
 
-#### Gulp Instructions
+#### create(options)
 
-**Initialization**. First, you'll need to initialize the repository with the relevant node modules:
+Создает новый экземпляр Glift с указанными параметрами.
 
-```shell
+```javascript
+const player = glift.create({
+  // Обязательный параметр - ID элемента для отображения
+  divId: 'glift_display',
+  
+  // Путь к SGF-файлу или строка SGF
+  sgf: 'path/to/game.sgf',
+  
+  // Настройки отображения
+  display: {
+    // Тема оформления (DEFAULT, DEPTH, MOODY, TRANSPARENT, TEXTBOOK)
+    theme: 'DEPTH',
+    
+    // Отображать координаты доски
+    drawBoardCoords: true,
+    
+    // Фоновое изображение доски
+    goBoardBackground: 'path/to/board.jpg'
+  },
+  
+  // Настройки SGF
+  sgfDefaults: {
+    // Тип виджета (GAME_VIEWER, PROBLEM_VIEWER и т.д.)
+    widgetType: 'GAME_VIEWER'
+  },
+  
+  // Обработчики событий
+  hooks: {
+    // Вызывается при правильном решении проблемы
+    problemCorrect: () => {
+      console.log('Проблема решена правильно!');
+    }
+  }
+});
+```
+
+## Разработка
+
+### Требования
+
+- Node.js 14+
+- npm 6+
+
+### Установка зависимостей
+
+```bash
 npm install
 ```
 
-This will create the necessary `node_modules` directory, which should be ignored via the `.gitignore`
+### Запуск для разработки
 
-**Running Tests**
-
-There are several ways to run the qunit tests. To simply run the QUnit Tests via gulp:
-
-```shell
-gulp test
+```bash
+npm run dev
 ```
 
-Or, once you've run `gulp test` or `gulp update-html-srcs` you can just open
-`test/htmltests_gen/QunitTest.html` in a browser and run the tests there (it's
-bit faster). Running the aformentioned commands dynamically inserts the sources
-into the HTML test templates in the `test/htmltests` directory and outputs the
-templated files to `test/htmltests_gen`.
+### Сборка для production
 
-**Compilation**
-
-To compile the JavaScript, run:
-
-```shell
-gulp compile
+```bash
+npm run build
 ```
 
-**Automated Build+Testing**
+### Запуск тестов
 
-To both build _and_ run the tests, run:
-
-```shell
-gulp build-test
+```bash
+npm test
 ```
 
-This is the command run by the Travis continuous integration suite.
+## Обратная совместимость
 
-#### Editing documentation
+Для обеспечения обратной совместимости со старыми скриптами, использующими Glift, библиотека все еще создает глобальный объект `glift` при загрузке.
 
-If you find yourself editing the Markdown docs, I use the node script [Markdown
-Preview](https://www.npmjs.com/package/markdown-preview). It's then used via the
-following:
+## Лицензия
 
-```shell
-markdown-preview [options] <filename>
-```
-
-or in Vim:
-
-```vimscript
-au Filetype markdown command! PrevMarkdown !markdown-preiew %
-```
+MIT License
