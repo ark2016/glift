@@ -1,7 +1,10 @@
-goog.provide('glift.svg');
+/**
+ * Модуль для работы с SVG в Glift.
+ * @module svg/svg
+ */
 
 /**
- * SVG utilities. Arguably, this should be in the Glift ui. But the utilities,
- * modulo some dom-utilities, are agnostic to any rendering engine.
+ * Утилиты SVG. Возможно, это должно быть в Glift UI. Но утилиты,
+ * за исключением некоторых dom-утилит, не зависят от какого-либо движка рендеринга.
  */
-glift.svg = {};
+export const svg = {};

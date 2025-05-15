@@ -1,42 +1,27 @@
-goog.provide('glift.markdown');
-goog.provide('glift.markdown.Ast');
+/**
+ * Модуль для работы с Markdown в Glift.
+ * @module markdown/markdown
+ */
 
-goog.require('glift.marked');
+import { marked as markedParser } from './marked.js';
 
 /**
- * Marked is dumped into this namespace. Just for reference
- * https://github.com/chjj/marked
+ * Класс представляющий абстрактное синтаксическое дерево.
  */
-glift.markdown = {
-  /** Render the AST from some text. */
-  renderAst: function (text) {
-    // We expect the markdown extern to be exposed.
-    var lex = glift.marked.lexer(text);
-    return new glift.markdown.Ast(lex);
-  },
-
-  render: function (text) {
-    return glift.marked(text);
-  },
-};
-
-/**
- * Wrapper object for the abstract syntax tree.
- *
- * @param {!Array<!glift.marked.Token>} tree Array of tokens.
- * @constructor @final @struct
- */
-glift.markdown.Ast = function (tree) {
-  /** The token array */
-  this.tree = tree;
-};
-
-glift.markdown.Ast.prototype = {
+export class Ast {
   /**
-   * Returns just the headers. We assume no nested headers.
-   * @return{!Array<!glift.marked.Token>} Array of header tokens.
+   * @param {!Array<!marked.Token>} tree Массив токенов.
    */
-  headers: function () {
+  constructor(tree) {
+    /** Массив токенов */
+    this.tree = tree;
+  }
+
+  /**
+   * Возвращает только заголовки. Предполагается, что вложенных заголовков нет.
+   * @return{!Array<!marked.Token>} Массив токенов заголовков.
+   */
+  headers() {
     var out = [];
     for (var i = 0; i < this.tree.length; i++) {
       var elem = this.tree[i];
@@ -45,5 +30,22 @@ glift.markdown.Ast.prototype = {
       }
     }
     return out;
+  }
+}
+
+/**
+ * Marked встроен в это пространство имен. Для справки
+ * https://github.com/chjj/marked
+ */
+export const markdown = {
+  /** Создаёт AST из текста. */
+  renderAst: function(text) {
+    // Мы ожидаем, что markdown extern будет доступен.
+    var lex = markedParser.lexer(text);
+    return new Ast(lex);
   },
+
+  render: function(text) {
+    return markedParser(text);
+  }
 };

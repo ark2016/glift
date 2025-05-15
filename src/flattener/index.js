@@ -1,8 +1,5 @@
 /**
- * Модуль flattener помогает преобразовать доску Го в формат для отображения.
- * Это полезно для всех видов рендеринга доски Го, будь то печатный рендеринг или
- * динамический пользовательский интерфейс.
- * 
+ * Индексный файл для модуля flattener, который экспортирует все компоненты.
  * @module flattener
  */
 
@@ -149,7 +146,7 @@ export class Flattened {
  * @param {Object} markMap - Карта меток
  * @return {Array<Array<Object>>} Матрица представлений пересечений
  */
-export const board = {
+export const boardCreator = {
   create: (cropping, stoneMap, markMap) => {
     // Упрощенная версия
     return [];
@@ -169,6 +166,15 @@ export const flatten = (movetreeInitial, options = {}) => {
   return new Flattened(options);
 };
 
+/**
+ * Генератор ID для элементов в flattener.
+ */
+export const idGenerator = {
+  next: () => {
+    return 'id_' + Math.random().toString(36).substring(2, 9);
+  }
+};
+
 // Объявление символов для пересечений доски
 export const symbols = {
   EMPTY: 'EMPTY',
@@ -179,15 +185,52 @@ export const symbols = {
   CIRCLE: 'CIRCLE'
 };
 
-// Экспорт объекта flattener для обратной совместимости
+// Импортируем компоненты из соответствующих файлов
+import { Board, BoardDiffPt, boardDiffPtTypes } from './board.js';
+import { 
+  symbols as symbolsModuleExports, 
+  symbolStoneToState, 
+  symbolMarkToMark, 
+  symbolStr 
+} from './symbols.js';
+
+import { starpoints as starpointsModule } from './starpoints.js';
+import { Intersection as IntersectionClass, intersection as intersectionModule } from './intersection.js';
+import { 
+  BoardPoints as BoardPointsModule, 
+  EdgeLabel as EdgeLabelModule, 
+  BoardPt as BoardPtModule 
+} from './board_points.js';
+import { Flattened as FlattenedModule, FlattenedParams } from './flattened.js';
+
+// Экспортируем импортированные компоненты
+export { 
+  Board, 
+  BoardDiffPt, 
+  boardDiffPtTypes,
+  symbolStoneToState, 
+  symbolMarkToMark, 
+  symbolStr,
+  IntersectionClass,
+  FlattenedParams 
+};
+
+// Создаем пространство имен для обратной совместимости
 export const flattener = {
-  flatten,
-  board,
+  board: boardCreator,
+  symbols,
+  symbolStoneToState,
+  symbolMarkToMark,
+  symbolStr,
+  starpoints,
+  intersection,
+  Board,
+  BoardDiffPt,
+  boardDiffPtTypes,
+  Intersection: IntersectionClass,
   BoardPoints,
   EdgeLabel,
   BoardPt,
   Flattened,
-  symbols,
-  intersection,
-  starpoints
+  FlattenedParams
 }; 

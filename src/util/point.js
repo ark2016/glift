@@ -3,7 +3,7 @@
  * @module util/point
  */
 
-import { Point } from './index.js';
+import { Point, point } from './index.js';
 
-// Реэкспортируем класс Point для обратной совместимости
-export { Point }; 
+// Реэкспортируем класс Point и функцию point для обратной совместимости
+export { Point, point }; 

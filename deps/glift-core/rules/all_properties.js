@@ -1,11 +1,13 @@
-goog.provide('glift.rules.prop');
+/**
+ * Модуль для определения всех свойств SGF.
+ * @module rules/all_properties
+ */
 
 /**
- * All the SGF Properties plus some things.
+ * Все свойства SGF плюс некоторые дополнительные.
  * @enum {string}
  */
-//  TODO(kashomon): Comment these and delete the invalid ones.
-glift.rules.prop = {
+export const prop = {
   /** Node: Black placements. */
   AB: 'AB',
   /** Node: Clear Intersections.  */
@@ -112,4 +114,40 @@ glift.rules.prop = {
   WS: 'WS',
   WT: 'WT',
   MU: 'MU',
+};
+
+/**
+ * Свойства, которые принимают значения точек. Полезно в основном для модификаций 
+ * полной доски (например, вращений).
+ *
+ * Примечания: существует несколько способов представления точек в SGF.
+ *  [ab] - Простая точка в 0,1 (начало координат=верхний левый угол. ориентировано вниз-вправо)
+ *  [aa:cc] - Прямоугольник точек (все точки от 0,0 до 2,2 в прямоугольнике)
+ *
+ * Кроме того, метки (LB) имеют формат
+ *  [ab:label]
+ *
+ * @type {!Object<string, boolean>}
+ */
+export const propertiesWithPts = {
+  // Marks
+  CR: true,
+  LB: true,
+  MA: true,
+  SQ: true,
+  TR: true,
+  // Stones
+  B: true,
+  W: true,
+  AW: true,
+  AB: true,
+  // Clear Stones
+  AE: true,
+  // Misc. These properties are very rare, and usually can be ignored.
+  // Still, they're here for completeness.
+  AR: true, // arrow
+  DD: true, // gray area
+  LN: true, // line
+  TB: true, // black area/territory
+  TW: true, // white area
 };

@@ -274,7 +274,9 @@
 <a name='L209'></a><a href='#L209'>209</a>
 <a name='L210'></a><a href='#L210'>210</a>
 <a name='L211'></a><a href='#L211'>211</a>
-<a name='L212'></a><a href='#L212'>212</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -492,6 +494,7 @@
  */
 &nbsp;
 import * as svg from '../../svg/index.js';
+import * as enums from '../../util/enums.js';
 &nbsp;
 /**
  * Создает контейнер для меток на доске.
@@ -506,7 +509,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
 /**
  * Add a mark of a particular type to the GoBoard
  */
-<span class="cstat-no" title="statement not covered" >glift.displays.board.addMark = <span class="fstat-no" title="function not covered" >fu</span>nction (</span>
+export const addMark = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >fu</span>nction (</span>
   container,
   idGen,
   boardPoints,
@@ -522,10 +525,10 @@ export const markContainer = <span class="cstat-no" title="statement not covered
   // the files come in (beyond the base package file).  So, either we need to
   // combine intersections.js with board.js or keep this a separate static
   // method.
-  var svgpath = <span class="cstat-no" title="statement not covered" >glift.svg.pathutils;</span>
+  var svgpath = <span class="cstat-no" title="statement not covered" >svg.pathutils;</span>
   var rootTwo = <span class="cstat-no" title="statement not covered" >1.41421356237;</span>
   var rootThree = <span class="cstat-no" title="statement not covered" >1.73205080757;</span>
-  var marks = <span class="cstat-no" title="statement not covered" >glift.enums.marks;</span>
+  var marks = <span class="cstat-no" title="statement not covered" >enums.marks;</span>
   var coordPt = <span class="cstat-no" title="statement not covered" >boardPoints.getCoord(pt).coordPt;</span>
   var markId = <span class="cstat-no" title="statement not covered" >idGen.mark(pt);</span>
   var baseDelta;
@@ -553,11 +556,11 @@ export const markContainer = <span class="cstat-no" title="statement not covered
 <span class="cstat-no" title="statement not covered" >      threeDigitMod = 0.75;</span>
     }
     var strokeWidth = <span class="cstat-no" title="statement not covered" >parseInt(marksTheme['stroke-width'] || 1, 10);</span>
-<span class="cstat-no" title="statement not covered" >    if (stoneColor === glift.enums.states.BLACK) {</span>
+<span class="cstat-no" title="statement not covered" >    if (stoneColor === enums.states.BLACK) {</span>
 <span class="cstat-no" title="statement not covered" >      strokeWidth = strokeWidth * 0.4;</span>
     }
 <span class="cstat-no" title="statement not covered" >    container.append(</span>
-      glift.svg
+      svg
         .text()
         .setText(label)
         .setData(pt)
@@ -582,7 +585,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
     // as if it's offset by a little bit.
     var halfWidth = <span class="cstat-no" title="statement not covered" >baseDelta - fudge;</span>
 <span class="cstat-no" title="statement not covered" >    container.append(</span>
-      glift.svg
+      svg
         .rect()
         .setData(pt)
         .setAttr('x', coordPt.x() - halfWidth)
@@ -602,7 +605,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
     var botLeft = <span class="cstat-no" title="statement not covered" >coordPt.translate(-1 * halfDelta, halfDelta);</span>
     var botRight = <span class="cstat-no" title="statement not covered" >coordPt.translate(halfDelta, halfDelta);</span>
 <span class="cstat-no" title="statement not covered" >    container.append(</span>
-      glift.svg
+      svg
         .path()
         .setData(pt)
         .setAttr(
@@ -629,7 +632,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
     );
   } else <span class="cstat-no" title="statement not covered" >if (mark === marks.CIRCLE) {</span>
 <span class="cstat-no" title="statement not covered" >    container.append(</span>
-      glift.svg
+      svg
         .circle()
         .setData(pt)
         .setAttr('cx', coordPt.x())
@@ -642,7 +645,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
     );
   } else <span class="cstat-no" title="statement not covered" >if (mark === marks.STONE_MARKER) {</span>
 <span class="cstat-no" title="statement not covered" >    container.append(</span>
-      glift.svg
+      svg
         .circle()
         .setData(pt)
         .setAttr('cx', coordPt.x())
@@ -658,7 +661,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
     var leftNode = <span class="cstat-no" title="statement not covered" >coordPt.translate(r * ((-1 * rootThree) / 2), r * (1 / 2));</span>
     var topNode = <span class="cstat-no" title="statement not covered" >coordPt.translate(0, -1 * r);</span>
 <span class="cstat-no" title="statement not covered" >    container.append(</span>
-      glift.svg
+      svg
         .path()
         .setData(pt)
         .setAttr('fill', 'none')
@@ -680,7 +683,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
     );
   } else <span class="cstat-no" title="statement not covered" >if (mark === marks.KO_LOCATION) {</span>
 <span class="cstat-no" title="statement not covered" >    container.append(</span>
-      glift.svg
+      svg
         .circle()
         .setData(pt)
         .setAttr('cx', coordPt.x())
@@ -703,7 +706,7 @@ export const markContainer = <span class="cstat-no" title="statement not covered
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-14T16:59:41.242Z
+                at 2025-05-14T21:19:21.243Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

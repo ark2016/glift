@@ -1,118 +1,124 @@
-goog.provide('glift.rules.ProblemConditions');
-goog.provide('glift.rules.problems');
+/**
+ * Модуль для работы с задачами Го.
+ * @module rules/problems
+ */
+
+import { enums } from '../../src/util/enums.js';
+import { treepath } from './treepath.js';
 
 /**
- * Map of prop-to-values.
+ * Карта свойство-значения.
  *
- * @typedef {!Object<glift.rules.prop, !Array<string>>}
+ * @typedef {!Object<string, !Array<string>>}
  */
-glift.rules.ProblemConditions;
+export let ProblemConditions;
 
-glift.rules.problems = {
-  /**
-   * Determines if a 'move' is correct. Takes a movetree and a series of
-   * conditions, which is a map of properties to an array of possible substring
-   * matches.  Only one conditien must be met.
-   *
-   * Problem results:
-   *
-   * CORRECT - The position properties must match one of several problem
-   *    conditions.
-   * INDETERMINATE - There must exist at path to a correct position from the
-   *    current position.
-   * INCORRECT - The position has to path to a correct position.
-   *
-   * Some Examples:
-   *    Correct if there is a GB property or the words 'Correct' or 'is correct' in
-   *    the comment. This is the default.
-   *    { GB: [], C: ['Correct', 'is correct'] }
-   *
-   *    Nothing is correct
-   *    {}
-   *
-   *    Correct as long as there is a comment tag.
-   *    { C: [] }
-   *
-   *    Correct as long as there is a black stone (a strange condition).
-   *    { B: [] }
-   *
-   * @param {!glift.rules.MoveTree} movetree
-   * @param {!glift.rules.ProblemConditions} conditions
-   * @return {glift.enums.problemResults}
-   */
-  positionCorrectness: function (movetree, conditions) {
-    var problemResults = glift.enums.problemResults;
-    if (movetree.properties().matches(conditions)) {
-      return problemResults.CORRECT;
-    } else {
-      var flatPaths = glift.rules.treepath.flattenMoveTree(movetree);
+/**
+ * Определяет, является ли "ход" правильным. Принимает дерево ходов и ряд
+ * условий, которые представляют собой карту свойств в массив возможных совпадений
+ * подстрок. Должно быть выполнено только одно условие.
+ *
+ * Результаты задачи:
+ *
+ * CORRECT - Свойства позиции должны соответствовать одному из нескольких условий
+ *    задачи.
+ * INDETERMINATE - Должен существовать путь к правильной позиции из
+ *    текущей позиции.
+ * INCORRECT - Позиция не имеет пути к правильной позиции.
+ *
+ * Некоторые примеры:
+ *    Правильно, если есть свойство GB или слова 'Correct' или 'is correct' в
+ *    комментарии. Это значение по умолчанию.
+ *    { GB: [], C: ['Correct', 'is correct'] }
+ *
+ *    Ничего не правильно
+ *    {}
+ *
+ *    Правильно, если есть тег комментария.
+ *    { C: [] }
+ *
+ *    Правильно, если есть черный камень (странное условие).
+ *    { B: [] }
+ *
+ * @param {!Object} movetree Дерево ходов
+ * @param {!ProblemConditions} conditions Условия задачи
+ * @return {string} Результат проверки задачи
+ */
+export function positionCorrectness(movetree, conditions) {
+  const problemResults = enums.problemResults;
+  if (movetree.properties().matches(conditions)) {
+    return problemResults.CORRECT;
+  } else {
+    const flatPaths = treepath.flattenMoveTree(movetree);
 
-      /** @type {!Object<glift.enums.problemResults, boolean>} */
-      var successTracker = {};
+    /** @type {!Object<string, boolean>} */
+    const successTracker = {};
 
-      // For each path, we evaluate if each path has the possibility of being
-      // correct.
-      for (var i = 0; i < flatPaths.length; i++) {
-        var path = flatPaths[i];
-        var newmt = movetree.getFromNode(movetree.node());
-        var pathCorrect = false;
-        for (var j = 0; j < path.length; j++) {
-          newmt.moveDown(path[j]);
-          if (newmt.properties().matches(conditions)) {
-            pathCorrect = true;
-          }
-        }
-        if (pathCorrect) {
-          successTracker[problemResults.CORRECT] = true;
-        } else {
-          // If no problem conditions are matched, path (variation) is
-          // considered incorrect.
-          successTracker[problemResults.INCORRECT] = true;
+    // Для каждого пути мы оцениваем, имеет ли каждый путь возможность быть
+    // правильным.
+    for (let i = 0; i < flatPaths.length; i++) {
+      const path = flatPaths[i];
+      const newmt = movetree.getFromNode(movetree.node());
+      let pathCorrect = false;
+      for (let j = 0; j < path.length; j++) {
+        newmt.moveDown(path[j]);
+        if (newmt.properties().matches(conditions)) {
+          pathCorrect = true;
         }
       }
-
-      if (
-        successTracker[problemResults.CORRECT] &&
-        !successTracker[problemResults.INCORRECT]
-      ) {
-        if (movetree.properties().matches(conditions)) {
-          return problemResults.CORRECT;
-        } else {
-          return problemResults.INDETERMINATE;
-        }
-      } else if (
-        successTracker[problemResults.CORRECT] &&
-        successTracker[problemResults.INCORRECT]
-      ) {
-        return problemResults.INDETERMINATE;
+      if (pathCorrect) {
+        successTracker[problemResults.CORRECT] = true;
       } else {
-        return problemResults.INCORRECT;
+        // Если ни одно условие задачи не совпадает, путь (вариация) считается
+        // неправильным.
+        successTracker[problemResults.INCORRECT] = true;
       }
     }
-  },
 
-  /**
-   * Gets the correct next moves. This assumes the the SGF is a problem-like SGF
-   * with with right conditions specified.
-   *
-   * @param {!glift.rules.MoveTree} movetree
-   * @param {!glift.rules.ProblemConditions} conditions
-   * @return {!Array<!glift.rules.Move>} An array of correct next moves.
-   */
-  correctNextMoves: function (movetree, conditions) {
-    var nextMoves = movetree.nextMoves();
-    var INCORRECT = glift.enums.problemResults.INCORRECT;
-    var correctNextMoves = [];
-    for (var i = 0; i < nextMoves.length; i++) {
-      movetree.moveDown(i);
-      if (
-        glift.rules.problems.positionCorrectness(movetree, conditions) !==
-        INCORRECT
-      ) {
-        correctNextMoves.push(nextMoves[i]);
+    if (
+      successTracker[problemResults.CORRECT] &&
+      !successTracker[problemResults.INCORRECT]
+    ) {
+      if (movetree.properties().matches(conditions)) {
+        return problemResults.CORRECT;
+      } else {
+        return problemResults.INDETERMINATE;
       }
-      movetree.moveUp(); // reset the position
+    } else if (
+      successTracker[problemResults.CORRECT] &&
+      successTracker[problemResults.INCORRECT]
+    ) {
+      return problemResults.INDETERMINATE;
+    } else {
+      return problemResults.INCORRECT;
     }
-    return correctNextMoves;
-  },
+  }
+}
+
+/**
+ * Получает правильные следующие ходы. Предполагается, что SGF является подобным
+ * задаче SGF с указанными правильными условиями.
+ *
+ * @param {!Object} movetree Дерево ходов
+ * @param {!ProblemConditions} conditions Условия задачи
+ * @return {!Array<!Object>} Массив правильных следующих ходов
+ */
+export function correctNextMoves(movetree, conditions) {
+  const nextMoves = movetree.nextMoves();
+  const INCORRECT = enums.problemResults.INCORRECT;
+  const correctNextMoves = [];
+  for (let i = 0; i < nextMoves.length; i++) {
+    movetree.moveDown(i);
+    if (positionCorrectness(movetree, conditions) !== INCORRECT) {
+      correctNextMoves.push(nextMoves[i]);
+    }
+    movetree.moveUp(); // сбрасываем позицию
+  }
+  return correctNextMoves;
+}
+
+// Экспорт объекта для обратной совместимости
+export const problems = {
+  positionCorrectness,
+  correctNextMoves
 };

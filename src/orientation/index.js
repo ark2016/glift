@@ -6,6 +6,10 @@
  */
 
 /**
+ * Индексный файл для модуля orientation.
+ */
+
+/**
  * Класс ограничивающего прямоугольника.
  * Представляет прямоугольную область на доске.
  */
@@ -74,7 +78,13 @@ export class BoundingBox {
  * @param {!Object} botRight - Нижняя правая точка
  * @return {!BoundingBox}
  */
-export const bbox = {
+export const bboxCreator = {
+  /**
+   * Создает BoundingBox из двух точек
+   * @param {!Object} topLeft - Верхняя левая точка
+   * @param {!Object} botRight - Нижняя правая точка
+   * @return {!BoundingBox}
+   */
   fromPts: (topLeft, botRight) => {
     return new BoundingBox(topLeft, botRight);
   },
@@ -87,8 +97,21 @@ export const bbox = {
    * @return {!BoundingBox}
    */
   fromSides: (topLeft, width, height) => {
-    // Реализация будет добавлена позже
-    return new BoundingBox(topLeft, { x: () => topLeft.x() + width, y: () => topLeft.y() + height });
+    // Используем функцию createPoint из модуля util для создания точки
+    const createPoint = (x, y) => {
+      return {
+        x: () => x,
+        y: () => y
+      };
+    };
+    
+    return new BoundingBox(
+      topLeft, 
+      createPoint(
+        topLeft.x() + width, 
+        topLeft.y() + height
+      )
+    );
   }
 };
 
@@ -144,10 +167,30 @@ export class Cropbox {
  * @param {number} size - Размер доски
  * @return {!Cropbox}
  */
-export const cropbox = {
+export const cropboxCreator = {
+  /**
+   * Получить cropbox для указанной области доски
+   * @param {string} region - Регион доски
+   * @param {number} size - Размер доски
+   * @return {!Cropbox}
+   */
   get: (region, size) => {
+    // Создаем вспомогательную функцию для точек
+    const createPoint = (x, y) => {
+      return {
+        x: () => x,
+        y: () => y
+      };
+    };
+    
     // Упрощенная реализация
-    return new Cropbox(bbox.fromPts({ x: () => 0, y: () => 0 }, { x: () => size - 1, y: () => size - 1 }), size);
+    return new Cropbox(
+      new BoundingBox(
+        createPoint(0, 0), 
+        createPoint(size - 1, size - 1)
+      ), 
+      size
+    );
   }
 };
 
@@ -161,11 +204,21 @@ export const getQuadCropFromMovetree = (movetree) => {
   return 'ALL';
 };
 
-// Экспорт объекта orientation для обратной совместимости
+// Импортируем из модулей
+import { BoundingBox as BBoxFromModule } from './bbox.js';
+import { Cropbox as CropboxFromModule } from './cropbox.js';
+
+// Экспортируем импортированные объекты
+export { BBoxFromModule, CropboxFromModule };
+
+// Пространство имен для обратной совместимости
+import * as b from './bbox.js';
+import * as c from './cropbox.js';
+
 export const orientation = {
-  bbox,
-  cropbox,
-  BoundingBox,
-  Cropbox,
+  bbox: b.bbox,
+  cropbox: c.cropbox,
+  Cropbox: c.Cropbox,
+  BoundingBox: b.BoundingBox,
   getQuadCropFromMovetree
 }; 

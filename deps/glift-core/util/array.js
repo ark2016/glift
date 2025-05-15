@@ -1,39 +1,47 @@
-goog.provide('glift.array');
-
-goog.require('glift');
+/**
+ * Модуль для работы с массивами в Glift.
+ * @module util/array
+ */
 
 /**
- * Collection of utility methods for arrays
+ * Удаляет элемент из массива.
+ * 
+ * @param {!Array<T>} arr - Исходный массив
+ * @param {T} elem - Элемент для удаления
+ * @return {!Array<T>} Массив с удаленным элементом
+ * 
+ * @template T
  */
-glift.array = {
-  /**
-   * @param {!Array<!T>} arr
-   * @param {!T} elem
-   * @return {!Array<!T>} The array with the element removed.
-   *
-   * @template T
-   */
-  remove: function (arr, elem) {
-    var index = arr.indexOf(elem);
-    if (index > -1) {
-      arr.splice(index, 1);
-    }
-    return arr;
-  },
+export function remove(arr, elem) {
+  const index = arr.indexOf(elem);
+  if (index > -1) {
+    arr.splice(index, 1);
+  }
+  return arr;
+}
 
-  /**
-   * @param {!Array<!T>} arr
-   * @param {!T} elem
-   * @param {!T} elemRep
-   * @return {!Array<!T>} The array with the element replaced.
-   *
-   * @template T
-   */
-  replace: function (arr, elem, elemRep) {
-    var index = arr.indexOf(elem);
-    if (index > -1) {
-      arr[index] = elemRep;
-    }
-    return arr;
-  },
+/**
+ * Заменяет элемент в массиве.
+ * 
+ * @param {!Array<T>} arr - Исходный массив
+ * @param {T} elem - Элемент для замены
+ * @param {T} elemRep - Заменяющий элемент
+ * @return {!Array<T>} Массив с замененным элементом
+ * 
+ * @template T
+ */
+export function replace(arr, elem, elemRep) {
+  const index = arr.indexOf(elem);
+  if (index > -1) {
+    arr[index] = elemRep;
+  }
+  return arr;
+}
+
+/**
+ * Экспорт для обратной совместимости
+ */
+export const array = {
+  remove,
+  replace
 };

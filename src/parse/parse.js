@@ -1,14 +1,34 @@
 /**
- * Модуль парсинга для строк Glift.
+ * Модуль для парсинга строк Го-формата.
  * @module parse/parse
  */
 
 import { toCamelCase } from '../util/enums.js';
-import { movetree } from '../rules/movetree.js';
-import { parseType } from './index.js';
+import { initRootProperties } from '../rules/movetree.js';
+import { sgf } from './sgf_parser.js';
 
 /**
- * Список известных расширений файлов и соответствующих им типов парсеров.
+ * Типы парсинга
+ * @enum {string}
+ */
+export const parseType = {
+  /** FF1-FF4 Parse Type. */
+  SGF: 'SGF',
+
+  /** Tygem .gib files. */
+  TYGEM: 'TYGEM',
+
+  /**
+   * УСТАРЕВШИЙ. Создан, когда я не понимал различия
+   * между различными версиями FF1-3 и FF4
+   *
+   * Предпочитайте SGF, теперь это эквивалентно.
+   */
+  PANDANET: 'PANDANET',
+};
+
+/**
+ * Список известных суффиксов и типов файлов, которым они соответствуют.
  * @type {!Object<string, string>}
  */
 export const suffixToType = {
@@ -19,8 +39,8 @@ export const suffixToType = {
 /**
  * Определяет, является ли файл известным файлом Го.
  *
- * @param {string} filename - Имя файла
- * @return {boolean} Является ли файл с таким именем известным типом
+ * @param {string} filename Имя файла
+ * @return {boolean} является ли имя файла известным типом
  */
 export function knownGoFile(filename) {
   if (!filename || typeof filename !== 'string') {
@@ -35,10 +55,10 @@ export function knownGoFile(filename) {
 }
 
 /**
- * Получить тип парсера из имени файла.
+ * Получает тип парсинга из имени файла
  *
- * @param {string} filename - Имя файла
- * @return {string} Тип парсера
+ * @param {string} filename Имя файла
+ * @return {string} Тип парсинга
  */
 export function parseTypeFromFilename(filename) {
   let ttype = parseType.SGF; // тип по умолчанию = SGF.
@@ -51,10 +71,10 @@ export function parseTypeFromFilename(filename) {
 }
 
 /**
- * Разбирает строку в формате Го по имени файла.
+ * Парсит формат Го из строки.
  *
- * @param {string} str - Необработанное содержимое, которое нужно разобрать
- * @param {string} filename - Имя файла, из которого взято содержимое
+ * @param {string} str Сырое содержимое, которое нужно проанализировать.
+ * @param {string} filename Имя файла, из которого пришло содержимое.
  * @return {!Object} Дерево ходов
  */
 export function fromFileName(str, filename) {
@@ -65,10 +85,11 @@ export function fromFileName(str, filename) {
 }
 
 /**
- * Преобразует строку игрового файла в дерево ходов.
+ * Преобразует строковый игровой файл в дерево ходов.
  *
- * @param {string} str - Необработанное содержимое, которое нужно разобрать
- * @param {string=} opt_ttype - Тип парсера. По умолчанию SGF, если не указан
+ * @param {string} str Сырое содержимое, которое нужно проанализировать.
+ * @param {string=} opt_ttype Тип парсинга. По умолчанию SGF,
+ *    если не указан.
  * @return {!Object} Сгенерированное дерево ходов
  */
 export function fromString(str, opt_ttype) {
@@ -77,15 +98,18 @@ export function fromString(str, opt_ttype) {
     // Тип PANDANET теперь эквивалентен SGF.
     ttype = parseType.SGF;
   }
-  const methodName = toCamelCase(ttype);
-  const func = methodMap[methodName];
   
-  if (!func) {
-    throw new Error(`Неизвестный тип парсера: ${ttype}`);
+  let moveTr;
+  if (ttype === parseType.SGF) {
+    moveTr = sgf(str);
+  } else if (ttype === parseType.TYGEM) {
+    // В настоящее время не поддерживается
+    throw new Error('Tygem parsing not yet supported.');
+  } else {
+    throw new Error('Unknown parse type: ' + ttype);
   }
   
-  const moveTree = func(str);
-  return movetree.initRootProperties(moveTree);
+  return initRootProperties(moveTr);
 }
 
 // Экспорт для обратной совместимости

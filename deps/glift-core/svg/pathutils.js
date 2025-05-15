@@ -1,9 +1,17 @@
-goog.provide('glift.svg.pathutils');
+/**
+ * Модуль для генерации SVG-путей.
+ * @module svg/pathutils
+ */
 
-glift.svg.pathutils = {
+import { Point } from '../util/point.js';
+
+/**
+ * Утилиты для работы с SVG-путями.
+ */
+export const pathutils = {
   /**
-   * Move the current position to X,Y.  Usually used in the context of creating a
-   * path.
+   * Перемещает текущую позицию в X,Y. Обычно используется в контексте создания
+   * пути.
    * @param {number} x
    * @param {number} y
    * @return {string}
@@ -13,17 +21,17 @@ glift.svg.pathutils = {
   },
 
   /**
-   * Like move, but with a glift point.
-   * @param {!glift.Point} pt
+   * Как move, но с точкой glift.
+   * @param {!Object} pt
    * @return {string}
    */
   movePt: function (pt) {
-    return glift.svg.pathutils.move(pt.x(), pt.y());
+    return pathutils.move(pt.x(), pt.y());
   },
 
   /**
-   * Create a relative SVG line, starting from the 'current' position. I.e.,
-   * the (0,0) point is that last place drawn-to or moved-to.
+   * Создает относительную линию SVG, начиная с 'текущей' позиции. То есть,
+   * точка (0,0) - это последнее место, до которого был рисунок или перемещение.
    * @param {number} x
    * @param {number} y
    * @return {string}
@@ -33,17 +41,17 @@ glift.svg.pathutils = {
   },
 
   /**
-   * Like lineRel, but with a pt.
-   * @param {!glift.Point} pt
+   * Как lineRel, но с точкой.
+   * @param {!Object} pt
    * @return {string}
    */
   lineRelPt: function (pt) {
-    return glift.svg.pathutils.lineRel(pt.x(), pt.y());
+    return pathutils.lineRel(pt.x(), pt.y());
   },
 
   /**
-   * Create an absolute SVG line -- different from lower case.
-   * This form is usually preferred.
+   * Создает абсолютную линию SVG - отличается от строчной.
+   * Эта форма обычно предпочтительнее.
    * @param {number} x
    * @param {number} y
    * @return {string}
@@ -53,11 +61,11 @@ glift.svg.pathutils = {
   },
 
   /**
-   * Like lineAbs, but with a pt.
-   * @param {!glift.Point} pt
+   * Как lineAbs, но с точкой.
+   * @param {!Object} pt
    * @return {string}
    */
   lineAbsPt: function (pt) {
-    return glift.svg.pathutils.lineAbs(pt.x(), pt.y());
-  },
+    return pathutils.lineAbs(pt.x(), pt.y());
+  }
 };

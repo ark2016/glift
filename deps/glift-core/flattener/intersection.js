@@ -1,27 +1,36 @@
-goog.provide('glift.flattener.intersection');
-goog.provide('glift.flattener.Intersection');
+/**
+ * Модуль для работы с перекрестиями (пересечениями линий) на доске Го.
+ * @module flattener/intersection
+ */
 
-glift.flattener.intersection = {
+import { Point } from '../util/point.js';
+import { enums } from '../../../src/util/enums.js';
+import { symbols, symbolStr } from './symbols.js';
+import { starpoints } from './starpoints.js';
+
+/**
+ * Утилиты для работы с перекрестиями.
+ */
+export const intersection = {
   /**
    * Creates an intersection obj.
    *
-   * @param {!glift.Point} pt 0-indexed and bounded by the number
+   * @param {!Point} pt 0-indexed and bounded by the number
    *    of intersections.  Thus, typically between 0 and 18. Note, the zero for
    *    this point is the top-left rather than the more traditional
    *    bottom-right, as it is for kifus.
-   * @param {glift.enums.states} stoneColor EMPTY here is used to indicate that
+   * @param {enums.states} stoneColor EMPTY here is used to indicate that
    *    we don't want to set the stone.
-   * @param {!glift.flattener.symbols} mark Mark for the stone
+   * @param {!symbols} mark Mark for the stone
    * @param {string} textLabel text label for the stone. Should really only be
    *    set when the mark is TEXTLABEL.
    * @param {number} maxInts The maximum number of intersections on the board.
    *    Typically 9, 13 or 19.
    *
-   * @return {!glift.flattener.Intersection}
+   * @return {!Intersection}
    */
   create: function (pt, stoneColor, mark, textLabel, maxInts) {
-    var sym = glift.flattener.symbols;
-    var intsect = new glift.flattener.Intersection(pt);
+    var intsect = new Intersection(pt);
 
     if (pt.x() < 0 || pt.y() < 0 || pt.x() >= maxInts || pt.y() >= maxInts) {
       throw new Error(
@@ -30,34 +39,34 @@ glift.flattener.intersection = {
     }
 
     var intz = maxInts - 1;
-    var baseSymb = sym.EMPTY;
+    var baseSymb = symbols.EMPTY;
     if (pt.x() === 0 && pt.y() === 0) {
-      baseSymb = sym.TL_CORNER;
+      baseSymb = symbols.TL_CORNER;
     } else if (pt.x() === 0 && pt.y() === intz) {
-      baseSymb = sym.BL_CORNER;
+      baseSymb = symbols.BL_CORNER;
     } else if (pt.x() === intz && pt.y() === 0) {
-      baseSymb = sym.TR_CORNER;
+      baseSymb = symbols.TR_CORNER;
     } else if (pt.x() === intz && pt.y() === intz) {
-      baseSymb = sym.BR_CORNER;
+      baseSymb = symbols.BR_CORNER;
     } else if (pt.y() === 0) {
-      baseSymb = sym.TOP_EDGE;
+      baseSymb = symbols.TOP_EDGE;
     } else if (pt.x() === 0) {
-      baseSymb = sym.LEFT_EDGE;
+      baseSymb = symbols.LEFT_EDGE;
     } else if (pt.x() === intz) {
-      baseSymb = sym.RIGHT_EDGE;
+      baseSymb = symbols.RIGHT_EDGE;
     } else if (pt.y() === intz) {
-      baseSymb = sym.BOT_EDGE;
-    } else if (glift.flattener.starpoints.isPt(pt, maxInts)) {
-      baseSymb = sym.CENTER_STARPOINT;
+      baseSymb = symbols.BOT_EDGE;
+    } else if (starpoints.isPt(pt, maxInts)) {
+      baseSymb = symbols.CENTER_STARPOINT;
     } else {
-      baseSymb = sym.CENTER;
+      baseSymb = symbols.CENTER;
     }
     intsect.setBase(baseSymb);
 
-    if (stoneColor === glift.enums.states.BLACK) {
-      intsect.setStone(sym.BSTONE);
-    } else if (stoneColor === glift.enums.states.WHITE) {
-      intsect.setStone(sym.WSTONE);
+    if (stoneColor === enums.states.BLACK) {
+      intsect.setStone(symbols.BSTONE);
+    } else if (stoneColor === enums.states.WHITE) {
+      intsect.setStone(symbols.WSTONE);
     }
 
     if (mark !== undefined) {
@@ -70,6 +79,42 @@ glift.flattener.intersection = {
 
     return intsect;
   },
+
+  /**
+   * Static maps to evaluate symbol validity.
+   */
+  layerMapping: {
+    base: {
+      EMPTY: true,
+      TL_CORNER: true,
+      TR_CORNER: true,
+      BL_CORNER: true,
+      BR_CORNER: true,
+      TOP_EDGE: true,
+      BOT_EDGE: true,
+      LEFT_EDGE: true,
+      RIGHT_EDGE: true,
+      CENTER: true,
+      CENTER_STARPOINT: true,
+    },
+    stone: {
+      EMPTY: true,
+      BSTONE: true,
+      WSTONE: true,
+    },
+    mark: {
+      EMPTY: true,
+      TRIANGLE: true,
+      SQUARE: true,
+      CIRCLE: true,
+      XMARK: true,
+      TEXTLABEL: true,
+      LASTMOVE: true,
+      NEXTVARIATION: true,
+      CORRECT_VARIATION: true,
+      KO_LOCATION: true,
+    },
+  }
 };
 
 /**
@@ -80,95 +125,59 @@ glift.flattener.intersection = {
  *
  * Shouldn't be constructed directly outside of this file.
  *
- * @param {!glift.Point} pt
+ * @param {!Point} pt
  *
  * @constructor @final @struct
  */
-glift.flattener.Intersection = function (pt) {
-  var EMPTY = glift.flattener.symbols.EMPTY;
+export class Intersection {
+  constructor(pt) {
+    var EMPTY = symbols.EMPTY;
 
-  /** @private {!glift.Point} */
-  this.pt_ = pt;
-  /** @private {glift.flattener.symbols} */
-  this.baseLayer_ = EMPTY;
-  /** @private {glift.flattener.symbols} */
-  this.stoneLayer_ = EMPTY;
-  /** @private {glift.flattener.symbols} */
-  this.markLayer_ = EMPTY;
+    /** @private {!Point} */
+    this.pt_ = pt;
+    /** @private {symbols} */
+    this.baseLayer_ = EMPTY;
+    /** @private {symbols} */
+    this.stoneLayer_ = EMPTY;
+    /** @private {symbols} */
+    this.markLayer_ = EMPTY;
+
+    /**
+     * Optional text label. Should only be set when the mark layer symbol is some
+     * sort of text-symbol (e.g., TEXTLABEL, NEXTVARIATION)
+     * @private {?string}
+     */
+    this.textLabel_ = null;
+  }
 
   /**
-   * Optional text label. Should only be set when the mark layer symbol is some
-   * sort of text-symbol (e.g., TEXTLABEL, NEXTVARIATION)
-   * @private {?string}
-   */
-  this.textLabel_ = null;
-};
-
-/**
- * Static maps to evaluate symbol validity.
- */
-glift.flattener.intersection.layerMapping = {
-  base: {
-    EMPTY: true,
-    TL_CORNER: true,
-    TR_CORNER: true,
-    BL_CORNER: true,
-    BR_CORNER: true,
-    TOP_EDGE: true,
-    BOT_EDGE: true,
-    LEFT_EDGE: true,
-    RIGHT_EDGE: true,
-    CENTER: true,
-    CENTER_STARPOINT: true,
-  },
-  stone: {
-    EMPTY: true,
-    BSTONE: true,
-    WSTONE: true,
-  },
-  mark: {
-    EMPTY: true,
-    TRIANGLE: true,
-    SQUARE: true,
-    CIRCLE: true,
-    XMARK: true,
-    TEXTLABEL: true,
-    LASTMOVE: true,
-    NEXTVARIATION: true,
-    CORRECT_VARIATION: true,
-    KO_LOCATION: true,
-  },
-};
-
-glift.flattener.Intersection.prototype = {
-  /**
-   * @param {glift.flattener.symbols} s Symbol to validate
+   * @param {symbols} s Symbol to validate
    * @param {string} layer
    * @private
    */
-  validateSymbol_: function (s, layer) {
-    var str = glift.flattener.symbolStr(s);
+  validateSymbol_(s, layer) {
+    var str = symbolStr(s);
     if (!str) {
       throw new Error('Symbol Val: ' + s + ' is not a defined symbol.');
     }
-    if (!glift.flattener.intersection.layerMapping[layer][str]) {
+    if (!intersection.layerMapping[layer][str]) {
       throw new Error(
         'Incorrect layer for: ' + str + ',' + s + '. Layer was ' + layer
       );
     }
     return s;
-  },
+  }
 
   /**
    * Test whether this intersection is equal to another intersection.
    * @param {!Object} thatint
    * @return {boolean}
    */
-  equals: function (thatint) {
+  equals(thatint) {
     if (thatint == null) {
       return false;
     }
-    var that = /** @type {!glift.flattener.Intersection} */ (thatint);
+    var that = /** @type {!Intersection} */ (thatint);
     return (
       this.pt_.equals(that.pt_) &&
       this.baseLayer_ === that.baseLayer_ &&
@@ -176,74 +185,54 @@ glift.flattener.Intersection.prototype = {
       this.markLayer_ === that.markLayer_ &&
       this.textLabel_ === that.textLabel_
     );
-  },
+  }
 
-  /** @return {glift.flattener.symbols} Returns the base layer. */
-  base: function () {
+  /** @return {symbols} Returns the base layer. */
+  base() {
     return this.baseLayer_;
-  },
+  }
 
-  /** @return {glift.flattener.symbols} Returns the stone layer. */
-  stone: function () {
+  /** @return {symbols} Returns the stone layer. */
+  stone() {
     return this.stoneLayer_;
-  },
+  }
 
-  /** @return {glift.flattener.symbols} Returns the mark layer. */
-  mark: function () {
+  /** @return {symbols} Returns the mark layer. */
+  mark() {
     return this.markLayer_;
-  },
+  }
 
   /** @return {?string} Returns the text label. */
-  textLabel: function () {
+  textLabel() {
     return this.textLabel_;
-  },
+  }
 
-  /**
-   * Sets the base layer.
-   * @param {!glift.flattener.symbols} s
-   * @return {!glift.flattener.Intersection} this
-   */
-  setBase: function (s) {
+  /** @return {!Point} Returns the point. */
+  point() {
+    return this.pt_;
+  }
+
+  /** @param {symbols} s Set the base layer. */
+  setBase(s) {
     this.baseLayer_ = this.validateSymbol_(s, 'base');
     return this;
-  },
+  }
 
-  /**
-   * Sets the stone layer.
-   * @param {!glift.flattener.symbols} s
-   * @return {!glift.flattener.Intersection} this
-   */
-  setStone: function (s) {
+  /** @param {symbols} s Set the stone layer. */
+  setStone(s) {
     this.stoneLayer_ = this.validateSymbol_(s, 'stone');
     return this;
-  },
+  }
 
-  /**
-   * Sets the mark layer.
-   * @param {!glift.flattener.symbols} s
-   * @return {!glift.flattener.Intersection} this
-   */
-  setMark: function (s) {
+  /** @param {symbols} s Set the mark layer. */
+  setMark(s) {
     this.markLayer_ = this.validateSymbol_(s, 'mark');
     return this;
-  },
+  }
 
-  /**
-   * Sets the text label.
-   * @param {string} t
-   * @return {!glift.flattener.Intersection} this
-   */
-  setTextLabel: function (t) {
-    this.textLabel_ = t + '';
+  /** @param {?string} t Set the text label. */
+  setTextLabel(t) {
+    this.textLabel_ = t;
     return this;
-  },
-
-  /**
-   * Clears the text label
-   * @return {!glift.flattener.Intersection} this
-   */
-  clearTextLabel: function () {
-    this.textLabel_ = null;
-    return this;
-  },
-};
+  }
+}

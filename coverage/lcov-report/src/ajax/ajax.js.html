@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/18</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/18</span>
             </div>
         
             
@@ -135,16 +135,11 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -212,82 +207,78 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >goog.provide('glift.ajax');</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Ajax/XHR и fetch утилиты.
+ * @module ajax/ajax
+ */
 &nbsp;
 /**
- * Ajax/XHR and fetch utilities.
- * @namespace
+ * Выполняет HTTP GET запрос по указанному URL используя fetch API.
+ * 
+ * @param {string} url URL для запроса
+ * @param {function(string)} successCallback Функция обратного вызова при успешном запросе
+ * @param {function(number, string)=} opt_failureCallback Опциональная функция обратного вызова при ошибке
  */
-<span class="cstat-no" title="statement not covered" >glift.ajax = {</span>
-  /**
-   * Performs an HTTP GET request to the specified URL using fetch API.
-   * 
-   * @param {string} url URL to request
-   * @param {function(string)} successCallback Callback for successful request
-   * @param {function(number, string)=} opt_failureCallback Optional failure callback
-   */
-<span class="fstat-no" title="function not covered" >  ge</span>t(url, successCallback, opt_failureCallback) {
-<span class="cstat-no" title="statement not covered" >    fetch(url)</span>
-      .then(<span class="fstat-no" title="function not covered" >re</span>sponse =&gt; {
-<span class="cstat-no" title="statement not covered" >        if (!response.ok) {</span>
-<span class="cstat-no" title="statement not covered" >          throw new Error(`HTTP error! Status: ${response.status}`);</span>
-        }
-<span class="cstat-no" title="statement not covered" >        return response.text();</span>
-      })
-      .then(<span class="fstat-no" title="function not covered" >da</span>ta =&gt; {
-<span class="cstat-no" title="statement not covered" >        successCallback(data);</span>
-      })
-      .catch(<span class="fstat-no" title="function not covered" >er</span>ror =&gt; {
-<span class="cstat-no" title="statement not covered" >        if (opt_failureCallback) {</span>
-          const status = <span class="cstat-no" title="statement not covered" >error.response?.status || 0;</span>
-          const text = <span class="cstat-no" title="statement not covered" >error.message || `Error fetching ${url}`;</span>
-<span class="cstat-no" title="statement not covered" >          opt_failureCallback(status, text);</span>
-        } else {
-<span class="cstat-no" title="statement not covered" >          console.error(`Error retrieving ${url}: ${error.message}`);</span>
-        }
-      });
-  },
-&nbsp;
-  /**
-   * Promise-based version of the GET request.
-   * 
-   * @param {string} url URL to request
-   * @return {!Promise&lt;string&gt;} Promise that resolves with the response text
-   */
-<span class="fstat-no" title="function not covered" >  ge</span>tPromise(url) {
-<span class="cstat-no" title="statement not covered" >    return fetch(url)</span>
-      .then(<span class="fstat-no" title="function not covered" >re</span>sponse =&gt; {
-<span class="cstat-no" title="statement not covered" >        if (!response.ok) {</span>
-<span class="cstat-no" title="statement not covered" >          throw new Error(`HTTP error! Status: ${response.status}`);</span>
-        }
-<span class="cstat-no" title="statement not covered" >        return response.text();</span>
-      });
-  },
-&nbsp;
-  /**
-   * Performs an HTTP POST request to the specified URL.
-   * 
-   * @param {string} url URL to request
-   * @param {Object} data JSON data to send
-   * @return {!Promise&lt;string&gt;} Promise that resolves with the response text
-   */
-<span class="fstat-no" title="function not covered" >  po</span>st(url, data) {
-<span class="cstat-no" title="statement not covered" >    return fetch(url, {</span>
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+export function <span class="fstat-no" title="function not covered" >get(</span>url, successCallback, opt_failureCallback) {
+<span class="cstat-no" title="statement not covered" >  fetch(url)</span>
+    .then(<span class="fstat-no" title="function not covered" >re</span>sponse =&gt; {
+<span class="cstat-no" title="statement not covered" >      if (!response.ok) {</span>
+<span class="cstat-no" title="statement not covered" >        throw new Error(`HTTP error! Status: ${response.status}`);</span>
+      }
+<span class="cstat-no" title="statement not covered" >      return response.text();</span>
     })
+    .then(<span class="fstat-no" title="function not covered" >da</span>ta =&gt; {
+<span class="cstat-no" title="statement not covered" >      successCallback(data);</span>
+    })
+    .catch(<span class="fstat-no" title="function not covered" >er</span>ror =&gt; {
+<span class="cstat-no" title="statement not covered" >      if (opt_failureCallback) {</span>
+        const status = <span class="cstat-no" title="statement not covered" >error.response?.status || 0;</span>
+        const text = <span class="cstat-no" title="statement not covered" >error.message || `Error fetching ${url}`;</span>
+<span class="cstat-no" title="statement not covered" >        opt_failureCallback(status, text);</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        console.error(`Error retrieving ${url}: ${error.message}`);</span>
+      }
+    });
+}
+&nbsp;
+/**
+ * Promise-версия GET запроса.
+ * 
+ * @param {string} url URL для запроса
+ * @return {!Promise&lt;string&gt;} Promise, который резолвится с текстом ответа
+ */
+export function <span class="fstat-no" title="function not covered" >getPromise(</span>url) {
+<span class="cstat-no" title="statement not covered" >  return fetch(url)</span>
     .then(<span class="fstat-no" title="function not covered" >re</span>sponse =&gt; {
 <span class="cstat-no" title="statement not covered" >      if (!response.ok) {</span>
 <span class="cstat-no" title="statement not covered" >        throw new Error(`HTTP error! Status: ${response.status}`);</span>
       }
 <span class="cstat-no" title="statement not covered" >      return response.text();</span>
     });
-  }
-};
+}
+&nbsp;
+/**
+ * Выполняет HTTP POST запрос по указанному URL.
+ * 
+ * @param {string} url URL для запроса
+ * @param {Object} data JSON-данные для отправки
+ * @return {!Promise&lt;string&gt;} Promise, который резолвится с текстом ответа
+ */
+export function <span class="fstat-no" title="function not covered" >post(</span>url, data) {
+<span class="cstat-no" title="statement not covered" >  return fetch(url, {</span>
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(<span class="fstat-no" title="function not covered" >re</span>sponse =&gt; {
+<span class="cstat-no" title="statement not covered" >    if (!response.ok) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error(`HTTP error! Status: ${response.status}`);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return response.text();</span>
+  });
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -295,7 +286,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-14T16:59:41.242Z
+                at 2025-05-14T21:19:21.243Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

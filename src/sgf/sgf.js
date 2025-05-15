@@ -1,129 +1,142 @@
 /**
- * Библиотека SGF содержит функции для работы с SGF-файлами.
- * Включает функции преобразования и утилиты для SGF.
+ * Модуль SGF (Smart Game Format) для работы с файлами Go.
  * 
- * @module sgf/sgf
+ * Этот модуль содержит вспомогательные функции для работы с SGF файлами.
+ * 
+ * @module sgf
  */
 
-import { marks } from '../util/enums.js';
-import { states } from '../util/enums.js';
-import { pointFromSgfCoord } from '../util/index.js';
-import { prop } from '../rules/all_properties.js';
+import { pointArrFromSgfProp } from '../util/index.js';
+import { enums } from '../util/index.js';
 
 /**
- * Преобразует цвет в токен для SGF.
- * @param {string} color - Цвет ('BLACK' или 'WHITE')
- * @return {string} Токен ('B' или 'W')
+ * Преобразует внутреннее представление цвета в SGF-токен.
+ * 
+ * @param {string} color - Цвет в формате состояния (BLACK/WHITE)
+ * @return {string} Токен цвета в SGF формате (B/W)
  */
 export const colorToToken = (color) => {
-  if (color === states.WHITE) {
-    return 'W';
-  } else if (color === states.BLACK) {
+  if (color === enums.states.BLACK) {
     return 'B';
-  } else {
-    throw new Error('Неизвестное преобразование цвета в токен для: ' + color);
+  } else if (color === enums.states.WHITE) {
+    return 'W';
   }
+  return null;
 };
 
 /**
- * Преобразует цвет в свойство размещения камня.
- * @param {string} color - Цвет ('BLACK' или 'WHITE')
- * @return {string} Свойство ('AW' или 'AB')
+ * Преобразует внутреннее представление цвета в SGF свойство.
+ * 
+ * @param {string} color - Цвет в формате состояния (BLACK/WHITE)
+ * @return {string} SGF-свойство для размещения камня (B/W)
  */
 export const colorToPlacement = (color) => {
-  if (color === states.WHITE) {
-    return 'AW';
-  } else if (color === states.BLACK) {
-    return 'AB';
-  } else {
-    throw new Error('Неизвестное преобразование цвета в токен для: ' + color);
-  }
+  return colorToToken(color);
 };
 
 /**
- * Преобразует тип метки Glift в соответствующее свойство SGF.
- * @param {string} mark - Тип метки
- * @return {string|null} Свойство SGF или null если не найдено
+ * Преобразует внутреннее представление метки в SGF-свойство.
+ * 
+ * @param {string} mark - Внутреннее представление метки
+ * @return {string} SGF-свойство метки
  */
 export const markToProperty = (mark) => {
-  const markToPropertyMap = {
-    LABEL_ALPHA: prop.LB,
-    LABEL_NUMERIC: prop.LB,
-    LABEL: prop.LB,
-    XMARK: prop.MA,
-    SQUARE: prop.SQ,
-    CIRCLE: prop.CR,
-    TRIANGLE: prop.TR,
-  };
-  return markToPropertyMap[mark] || null;
+  if (mark === enums.marks.TRIANGLE) {
+    return 'TR';
+  } else if (mark === enums.marks.SQUARE) {
+    return 'SQ';
+  } else if (mark === enums.marks.CIRCLE) {
+    return 'CR';
+  } else if (mark === enums.marks.LABEL) {
+    return 'LB';
+  } else if (mark === enums.marks.XMARK) {
+    return 'MA';
+  }
+  return null;
 };
 
 /**
- * Преобразует свойство SGF в соответствующий тип метки Glift.
- * @param {string} prop - Свойство SGF
- * @return {string|null} Тип метки или null если не найдено
+ * Преобразует SGF-свойство метки во внутреннее представление.
+ * 
+ * @param {string} prop - SGF-свойство метки
+ * @return {string} Внутреннее представление метки
  */
 export const propertyToMark = (prop) => {
-  const propertyToMarkMap = {
-    LB: marks.LABEL,
-    MA: marks.XMARK,
-    SQ: marks.SQUARE,
-    CR: marks.CIRCLE,
-    TR: marks.TRIANGLE,
-  };
-  return propertyToMarkMap[prop] || null;
+  if (prop === 'TR') {
+    return enums.marks.TRIANGLE;
+  } else if (prop === 'SQ') {
+    return enums.marks.SQUARE;
+  } else if (prop === 'CR') {
+    return enums.marks.CIRCLE;
+  } else if (prop === 'LB') {
+    return enums.marks.LABEL;
+  } else if (prop === 'MA') {
+    return enums.marks.XMARK;
+  }
+  return null;
 };
 
 /**
- * Преобразует массив SGF-координат в массив точек Glift.
- * @param {Array<string>} arr - Массив SGF-координат
- * @return {Array<Object>} Массив точек
+ * Преобразует SGF-координаты точек в массив объектов точек.
+ * 
+ * @param {string} str - Строка с SGF-координатами
+ * @return {Array<Object>} Массив объектов точек
  */
-export const allSgfCoordsToPoints = (arr) => {
-  const out = [];
-  if (!arr) {
-    return out;
+export const allSgfCoordsToPoints = (str) => {
+  if (!str) {
+    return [];
   }
-  for (let i = 0; i < arr.length; i++) {
-    out.push(pointFromSgfCoord(arr[i]));
+  const out = [];
+  const coordstrs = str.split(',');
+  for (let i = 0; i < coordstrs.length; i++) {
+    const coords = pointArrFromSgfProp(coordstrs[i]);
+    for (let j = 0; j < coords.length; j++) {
+      out.push(coords[j]);
+    }
   }
   return out;
 };
 
 /**
- * Преобразует точку в SGF-строку.
- * @param {Object} point - Точка
- * @return {string} SGF-координата
+ * Преобразует внутренний объект точки в строку.
+ * 
+ * @param {Object} pt - Объект точки
+ * @return {string} Строковое представление точки
  */
-export const pointToString = (point) => {
-  if (!point || typeof point.x !== 'number' || typeof point.y !== 'number') {
-    throw new Error('Недопустимая точка: ' + point);
-  }
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
-  return letters.charAt(point.x) + letters.charAt(point.y);
+export const pointToString = (pt) => {
+  return pt ? String.fromCharCode(97 + pt.x()) + String.fromCharCode(97 + pt.y()) : '';
 };
 
 /**
- * Преобразует данные метки в простой объект.
- * @param {string} data - Данные метки
- * @return {Object} Объект с точкой и значением
+ * Преобразует данные о метках в формат SGF.
+ * 
+ * @param {Object} map - Объект с метками
+ * @return {Array<string>} Массив меток в формате SGF
  */
-export const convertFromLabelData = (data) => {
-  const parts = data.split(':');
-  const pt = pointFromSgfCoord(parts[0]);
-  const value = parts[1];
-  return { point: pt, value: value };
-};
-
-/**
- * Преобразует массив данных меток в массив объектов.
- * @param {Array<string>} arr - Массив данных меток
- * @return {Array<Object>} Массив объектов с точками и значениями
- */
-export const convertFromLabelArray = (arr) => {
+export const convertFromLabelData = (map) => {
   const out = [];
-  for (let i = 0; i < arr.length; i++) {
-    out.push(convertFromLabelData(arr[i]));
+  for (const key in map) {
+    if (map.hasOwnProperty(key)) {
+      const value = map[key];
+      const sgfCoord = pointToString(value.point);
+      out.push(sgfCoord + ':' + value.label);
+    }
+  }
+  return out;
+};
+
+/**
+ * Преобразует массив меток в формат SGF.
+ * 
+ * @param {Array<Object>} labels - Массив с объектами меток
+ * @return {Array<string>} Массив меток в формате SGF
+ */
+export const convertFromLabelArray = (labels) => {
+  const out = [];
+  for (let i = 0; i < labels.length; i++) {
+    const label = labels[i];
+    const sgfCoord = pointToString(label.point);
+    out.push(sgfCoord + ':' + label.label);
   }
   return out;
 }; 

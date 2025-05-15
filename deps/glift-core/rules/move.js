@@ -1,13 +1,16 @@
-goog.provide('glift.rules.Move');
+/**
+ * Модуль для представления хода в игре Го.
+ * @module rules/move
+ */
 
 /**
- * A type encapsulating the idea of a move.
+ * Тип, представляющий ход в игре.
  *
- * A move can have an undefined point because players may pass.
+ * Точка может быть не определена, потому что игроки могут пасовать.
  *
  * @typedef {{
- *  point: (!glift.Point|undefined),
- *  color: !glift.enums.states
+ *  point: (!Object|undefined),
+ *  color: !string
  * }}
  */
-glift.rules.Move;
+export let Move;

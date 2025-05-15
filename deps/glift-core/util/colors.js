@@ -1,15 +1,22 @@
-goog.provide('glift.util.colors');
+/**
+ * Модуль для работы с цветами в Glift.
+ * @module util/colors
+ */
 
-goog.require('glift.util');
+import { enums } from '../../../src/util/enums.js';
 
-glift.util.colors = {
+/**
+ * Утилиты для работы с цветами.
+ */
+export const colors = {
   /**
-   * @param {glift.enums.states} color
-   * @return {glift.enums.states} The opposite color
+   * Возвращает противоположный цвет.
+   * @param {string} color - Исходный цвет
+   * @return {string} Противоположный цвет
    */
-  oppositeColor: function (color) {
-    if (color === glift.enums.states.BLACK) return glift.enums.states.WHITE;
-    if (color === glift.enums.states.WHITE) return glift.enums.states.BLACK;
+  oppositeColor: function(color) {
+    if (color === enums.states.BLACK) return enums.states.WHITE;
+    if (color === enums.states.WHITE) return enums.states.BLACK;
     else return color;
-  },
+  }
 };

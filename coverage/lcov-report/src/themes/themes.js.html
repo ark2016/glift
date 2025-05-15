@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -186,7 +186,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -203,7 +203,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -231,7 +231,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -253,7 +253,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -269,7 +269,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -298,7 +298,7 @@ import { baseTheme } from './base_theme.js';
 /**
  * Тема DEFAULT: Стандартная тема с обычными камнями
  */
-export const DEFAULT = <span class="cstat-no" title="statement not covered" >{</span>
+export const DEFAULT = {
   ...baseTheme,
   stones: {
     ...baseTheme.stones,
@@ -315,7 +315,7 @@ export const DEFAULT = <span class="cstat-no" title="statement not covered" >{</
 /**
  * Тема DEPTH: Камни с тенями для объемного эффекта
  */
-export const DEPTH = <span class="cstat-no" title="statement not covered" >{</span>
+export const DEPTH = {
   ...baseTheme,
   stones: {
     ...baseTheme.stones,
@@ -343,7 +343,7 @@ export const DEPTH = <span class="cstat-no" title="statement not covered" >{</sp
 /**
  * Тема MOODY: Серый фон, камни без контура
  */
-export const MOODY = <span class="cstat-no" title="statement not covered" >{</span>
+export const MOODY = {
   ...baseTheme,
   stones: {
     ...baseTheme.stones,
@@ -365,7 +365,7 @@ export const MOODY = <span class="cstat-no" title="statement not covered" >{</sp
 /**
  * Тема TRANSPARENT: Прозрачная доска
  */
-export const TRANSPARENT = <span class="cstat-no" title="statement not covered" >{</span>
+export const TRANSPARENT = {
   ...baseTheme,
   board: {
     ...baseTheme.board,
@@ -381,7 +381,7 @@ export const TRANSPARENT = <span class="cstat-no" title="statement not covered" 
 /**
  * Тема TEXTBOOK: Черно-белое оформление
  */
-export const TEXTBOOK = <span class="cstat-no" title="statement not covered" >{</span>
+export const TEXTBOOK = {
   ...baseTheme,
   stones: {
     ...baseTheme.stones,
@@ -406,7 +406,7 @@ export const TEXTBOOK = <span class="cstat-no" title="statement not covered" >{<
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-14T16:59:41.242Z
+                at 2025-05-14T21:19:21.243Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

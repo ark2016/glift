@@ -5,7 +5,37 @@
  * @module sgf
  */
 
-import * as sgfModule from './sgf.js';
+import {
+  colorToToken,
+  colorToPlacement,
+  markToProperty,
+  propertyToMark,
+  allSgfCoordsToPoints,
+  pointToString,
+  convertFromLabelData,
+  convertFromLabelArray
+} from './sgf.js';
 
-// Реэкспортируем все функции из модуля sgf
-export const sgf = sgfModule; 
+// Экспортируем функции из sgf.js
+export {
+  colorToToken,
+  colorToPlacement,
+  markToProperty,
+  propertyToMark,
+  allSgfCoordsToPoints,
+  pointToString,
+  convertFromLabelData,
+  convertFromLabelArray
+};
+
+// Для обратной совместимости
+export const sgf = {
+  colorToToken,
+  colorToPlacement,
+  markToProperty,
+  propertyToMark,
+  allSgfCoordsToPoints,
+  pointToString,
+  convertFromLabelData,
+  convertFromLabelArray
+}; 

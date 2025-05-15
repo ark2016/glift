@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>0/72</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/73</span>
+                <span class='fraction'>0/69</span>
             </div>
         
             
@@ -273,29 +273,41 @@
 <a name='L208'></a><a href='#L208'>208</a>
 <a name='L209'></a><a href='#L209'>209</a>
 <a name='L210'></a><a href='#L210'>210</a>
-<a name='L211'></a><a href='#L211'>211</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -409,7 +421,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -417,7 +428,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -480,51 +490,59 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >goog.provide('glift.displays.position.WidgetBoxes');</span>
-<span class="cstat-no" title="statement not covered" >goog.provide('glift.displays.position.WidgetColumn');</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Классы для хранения и управления блоками виджетов Glift.
+ * @module displays/position/widget_boxes
+ */
+&nbsp;
+import { orientation } from '../../orientation/orientation.js';
+import { util } from '../../util/util.js';
+import { BoardComponent } from '../../enums.js';
 &nbsp;
 /**
- * Container for the widget boxes. Everything starts undefined,
- *
- * @constructor @final @struct
+ * Контейнер для боксов виджета. Изначально все параметры не определены.
  */
-<span class="cstat-no" title="statement not covered" >glift.displays.position.WidgetBoxes = <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
-  /** @private {glift.displays.position.WidgetColumn} */
-<span class="cstat-no" title="statement not covered" >  this._first = null;</span>
-  /** @private {glift.displays.position.WidgetColumn} */
-<span class="cstat-no" title="statement not covered" >  this._second = null;</span>
-};
+class WidgetBoxes {
+<span class="fstat-no" title="function not covered" >  co</span>nstructor() {
+    /** @private {WidgetColumn} */
+<span class="cstat-no" title="statement not covered" >    this._first = null;</span>
+    /** @private {WidgetColumn} */
+<span class="cstat-no" title="statement not covered" >    this._second = null;</span>
+  }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >glift.displays.position.WidgetBoxes.prototype = {</span>
-  /** @param {!glift.displays.position.WidgetColumn} col */
-  setFirst: <span class="fstat-no" title="function not covered" >fu</span>nction (col) {
+  /** @param {!WidgetColumn} col */
+<span class="fstat-no" title="function not covered" >  se</span>tFirst(col) {
 <span class="cstat-no" title="statement not covered" >    this._first = col;</span>
-  },
+<span class="cstat-no" title="statement not covered" >    return this;</span>
+  }
 &nbsp;
-  /** @param {!glift.displays.position.WidgetColumn} col */
-  setSecond: <span class="fstat-no" title="function not covered" >fu</span>nction (col) {
+  /** @param {!WidgetColumn} col */
+<span class="fstat-no" title="function not covered" >  se</span>tSecond(col) {
 <span class="cstat-no" title="statement not covered" >    this._second = col;</span>
-  },
+<span class="cstat-no" title="statement not covered" >    return this;</span>
+  }
 &nbsp;
-  /** @return {glift.displays.position.WidgetColumn} First column */
-  first: <span class="fstat-no" title="function not covered" >fu</span>nction () {
+  /** @return {WidgetColumn} Первая колонка */
+<span class="fstat-no" title="function not covered" >  fi</span>rst() {
 <span class="cstat-no" title="statement not covered" >    return this._first;</span>
-  },
+  }
 &nbsp;
-  /** @return {glift.displays.position.WidgetColumn} Second column */
-  second: <span class="fstat-no" title="function not covered" >fu</span>nction (col) {
+  /** @return {WidgetColumn} Вторая колонка */
+<span class="fstat-no" title="function not covered" >  se</span>cond() {
 <span class="cstat-no" title="statement not covered" >    return this._second;</span>
-  },
+  }
 &nbsp;
   /**
-   * Get a component by ID.
-   * @param {glift.BoardComponent} key Component key
-   * @return {?glift.orientation.BoundingBox} A bounding box or null.
+   * Получить компонент по ID.
+   * @param {BoardComponent} key Ключ компонента
+   * @return {?orientation.BoundingBox} Ограничивающий бокс или null.
    */
-  getBbox: <span class="fstat-no" title="function not covered" >fu</span>nction (key) {
+<span class="fstat-no" title="function not covered" >  ge</span>tBbox(key) {
 <span class="cstat-no" title="statement not covered" >    if (this._first &amp;&amp; this._first.mapping[key]) {</span>
 <span class="cstat-no" title="statement not covered" >      return this._first.mapping[key];</span>
     }
@@ -532,56 +550,56 @@
 <span class="cstat-no" title="statement not covered" >      return this._second.mapping[key];</span>
     }
 <span class="cstat-no" title="statement not covered" >    return null;</span>
-  },
+  }
 &nbsp;
   /**
-   * Get the bbox of a component or throw an exception
+   * Получить ограничивающий бокс компонента или вызвать исключение
    *
-   * @param {glift.BoardComponent} key Component key
-   * @return {!glift.orientation.BoundingBox}.
+   * @param {BoardComponent} key Ключ компонента
+   * @return {!orientation.BoundingBox}.
    */
-  mustGetBbox: <span class="fstat-no" title="function not covered" >fu</span>nction (key) {
-    var bbox = <span class="cstat-no" title="statement not covered" >this.getBbox(key);</span>
+<span class="fstat-no" title="function not covered" >  mu</span>stGetBbox(key) {
+    const bbox = <span class="cstat-no" title="statement not covered" >this.getBbox(key);</span>
 <span class="cstat-no" title="statement not covered" >    if (bbox == null) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('Column was null for component: ' + key);</span>
     }
 <span class="cstat-no" title="statement not covered" >    return bbox;</span>
-  },
+  }
 &nbsp;
   /**
-   * Iterate through all the bboxes.
+   * Перебрать все ограничивающие боксы.
    *
-   * This method passes both the component name and the relevant to the fn.
-   * Another way to say this is fn has the form:
+   * Этот метод передает как имя компонента, так и соответствующий бокс в функцию.
+   * Другими словами, функция имеет форму:
    *
    * fn(&lt;component-name&gt;, bbox&gt;);
    */
-  forEach: <span class="fstat-no" title="function not covered" >fu</span>nction (fn) {
-<span class="cstat-no" title="statement not covered" >    if (glift.util.typeOf(fn) !== 'function') {</span>
+<span class="fstat-no" title="function not covered" >  fo</span>rEach(fn) {
+<span class="cstat-no" title="statement not covered" >    if (util.typeOf(fn) !== 'function') {</span>
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
-    var applyOrdering = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >fu</span>nction (col, inFn) {</span>
-      var ordering = <span class="cstat-no" title="statement not covered" >col.ordering;</span>
-<span class="cstat-no" title="statement not covered" >      for (var j = <span class="cstat-no" title="statement not covered" >0;</span> j &lt; ordering.length; j++) {</span>
-        var key = <span class="cstat-no" title="statement not covered" >ordering[j];</span>
+    const applyOrdering = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >fu</span>nction (col, inFn) {</span>
+      const ordering = <span class="cstat-no" title="statement not covered" >col.ordering;</span>
+<span class="cstat-no" title="statement not covered" >      for (let j = <span class="cstat-no" title="statement not covered" >0;</span> j &lt; ordering.length; j++) {</span>
+        const key = <span class="cstat-no" title="statement not covered" >ordering[j];</span>
 <span class="cstat-no" title="statement not covered" >        inFn(key, col.mapping[key]);</span>
       }
     };
 <span class="cstat-no" title="statement not covered" >    this._first &amp;&amp; applyOrdering(this._first, fn.bind(this));</span>
 <span class="cstat-no" title="statement not covered" >    this._second &amp;&amp; applyOrdering(this._second, fn.bind(this));</span>
 <span class="cstat-no" title="statement not covered" >    return undefined;</span>
-  },
+  }
 &nbsp;
   /**
-   * Get the bounding box for the whole widget. Useful for creating temporary
-   * divs.  Note: Returns a new bounding box everytime, since it's calculated
-   * based on the existing bboxes.
+   * Получить ограничивающий бокс для всего виджета. Полезно для создания временных
+   * div-элементов. Примечание: Возвращает новый ограничивающий бокс каждый раз, так как он
+   * рассчитывается на основе существующих боксов.
    */
-  fullWidgetBbox: <span class="fstat-no" title="function not covered" >fu</span>nction () {
-    var top = <span class="cstat-no" title="statement not covered" >null;</span>
-    var left = <span class="cstat-no" title="statement not covered" >null;</span>
-    var bottom = <span class="cstat-no" title="statement not covered" >null;</span>
-    var right = <span class="cstat-no" title="statement not covered" >null;</span>
+<span class="fstat-no" title="function not covered" >  fu</span>llWidgetBbox() {
+    let top = <span class="cstat-no" title="statement not covered" >null;</span>
+    let left = <span class="cstat-no" title="statement not covered" >null;</span>
+    let bottom = <span class="cstat-no" title="statement not covered" >null;</span>
+    let right = <span class="cstat-no" title="statement not covered" >null;</span>
 <span class="cstat-no" title="statement not covered" >    this.forEach(<span class="fstat-no" title="function not covered" >fu</span>nction (compName, bbox) {</span>
 <span class="cstat-no" title="statement not covered" >      if (top === null) {</span>
 <span class="cstat-no" title="statement not covered" >        top = bbox.top();</span>
@@ -604,95 +622,95 @@
       }
     });
 <span class="cstat-no" title="statement not covered" >    if (top !== null &amp;&amp; left !== null &amp;&amp; bottom !== null &amp;&amp; right !== null) {</span>
-<span class="cstat-no" title="statement not covered" >      return glift.orientation.bbox.fromPts(</span>
-        glift.util.point(left, top),
-        glift.util.point(right, bottom)
+<span class="cstat-no" title="statement not covered" >      return orientation.bbox.fromPts(</span>
+        util.point(left, top),
+        util.point(right, bottom)
       );
     } else {
 <span class="cstat-no" title="statement not covered" >      return null;</span>
     }
-  },
-};
+  }
+}
 &nbsp;
 /**
- * Data container for information about how the widegt is positioned.
- *
- * @constructor @final @struct
+ * Контейнер данных для информации о том, как позиционирован виджет.
  */
-<span class="cstat-no" title="statement not covered" >glift.displays.position.WidgetColumn = <span class="fstat-no" title="function not covered" >fu</span>nction () {</span>
-  /** Mapping from component from map to box. */
-<span class="cstat-no" title="statement not covered" >  this.mapping = {};</span>
+class WidgetColumn {
+<span class="fstat-no" title="function not covered" >  co</span>nstructor() {
+    /** Отображение от компонента к ограничивающему боксу. */
+<span class="cstat-no" title="statement not covered" >    this.mapping = {};</span>
 &nbsp;
-  /** This ordering of the components. */
-<span class="cstat-no" title="statement not covered" >  this.ordering = [];</span>
-};
+    /** Порядок компонентов. */
+<span class="cstat-no" title="statement not covered" >    this.ordering = [];</span>
+  }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >glift.displays.position.WidgetColumn.prototype = {</span>
-  /** Set a mapping from from component to bounding box. */
-  setComponent: <span class="fstat-no" title="function not covered" >fu</span>nction (component, bbox) {
-<span class="cstat-no" title="statement not covered" >    if (!glift.BoardComponent[component]) {</span>
+  /** Установить отображение от компонента к ограничивающему боксу. */
+<span class="fstat-no" title="function not covered" >  se</span>tComponent(component, bbox) {
+<span class="cstat-no" title="statement not covered" >    if (!BoardComponent[component]) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('Unknown component: ' + component);</span>
     }
 <span class="cstat-no" title="statement not covered" >    this.mapping[component] = bbox;</span>
 <span class="cstat-no" title="statement not covered" >    return this;</span>
-  },
+  }
 &nbsp;
   /**
-   * Get the bbox of a component or return null.
+   * Получить ограничивающий бокс компонента или вернуть null.
    *
-   * @param {glift.BoardComponent} component Component key
-   * @return {?glift.orientation.BoundingBox} A bounding box or null.
+   * @param {BoardComponent} component Ключ компонента
+   * @return {?orientation.BoundingBox} Ограничивающий бокс или null.
    */
-  getBbox: <span class="fstat-no" title="function not covered" >fu</span>nction (component) {
+<span class="fstat-no" title="function not covered" >  ge</span>tBbox(component) {
 <span class="cstat-no" title="statement not covered" >    return this.mapping[component] || null;</span>
-  },
+  }
 &nbsp;
   /**
-   * Get the bbox of a component or throw an exception.
+   * Получить ограничивающий бокс компонента или вызвать исключение.
    *
-   * @param {glift.BoardComponent} component Component key
-   * @return {!glift.orientation.BoundingBox}
+   * @param {BoardComponent} component Ключ компонента
+   * @return {!orientation.BoundingBox}
    */
-  mustGetBbox: <span class="fstat-no" title="function not covered" >fu</span>nction (component) {
-    var bbox = <span class="cstat-no" title="statement not covered" >this.getBbox(component);</span>
+<span class="fstat-no" title="function not covered" >  mu</span>stGetBbox(component) {
+    const bbox = <span class="cstat-no" title="statement not covered" >this.getBbox(component);</span>
 <span class="cstat-no" title="statement not covered" >    if (bbox == null) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('Bbox was null for component: ' + component);</span>
     }
 <span class="cstat-no" title="statement not covered" >    return bbox;</span>
-  },
+  }
 &nbsp;
   /**
-   * Set the column from an ordering. Recall that ratio arrays have the
-   * following format:
+   * Установить колонку из упорядочения. Напомним, что массивы соотношений имеют
+   * следующий формат:
    * [
    *  { component: BOARD, ratio: 0.3}
    *  { component: COMMENT_BOX, ratio: 0.6}
    *  ...
    * ].
    *
-   * This is typically set before setting components.
+   * Обычно устанавливается перед установкой компонентов.
    */
-  setOrderingFromRatioArray: <span class="fstat-no" title="function not covered" >fu</span>nction (column) {
-    var ordering = <span class="cstat-no" title="statement not covered" >[];</span>
-<span class="cstat-no" title="statement not covered" >    for (var i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; column.length; i++) {</span>
-      var item = <span class="cstat-no" title="statement not covered" >column[i];</span>
+<span class="fstat-no" title="function not covered" >  se</span>tOrderingFromRatioArray(column) {
+    const ordering = <span class="cstat-no" title="statement not covered" >[];</span>
+<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; column.length; i++) {</span>
+      const item = <span class="cstat-no" title="statement not covered" >column[i];</span>
 <span class="cstat-no" title="statement not covered" >      if (item &amp;&amp; item.component) {</span>
 <span class="cstat-no" title="statement not covered" >        ordering.push(item.component);</span>
       }
     }
 <span class="cstat-no" title="statement not covered" >    this.ordering = ordering;</span>
 <span class="cstat-no" title="statement not covered" >    return this;</span>
-  },
+  }
 &nbsp;
   /**
-   * An ordering function. Expects the fn to take a component name.
+   * Функция упорядочения. Ожидает, что функция принимает имя компонента.
    */
-  orderFn: <span class="fstat-no" title="function not covered" >fu</span>nction (fn) {
-<span class="cstat-no" title="statement not covered" >    for (var i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; this.ordering.length; i++) {</span>
+<span class="fstat-no" title="function not covered" >  or</span>derFn(fn) {
+<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; this.ordering.length; i++) {</span>
 <span class="cstat-no" title="statement not covered" >      fn(this.ordering[i]);</span>
     }
-  },
-};
+  }
+}
+&nbsp;
+export { WidgetBoxes, WidgetColumn };
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -700,7 +718,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-14T16:59:41.242Z
+                at 2025-05-14T21:19:21.243Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

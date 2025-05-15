@@ -1,5 +1,7 @@
-goog.provide('glift.svg.SvgObj');
-goog.provide('glift.svg.ViewBox');
+/**
+ * Модуль для работы с SVG объектами.
+ * @module svg/svgobj
+ */
 
 /**
  * @typedef {{
@@ -9,121 +11,47 @@ goog.provide('glift.svg.ViewBox');
  *  brY: number
  * }}
  */
-glift.svg.ViewBox;
+export let ViewBox;
 
 /**
- * Creats a SVG Wrapper object.
- *
- * @param {string} type Svg element type.
- * @param {!Object<string>=} opt_attrObj optional attribute object.
+ * Оболочка для SVG объекта.
  */
-glift.svg.createObj = function (type, opt_attrObj) {
-  return new glift.svg.SvgObj(type, opt_attrObj);
-};
-
-/**
- * Creates a root SVG object.
- * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
- */
-glift.svg.svg = function (opt_attrObj) {
-  return new glift.svg.SvgObj('svg', opt_attrObj)
-    .setAttr('version', '1.1')
-    .setAttr('xmlns', 'http://www.w3.org/2000/svg');
-};
-
-/**
- * Creates a circle svg object.
- * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
- */
-glift.svg.circle = function (opt_attrObj) {
-  return new glift.svg.SvgObj('circle', opt_attrObj);
-};
-
-/**
- * Creates a path svg object.
- * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
- */
-glift.svg.path = function (opt_attrObj) {
-  return new glift.svg.SvgObj('path', opt_attrObj);
-};
-
-/**
- * Creates an rectangle svg object.
- * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
- */
-glift.svg.rect = function (opt_attrObj) {
-  return new glift.svg.SvgObj('rect', opt_attrObj);
-};
-
-/**
- * Creates an image svg object.
- * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
- */
-glift.svg.image = function (opt_attrObj) {
-  return new glift.svg.SvgObj('image', opt_attrObj);
-};
-
-/**
- * Creates a text svg object.
- * @param {!Object<string>=} opt_attrObj optional attribute object.
- * @return {!glift.svg.SvgObj}
- */
-glift.svg.text = function (opt_attrObj) {
-  return new glift.svg.SvgObj('text', opt_attrObj);
-};
-
-/**
- * Create a group object (without any attributes)
- * @return {!glift.svg.SvgObj}
- */
-glift.svg.group = function () {
-  return new glift.svg.SvgObj('g');
-};
-
-/**
- * SVG Wrapper object.
- * @constructor @final @struct
- *
- * @param {string} type Svg element type.
- * @param {Object<string>=} opt_attrObj optional attribute object.
- */
-glift.svg.SvgObj = function (type, opt_attrObj) {
-  /** @private {string} */
-  this.type_ = type;
-
+export class SvgObj {
   /**
-   * Optional style tag. Should really only be on the top-level SVG element.
-   * For more details, see:
-   * https://developer.mozilla.org/en-US/docs/Web/SVG/Element/style
-   * @private {string}
+   * @param {string} type Тип элемента SVG.
+   * @param {!Object<string>=} opt_attrObj Опциональный объект атрибутов.
    */
-  this.style_ = '';
+  constructor(type, opt_attrObj) {
+    /** @private {string} */
+    this.type_ = type;
 
-  /** @private {!Object<string>} */
-  this.attrMap_ = opt_attrObj || {};
-  /** @private {!Array<!glift.svg.SvgObj>} */
-  this.children_ = [];
-  /** @private {!Object<!glift.svg.SvgObj>} */
-  this.idMap_ = {};
-  /** @private {string} */
-  this.text_ = '';
-  /** @private {!glift.svg.ViewBox|undefined} */
-  this.viewBox_ = undefined;
-  /** @private {?Object} */
-  this.data_ = null;
-};
+    /**
+     * Опциональный тег стиля. Должен быть только на элементе SVG верхнего уровня.
+     * Подробнее см.:
+     * https://developer.mozilla.org/en-US/docs/Web/SVG/Element/style
+     * @private {string}
+     */
+    this.style_ = '';
 
-glift.svg.SvgObj.prototype = {
+    /** @private {!Object<string>} */
+    this.attrMap_ = opt_attrObj || {};
+    /** @private {!Array<!SvgObj>} */
+    this.children_ = [];
+    /** @private {!Object<!SvgObj>} */
+    this.idMap_ = {};
+    /** @private {string} */
+    this.text_ = '';
+    /** @private {!ViewBox|undefined} */
+    this.viewBox_ = undefined;
+    /** @private {?Object} */
+    this.data_ = null;
+  }
+
   /**
-   * Return the string form of the svg object.
+   * Возвращает строковую форму объекта svg.
    * @return {string}
    */
-  render: function () {
+  render() {
     var base = '<' + this.type_;
     for (var key in this.attrMap_) {
       base += ' ' + key + '="' + this.attrMap_[key] + '"';
@@ -165,203 +93,217 @@ glift.svg.SvgObj.prototype = {
       base += '</' + this.type_ + '>';
     }
     return base;
-  },
+  }
 
-  /** @return {string} A value in the attribute map. */
-  attr: function (key) {
+  /** @return {string} Значение в карте атрибутов. */
+  attr(key) {
     return this.attrMap_[key];
-  },
+  }
 
   /**
-   * Sets an SVG attribute.
-   * @param {string} key The key of an object in the map.
-   * @param {string|number} value The value to set in the map.
-   * @return {!glift.svg.SvgObj} This object.
+   * Устанавливает атрибут SVG.
+   * @param {string} key Ключ объекта в карте.
+   * @param {string|number} value Значение для установки в карту.
+   * @return {!SvgObj} Этот объект.
    */
-  setAttr: function (key, value) {
+  setAttr(key, value) {
     this.attrMap_[key] = value + '';
     return this;
-  },
+  }
 
   /**
-   * Sets the top-level CSS-styling.
+   * Устанавливает CSS-стиль верхнего уровня.
    * @param {string} s
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} Этот объект.
    */
-  setStyle: function (s) {
+  setStyle(s) {
     this.style_ = s;
     return this;
-  },
+  }
 
   /**
-   * Sets the view-box for the SVG element.
+   * Устанавливает view-box для элемента SVG.
    * https://css-tricks.com/scale-svg/
    *
    * @param {number} tlX tl.y
-   * @param {number} tlY tl.x
+   * @param {number} tlY br.x
    * @param {number} brX br.y
-   * @param {number} brY br.x
-   * @return {!glift.svg.SvgObj} this
+   * @param {number} brY
+   * @return {!SvgObj} сам объект
    */
-  setViewBox: function (tlX, tlY, brX, brY) {
-    this.viewBox_ = {
-      tlX: tlX,
-      tlY: tlY,
-      brX: brX,
-      brY: brY,
-    };
+  setViewBox(tlX, tlY, brX, brY) {
+    this.viewBox_ = { tlX: tlX, tlY: tlY, brX: brX, brY: brY };
     return this;
-  },
-
-  /** @return {?string} the Id of this object or null. */
-  id: function () {
-    return /** @type {?string} */ (this.attrMap_['id'] || null);
-  },
+  }
 
   /**
-   * Convenience method to avoid null ID type.
-   * @return {string}
-   */
-  idOrThrow: function () {
-    if (this.id() == null) {
-      throw new Error('ID was null; expected to be non-null');
-    }
-    return /** @type {string} */ (this.id());
-  },
-
-  /**
-   * Sets the ID (using the Attribute object as a store).
+   * Добавить id в отображение id.
    * @param {string} id
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} сам объект
    */
-  setId: function (id) {
-    if (id) {
-      this.attrMap_['id'] = id;
-    }
+  setId(id) {
+    this.attrMap_['id'] = id;
     return this;
-  },
-
-  /** @return {!Object<string>} The attribute object.  */
-  attrObj: function () {
-    return this.attrMap_;
-  },
+  }
 
   /**
-   * Sets the entire attribute object.
-   * @param {!Object<string>} attrObj
-   * @return {!glift.svg.SvgObj} This object.
+   * Получает объект из карты id.
+   * @param {string} id
+   * @return {SvgObj} объект из карты id.
    */
-  setAttrObj: function (attrObj) {
-    if (glift.util.typeOf(attrObj) !== 'object') {
-      throw new Error('Attr obj must be of type object');
-    }
-    this.attrMap_ = attrObj;
-    return this;
-  },
-
-  /** @return {?Object} The node's data */
-  data: function () {
-    return this.data_;
-  },
+  child(id) {
+    return this.idMap_[id];
+  }
 
   /**
-   * Set some internal data. Note: this data is not attached when the element is
-   * generated.
-   * @param {!Object} data
-   * @return {!glift.svg.SvgObj} This object.
-   */
-  setData: function (data) {
-    this.data_ = data;
-    return this;
-  },
-
-  /** @return {string} The text on the node. */
-  text: function () {
-    return this.text_;
-  },
-
-  /**
-   * Append some text. Usually only for text elements.
+   * Устанавливает текст для объекта SVG.
    * @param {string} text
-   * @return {!glift.svg.SvgObj} This object.
+   * @return {!SvgObj} Этот объект.
    */
-  setText: function (text) {
+  setText(text) {
     this.text_ = text;
     return this;
-  },
-
-  /** @return {string} The type of this object. */
-  type: function () {
-    return this.type_;
-  },
+  }
 
   /**
-   * Get child from an Id.
-   * @return {!glift.svg.SvgObj} The child obj.
+   * Добавить дочерний объект.
+   * @param {!SvgObj} obj
+   * @return {!SvgObj} Только что добавленный дочерний элемент.
    */
-  child: function (id) {
-    return this.idMap_[id];
-  },
-
-  /**
-   * Remove child, based on id.
-   * @return {!glift.svg.SvgObj} This object.
-   */
-  rmChild: function (id) {
-    delete this.idMap_[id];
-    return this;
-  },
-
-  /**
-   * Get all the Children.
-   * @return {!Array<!glift.svg.SvgObj>}
-   */
-  children: function () {
-    return this.children_;
-  },
-
-  /**
-   * Empty out all the children.
-   * @return {!glift.svg.SvgObj} this object.
-   */
-  emptyChildren: function () {
-    this.children_ = [];
-    return this;
-  },
-
-  /**
-   * Add an already existing child.
-   * @param {!glift.svg.SvgObj} obj Object to add.
-   * @return {!glift.svg.SvgObj} This object.
-   */
-  append: function (obj) {
-    if (obj.id() !== undefined) {
-      this.idMap_[obj.id()] = obj;
-    }
+  appendObject(obj) {
     this.children_.push(obj);
-    return this;
-  },
-
-  /**
-   * Add a new svg object child.
-   * @param {string} type
-   * @param {!Object<string>} attrObj
-   * @return {!glift.svg.SvgObj} This object.
-   */
-  appendNew: function (type, attrObj) {
-    var obj = glift.svg.createObj(type, attrObj);
-    return this.append(obj);
-  },
-
-  /**
-   * Create a copy of the object without any children
-   * @return {!glift.svg.SvgObj} The new object.
-   */
-  copyNoChildren: function () {
-    var newAttr = {};
-    for (var key in this.attrMap_) {
-      newAttr[key] = this.attrMap_[key];
+    var id = obj.attr('id');
+    if (id) {
+      this.idMap_[id] = obj;
     }
-    return glift.svg.createObj(this.type_, newAttr);
-  },
-};
+    return obj;
+  }
+
+  /**
+   * Приложить к родителю.
+   * @param {!SvgObj} obj
+   * @return {!SvgObj} Этот объект.
+   */
+  appendToParent(obj) {
+    obj.appendObject(this);
+    return this;
+  }
+
+  /**
+   * Вспомогательная функция, которая создает объект svgbase, а затем
+   * добавляет его как дочерний элемент
+   *
+   * @param {string} type
+   * @param {!Object<string>=} opt_attrObj
+   * @return {!SvgObj} Новый дочерний объект.
+   */
+  child(type, opt_attrObj) {
+    var obj = createObj(type, opt_attrObj);
+    return this.appendObject(obj);
+  }
+
+  /**
+   * Вспомогательная функция для добавления атрибутов в карту атрибутов.
+   * @param {!Object<string>} attrObj Атрибуты для добавления.
+   * @return {!SvgObj} this
+   */
+  addAttrObj(attrObj) {
+    for (var key in attrObj) {
+      this.attrMap_[key] = attrObj[key];
+    }
+    return this;
+  }
+
+  /**
+   * Прикрепляет произвольные данные к svg элементу.
+   * @param {!Object} data Произвольные данные.
+   * @return {!SvgObj} this
+   */
+  setData(data) {
+    this.data_ = data;
+    return this;
+  }
+
+  /**
+   * Получает прикрепленные произвольные данные.
+   * @return {?Object} Прикрепленные данные или null.
+   */
+  data() {
+    return this.data_;
+  }
+}
+
+/**
+ * Создает оболочку SVG.
+ *
+ * @param {string} type Тип элемента svg.
+ * @param {!Object<string>=} opt_attrObj опциональный объект атрибутов.
+ * @return {!SvgObj}
+ */
+export function createObj(type, opt_attrObj) {
+  return new SvgObj(type, opt_attrObj);
+}
+
+/**
+ * Создает корневой объект SVG.
+ * @param {!Object<string>=} opt_attrObj опциональный объект атрибутов.
+ * @return {!SvgObj}
+ */
+export function svg(opt_attrObj) {
+  return new SvgObj('svg', opt_attrObj)
+    .setAttr('version', '1.1')
+    .setAttr('xmlns', 'http://www.w3.org/2000/svg');
+}
+
+/**
+ * Создает объект circle svg.
+ * @param {!Object<string>=} opt_attrObj опциональный объект атрибутов.
+ * @return {!SvgObj}
+ */
+export function circle(opt_attrObj) {
+  return new SvgObj('circle', opt_attrObj);
+}
+
+/**
+ * Создает объект path svg.
+ * @param {!Object<string>=} opt_attrObj опциональный объект атрибутов.
+ * @return {!SvgObj}
+ */
+export function path(opt_attrObj) {
+  return new SvgObj('path', opt_attrObj);
+}
+
+/**
+ * Создает объект rectangle svg.
+ * @param {!Object<string>=} opt_attrObj опциональный объект атрибутов.
+ * @return {!SvgObj}
+ */
+export function rect(opt_attrObj) {
+  return new SvgObj('rect', opt_attrObj);
+}
+
+/**
+ * Создает объект image svg.
+ * @param {!Object<string>=} opt_attrObj опциональный объект атрибутов.
+ * @return {!SvgObj}
+ */
+export function image(opt_attrObj) {
+  return new SvgObj('image', opt_attrObj);
+}
+
+/**
+ * Создает объект text svg.
+ * @param {!Object<string>=} opt_attrObj опциональный объект атрибутов.
+ * @return {!SvgObj}
+ */
+export function text(opt_attrObj) {
+  return new SvgObj('text', opt_attrObj);
+}
+
+/**
+ * Создает объект group (без атрибутов)
+ * @return {!SvgObj}
+ */
+export function group() {
+  return new SvgObj('g');
+}

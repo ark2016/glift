@@ -64,6 +64,15 @@ export const uuid = () => {
 };
 
 /**
+ * Генератор ID для элементов.
+ */
+export const idGenerator = {
+  next: () => {
+    return 'id_' + Math.random().toString(36).substring(2, 9);
+  }
+};
+
+/**
  * Объединяет несколько объектов в один.
  * @param {Object} target - Целевой объект
  * @param {...Object} sources - Исходные объекты
@@ -170,6 +179,12 @@ export const point = (x, y) => {
       
       // Если неизвестный поворот, возвращаем исходную точку
       return point(x, y);
+    },
+    
+    // Преобразование в SGF-координату
+    toSgfCoord: () => {
+      const letters = 'abcdefghijklmnopqrstuvwxyz';
+      return letters.charAt(x) + letters.charAt(y);
     }
   };
 };
@@ -191,6 +206,39 @@ export const pointFromSgfCoord = (sgfCoord) => {
     throw new Error(`Не удалось создать точку из строки: ${sgfCoord}`);
   }
   return point(x, y);
+};
+
+/**
+ * Создает массив точек из SGF-свойства с форматом "aa:bb".
+ * SGF-спецификация позволяет использовать прямоугольники для представления 
+ * группы точек. Например, aa:cc представляет 9 точек в прямоугольнике 3x3.
+ * 
+ * @param {string} str - Строка в формате "tl:br", где tl - верхняя левая точка,
+ *    а br - правая нижняя точка прямоугольника в SGF-координатах
+ * @return {Array<Object>} Массив точек, представляющих все точки в прямоугольнике
+ */
+export const pointArrFromSgfProp = (str) => {
+  if (!str) {
+    return [];
+  }
+  
+  const split = str.split(':');
+  if (split.length !== 2) {
+    // Если это не прямоугольник, просто возвращаем одну точку
+    return [pointFromSgfCoord(str)];
+  }
+  
+  const tl = pointFromSgfCoord(split[0]);
+  const br = pointFromSgfCoord(split[1]);
+  const points = [];
+  
+  for (let i = tl.x(); i <= br.x(); i++) {
+    for (let j = tl.y(); j <= br.y(); j++) {
+      points.push(point(i, j));
+    }
+  }
+  
+  return points;
 };
 
 // Экспортируем перечисления для использования в других модулях

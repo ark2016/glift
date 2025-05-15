@@ -147,4 +147,16 @@ export const boardRegions = {
   
   /** Центр. */
   CENTER: 'CENTER'
+};
+
+/**
+ * Экспорт объекта для обратной совместимости
+ */
+export const enums = {
+  states,
+  marks,
+  problemResults,
+  rotations,
+  boardRegions,
+  toCamelCase
 }; 

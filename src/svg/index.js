@@ -11,10 +11,8 @@ import { Element } from '../dom/dom.js';
 import * as pathutilsModule from './pathutils.js';
 import * as svgobjModule from './svgobj.js';
 
-// Импортируем и экспортируем все из модуля pathutils
+// Экспортируем все функции из pathutils и svgobj модулей
 export * from './pathutils.js';
-
-// Импортируем и экспортируем все из модуля svgobj
 export * from './svgobj.js';
 
 /**
@@ -259,7 +257,7 @@ export const text = (attrObj, textContent) => {
  * Утилиты для работы с путями в SVG.
  * Предоставляет методы для создания команд SVG пути.
  */
-export const pathutils = {
+export const svgPathUtils = {
   /**
    * Создает команду перемещения к указанной точке.
    * 
@@ -292,7 +290,7 @@ export const pathutils = {
  * 
  * @class
  */
-export class IdGenerator {
+export class SvgIdGenerator {
   /**
    * Создает генератор ID с указанным префиксом.
    * 
@@ -436,14 +434,14 @@ export const ids = {
    * 
    * @function
    * @param {string} prefix - Префикс для ID
-   * @return {IdGenerator} Генератор ID
+   * @return {SvgIdGenerator} Генератор ID
    * @example
    * // Создание генератора ID с префиксом "goban"
    * const boardIds = svg.ids.gen('goban');
    * const stonesGroupId = boardIds.stones(); // "goban_stones"
    */
   gen: (prefix) => {
-    return new IdGenerator(prefix);
+    return new SvgIdGenerator(prefix);
   }
 };
 
@@ -567,4 +565,43 @@ class SvgElement {
     }
     return this;
   }
-} 
+}
+
+// Импортируем и переименовываем для локального использования
+import { pathutils as pathutilsFromFile } from './pathutils.js';
+import { 
+  SvgObj, 
+  ViewBox, 
+  createObj, 
+  svg as svgElement,
+  circle as circleFromFile, 
+  path as pathFromFile, 
+  rect as rectFromFile, 
+  image as imageFromFile, 
+  text as textFromFile, 
+  group as groupFromFile 
+} from './svgobj.js';
+import { svg as svgFromSvgFile } from './svg.js';
+
+// Создаем пространство имен для совместимости со старым кодом
+import * as pathu from './pathutils.js';
+import * as svgo from './svgobj.js';
+import { svg as svgNs } from './svg.js';
+
+export const svgObj = {
+  createObj: svgo.createObj,
+  svg: svgo.svg,
+  circle: svgo.circle,
+  path: svgo.path,
+  rect: svgo.rect,
+  image: svgo.image,
+  text: svgo.text,
+  group: svgo.group,
+  SvgObj: svgo.SvgObj
+};
+
+// Для обратной совместимости
+export { SvgIdGenerator as IdGenerator };
+
+// Добавляем функции pathutils к svg для обратной совместимости
+Object.assign(svgNs, pathu.pathutils); 

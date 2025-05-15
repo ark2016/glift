@@ -1,186 +1,174 @@
-goog.provide('glift.rules.MoveNode');
+/**
+ * Модуль для представления узла в дереве ходов.
+ * @module rules/movenode
+ */
+
+import { properties } from './properties.js';
 
 /**
- * Id for a particular node. Note: The ID is not guaranteed to be unique, due to
- * pranching up the tree. However, it does uniquely identify a child of a
- * parent.
+ * ID для конкретного узла. Примечание: ID не гарантированно уникален 
+ * из-за разветвления дерева. Однако он однозначно идентифицирует 
+ * дочерний элемент родительского элемента.
  *
  * @typedef {{
- *  nodeNum: number,
- *  varNum: number
+ *  nodeNum: number, // Номер узла (глубина)
+ *  varNum: number // Номер варианта
  * }}
  */
-glift.rules.NodeId;
+export let NodeId;
 
 /**
- * Creates a new MoveNode.
- *
- * @param {!glift.rules.Properties=} opt_properties
- * @param {!Array<!glift.rules.MoveNode>=} opt_children
- * @param {!glift.rules.NodeId=} opt_nodeId
- * @param {!glift.rules.MoveNode=} opt_parentNode
- *
+ * Класс, представляющий узел в дереве ходов.
  */
-glift.rules.movenode = function (
-  opt_properties,
-  opt_children,
-  opt_nodeId,
-  opt_parentNode
-) {
-  return new glift.rules.MoveNode(
-    opt_properties,
-    opt_children,
-    opt_nodeId,
-    opt_parentNode
-  );
-};
+export class MoveNode {
+  /**
+   * @param {!Object=} opt_properties - Свойства узла
+   * @param {!Array<!MoveNode>=} opt_children - Дочерние узлы
+   * @param {!NodeId=} opt_nodeId - ID узла
+   * @param {!MoveNode=} opt_parentNode - Родительский узел
+   */
+  constructor(opt_properties, opt_children, opt_nodeId, opt_parentNode) {
+    /** @private {!Object} */
+    this.properties_ = opt_properties || properties();
+    /** @type {!Array<!MoveNode>} */
+    this.children = opt_children || [];
+    /** @private {!NodeId} */
+    this.nodeId_ = opt_nodeId || { nodeNum: 0, varNum: 0 };
+    /** @type {?MoveNode} */
+    this.parentNode_ = opt_parentNode || null;
 
-/**
- * A Node in the MoveTree.
- *
- * @param {!glift.rules.Properties=} opt_properties
- * @param {!Array<!glift.rules.MoveNode>=} opt_children
- * @param {!glift.rules.NodeId=} opt_nodeId
- * @param {!glift.rules.MoveNode=} opt_parentNode
- *
- * @package
- * @constructor @final @struct
- */
-glift.rules.MoveNode = function (
-  opt_properties,
-  opt_children,
-  opt_nodeId,
-  opt_parentNode
-) {
-  /** @private {!glift.rules.Properties} */
-  this.properties_ = opt_properties || glift.rules.properties();
-  /** @type {!Array<!glift.rules.MoveNode>} */
-  this.children = opt_children || [];
-  /** @private {!glift.rules.NodeId} */
-  this.nodeId_ = opt_nodeId || { nodeNum: 0, varNum: 0 };
-  /** @type {?glift.rules.MoveNode} */
-  this.parentNode_ = opt_parentNode || null;
+    /**
+     * Маркер для определения основной линии.
+     * @package {boolean}
+     */
+    this.mainline_ = false;
+  }
 
   /**
-   * Marker for determining mainline.  Should ONLY be used by onMainline from
-   * the movetree.
-   * @package {boolean}
+   * Возвращает свойства узла.
+   * @return {!Object} Свойства узла
    */
-  this.mainline_ = false;
-};
-
-glift.rules.MoveNode.prototype = {
-  /**
-   * Returns the properties.
-   * @return {!glift.rules.Properties}
-   */
-  properties: function () {
+  properties() {
     return this.properties_;
-  },
+  }
 
   /**
-   * Set the NodeId. Each node has an ID based on the depth and variation
-   * number.
+   * Устанавливает ID узла. Каждый узел имеет ID на основе глубины и номера варианта.
    *
-   * Great caution should be exercised when using this method.  If you
-   * don't adjust the surrounding nodes, the movetree will get into a funky
-   * state.
-   * @param {number} nodeNum
-   * @param {number} varNum
+   * Этот метод следует использовать с осторожностью. Если не корректировать
+   * окружающие узлы, дерево ходов может прийти в некорректное состояние.
+   * @param {number} nodeNum - Номер узла
+   * @param {number} varNum - Номер варианта
    * @private
+   * @return {!MoveNode} this для цепочки вызовов
    */
-  setNodeId_: function (nodeNum, varNum) {
+  setNodeId_(nodeNum, varNum) {
     this.nodeId_ = { nodeNum: nodeNum, varNum: varNum };
     return this;
-  },
+  }
 
   /**
-   * Get the node number (i.e., the depth number). We consider passes and nodes
-   * without non-stone data to be 'moves', although this is relatively rare.
-   * @return {number}
+   * Получает номер узла (т.е. номер глубины). 
+   * @return {number} Номер узла
    */
-  getNodeNum: function () {
+  getNodeNum() {
     return this.nodeId_.nodeNum;
-  },
+  }
 
   /**
-   * Gets the variation number.
-   * @return {number}
+   * Получает номер варианта.
+   * @return {number} Номер варианта
    */
-  getVarNum: function () {
+  getVarNum() {
     return this.nodeId_.varNum;
-  },
+  }
 
   /**
-   * Gets the number of children.
-   * @return {number}
+   * Получает количество дочерних узлов.
+   * @return {number} Количество дочерних узлов
    */
-  numChildren: function () {
+  numChildren() {
     return this.children.length;
-  },
+  }
 
   /**
-   * Add a new child node.
-   * @return {!glift.rules.MoveNode} this
-   * @package
+   * Добавляет новый дочерний узел.
+   * @return {!MoveNode} this для цепочки вызовов
    */
-  addChild: function () {
+  addChild() {
     this.children.push(
-      glift.rules.movenode(
-        glift.rules.properties(),
-        [], // children
+      new MoveNode(
+        properties(),
+        [], // дочерние узлы
         { nodeNum: this.getNodeNum() + 1, varNum: this.numChildren() },
         this
       )
     );
     return this;
-  },
+  }
 
   /**
-   * Get the next child node.  This the same semantically as moving down the
-   * movetree.
-   * @return {?glift.rules.MoveNode} The node or null if it doesn't exist.
+   * Получает следующий дочерний узел. Семантически это то же самое, что и
+   * перемещение вниз по дереву ходов.
+   * @param {number=} variationNum - Номер варианта (по умолчанию 0)
+   * @return {?MoveNode} Узел или null, если он не существует
    */
-  getChild: function (variationNum) {
+  getChild(variationNum) {
     variationNum = variationNum || 0;
     if (this.children.length > 0) {
       return this.children[variationNum];
     } else {
       return null;
     }
-  },
+  }
 
   /**
-   * Return the parent node. Returns null if no parent node exists.
-   * @return {?glift.rules.MoveNode}
+   * Возвращает родительский узел. Возвращает null, если родительский узел не существует.
+   * @return {?MoveNode} Родительский узел
    */
-  getParent: function () {
+  getParent() {
     return this.parentNode_;
-  },
+  }
 
   /**
-   * Renumber the nodes.  Useful for when nodes are deleted during SGF editing.
-   * Note: This performs the renumbering recursively
-   * @return {!glift.rules.MoveNode} this
+   * Перенумеровывает узлы. Полезно, когда узлы удаляются при редактировании SGF.
+   * Примечание: перенумерация выполняется рекурсивно.
+   * @return {!MoveNode} this для цепочки вызовов
    */
-  renumber: function () {
-    glift.rules.numberMoves_(this, this.nodeId_.nodeNum, this.nodeId_.varNum);
+  renumber() {
+    numberMoves_(this, this.nodeId_.nodeNum, this.nodeId_.varNum);
     return this;
-  },
-};
+  }
+}
 
 /**
- * Recursively renumber the nodes
- * @param {!glift.rules.MoveNode} move
- * @param {number} nodeNum
- * @param {number} varNum
+ * Рекурсивно перенумеровывает узлы.
+ * @param {!MoveNode} move - Узел хода
+ * @param {number} nodeNum - Номер узла
+ * @param {number} varNum - Номер варианта
+ * @return {!MoveNode} Узел хода
  * @private
  */
-glift.rules.numberMoves_ = function (move, nodeNum, varNum) {
+export function numberMoves_(move, nodeNum, varNum) {
   move.setNodeId_(nodeNum, varNum);
-  for (var i = 0; i < move.children.length; i++) {
-    var next = move.children[i];
-    glift.rules.numberMoves_(next, nodeNum + 1, i);
+  for (let i = 0; i < move.children.length; i++) {
+    const next = move.children[i];
+    numberMoves_(next, nodeNum + 1, i);
   }
   return move;
-};
+}
+
+/**
+ * Создает новый узел хода.
+ * @param {!Object=} opt_properties - Свойства узла
+ * @param {!Array<!MoveNode>=} opt_children - Дочерние узлы
+ * @param {!NodeId=} opt_nodeId - ID узла
+ * @param {!MoveNode=} opt_parentNode - Родительский узел
+ * @return {!MoveNode} Новый узел хода
+ */
+export function createNode(opt_properties, opt_children, opt_nodeId, opt_parentNode) {
+  return new MoveNode(opt_properties, opt_children, opt_nodeId, opt_parentNode);
+}
+
+// Экспорт для обратной совместимости
+export const movenode = createNode;

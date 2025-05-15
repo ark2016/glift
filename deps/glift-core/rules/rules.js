@@ -1,6 +1,9 @@
-goog.provide('glift.rules');
+/**
+ * Модуль для правил игры Го.
+ * @module rules/rules
+ */
 
 /**
- * Objects and methods that enforce the basic rules of Go.
+ * Объекты и методы, которые обеспечивают базовые правила Го.
  */
-glift.rules = {};
+export const rules = {};

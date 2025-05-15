@@ -1,17 +1,21 @@
-goog.provide('glift.orientation.bbox');
-goog.provide('glift.orientation.BoundingBox');
+/**
+ * Модуль для работы с ограничивающими прямоугольниками.
+ * @module orientation/bbox
+ */
 
-glift.orientation.bbox = {
+import { util } from '../util/util.js';
+
+export const bbox = {
   /** Return a new bounding box with two points. */
   fromPts: function (topLeftPt, botRightPt) {
-    return new glift.orientation.BoundingBox(topLeftPt, botRightPt);
+    return new BoundingBox(topLeftPt, botRightPt);
   },
 
   /** Return a new bounding box with a top left point, a width, and a height. */
   fromSides: function (topLeft, width, height) {
-    return new glift.orientation.BoundingBox(
+    return new BoundingBox(
       topLeft,
-      glift.util.point(topLeft.x() + width, topLeft.y() + height)
+      util.point(topLeft.x() + width, topLeft.y() + height)
     );
   },
 };
@@ -25,64 +29,73 @@ glift.orientation.bbox = {
  * @param {!glift.Point} botRightPt The bottom right point of the bounding box.
  * @constructor @final @struct
  */
-glift.orientation.BoundingBox = function (topLeftPt, botRightPt) {
-  if (topLeftPt.x() > botRightPt.x() || topLeftPt.y() > botRightPt.y()) {
-    throw new Error(
-      'Topleft point must be less than the ' +
-        'bottom right point. tl:' +
-        topLeftPt.toString() +
-        '; br:' +
-        botRightPt.toString()
-    );
+export class BoundingBox {
+  constructor(topLeftPt, botRightPt) {
+    if (topLeftPt.x() > botRightPt.x() || topLeftPt.y() > botRightPt.y()) {
+      throw new Error(
+        'Topleft point must be less than the ' +
+          'bottom right point. tl:' +
+          topLeftPt.toString() +
+          '; br:' +
+          botRightPt.toString()
+      );
+    }
+    this._topLeftPt = topLeftPt;
+    this._botRightPt = botRightPt;
   }
-  this._topLeftPt = topLeftPt;
-  this._botRightPt = botRightPt;
-};
 
-glift.orientation.BoundingBox.prototype = {
-  topLeft: function () {
+  topLeft() {
     return this._topLeftPt;
-  },
-  botRight: function () {
+  }
+  
+  botRight() {
     return this._botRightPt;
-  },
+  }
+  
   /** TopRight and BotLeft are constructed */
-  topRight: function () {
-    return glift.util.point(this.right(), this.top());
-  },
-  botLeft: function () {
-    return glift.util.point(this.left(), this.bottom());
-  },
-  width: function () {
+  topRight() {
+    return util.point(this.right(), this.top());
+  }
+  
+  botLeft() {
+    return util.point(this.left(), this.bottom());
+  }
+  
+  width() {
     return this.botRight().x() - this.topLeft().x();
-  },
-  height: function () {
+  }
+  
+  height() {
     return this.botRight().y() - this.topLeft().y();
-  },
-  top: function () {
+  }
+  
+  top() {
     return this.topLeft().y();
-  },
-  left: function () {
+  }
+  
+  left() {
     return this.topLeft().x();
-  },
-  bottom: function () {
+  }
+  
+  bottom() {
     return this.botRight().y();
-  },
-  right: function () {
+  }
+  
+  right() {
     return this.botRight().x();
-  },
+  }
 
   /**
    * Find the center of the box. Returns a point representing the center.
    */
-  center: function () {
-    return glift.util.point(
+  center() {
+    return util.point(
       Math.abs((this.botRight().x() - this.topLeft().x()) / 2) +
         this.topLeft().x(),
       Math.abs((this.botRight().y() - this.topLeft().y()) / 2) +
         this.topLeft().y()
     );
-  },
+  }
 
   /**
    * Test to see if a point is contained in the bounding box.  Points on the
@@ -91,21 +104,21 @@ glift.orientation.BoundingBox.prototype = {
    * We assume a canonical orientation of the top left being the minimum and the
    * bottom right being the maximum.
    */
-  contains: function (point) {
+  contains(point) {
     return (
       point.x() >= this.topLeft().x() &&
       point.x() <= this.botRight().x() &&
       point.y() >= this.topLeft().y() &&
       point.y() <= this.botRight().y()
     );
-  },
+  }
 
   /**
    * Test whether this bbox completely covers another bbox.
    */
-  covers: function (bbox) {
+  covers(bbox) {
     return this.contains(bbox.topLeft()) && this.contains(bbox.botRight());
-  },
+  }
 
   /**
    * Intersect this bbox with another bbox and return a new bbox that represents
@@ -113,7 +126,7 @@ glift.orientation.BoundingBox.prototype = {
    *
    * Returns null if the intersection is the emptyset.
    */
-  intersect: function (bbox) {
+  intersect(bbox) {
     // Note: Boxes overlap iff one of the boxes contains at least one of
     // the corners.
     var bboxOverlaps =
@@ -133,16 +146,16 @@ glift.orientation.BoundingBox.prototype = {
     var left = Math.max(this.left(), bbox.left());
     var bottom = Math.min(this.bottom(), bbox.bottom());
     var right = Math.min(this.right(), bbox.right());
-    return glift.orientation.bbox.fromPts(
-      glift.util.point(left, top),
-      glift.util.point(right, bottom)
+    return exports.bbox.fromPts(
+      util.point(left, top),
+      util.point(right, bottom)
     );
-  },
+  }
 
   /**
    * Returns a new bounding box that has been expanded to contain the point.
    */
-  expandToContain: function (point) {
+  expandToContain(point) {
     // Note that for our purposes the top left is 0,0 and the bottom right is
     // (+N,+N). Thus, by this definition, the top left is the minimum and the
     // bottom right is the maximum (true for both x and y).
@@ -162,61 +175,59 @@ glift.orientation.BoundingBox.prototype = {
     if (point.y() > bry) {
       bry = point.y();
     }
-    return glift.orientation.bbox.fromPts(
-      glift.util.point(tlx, tly),
-      glift.util.point(brx, bry)
+    return exports.bbox.fromPts(
+      util.point(tlx, tly),
+      util.point(brx, bry)
     );
-  },
+  }
 
   /**
    * Test to see if two bboxes are equal by comparing whether their points.
    */
-  equals: function (other) {
+  equals(other) {
     return (
       other.topLeft() &&
       this.topLeft().equals(other.topLeft()) &&
       other.botRight() &&
       this.botRight().equals(other.botRight())
     );
-  },
+  }
 
   /**
    * Return a new bbox with the width and the height scaled by some fraction.
    * The TopLeft point is also scaled by the amount.
    */
-  scale: function (amount) {
+  scale(amount) {
     var newHeight = this.height() * amount,
       newWidth = this.width() * amount,
-      newTopLeft = glift.util.point(
+      newTopLeft = util.point(
         this.topLeft().x() * amount,
         this.topLeft().y() * amount
       );
-    return glift.orientation.bbox.fromSides(newTopLeft, newWidth, newHeight);
-  },
+    return exports.bbox.fromSides(newTopLeft, newWidth, newHeight);
+  }
 
   /**
    * @returns {string} Stringified version of the bounding box.
    */
-  toString: function () {
+  toString() {
     return (
       '(' + this.topLeft().toString() + '),(' + this.botRight().toString() + ')'
     );
-  },
+  }
 
   /**
    * Move the bounding box by translating the box
    * @param {number} dx
    * @param {number} dy
-   * @return {glift.orientation.BoundingBox} A new bounding box.
+   * @return {BoundingBox} A new bounding box.
    */
-  translate: function (dx, dy) {
-    return glift.orientation.bbox.fromPts(
-      glift.util.point(this.topLeft().x() + dx, this.topLeft().y() + dy),
-      glift.util.point(this.botRight().x() + dx, this.botRight().y() + dy)
+  translate(dx, dy) {
+    return exports.bbox.fromPts(
+      util.point(this.topLeft().x() + dx, this.topLeft().y() + dy),
+      util.point(this.botRight().x() + dx, this.botRight().y() + dy)
     );
-  },
-
-  // TODO(kashomon): Move this splitting methods out of the base class.
+  }
 
   /**
    * Split this bbox into two or more divs across a horizontal axis.  The
@@ -232,9 +243,9 @@ glift.orientation.BoundingBox.prototype = {
    * have rounding errors.In other words: [0.7] uses 0.7 and 0.3 for splits and
    * [0.7, 0.2] uses 0.7, 0.2, and 0.1 for splits.
    */
-  hSplit: function (bboxSplits) {
+  hSplit(bboxSplits) {
     return this._splitBox('h', bboxSplits);
-  },
+  }
 
   /**
    * Split this bbox into two or more divs across a horizontal axis.  The
@@ -248,77 +259,77 @@ glift.orientation.BoundingBox.prototype = {
    * have rounding errors. In other words: [0.7] uses 0.7 and 0.3 for splits and
    * [0.7, 0.2] uses 0.7, 0.2, and 0.1 for splits.
    */
-  vSplit: function (bboxSplits) {
+  vSplit(bboxSplits) {
     return this._splitBox('v', bboxSplits);
-  },
+  }
 
   /**
-   * Internal method for vSplit and hSplit.
+   * Private method for splitting boxes.
    */
-  _splitBox: function (d, bboxSplits) {
-    if (glift.util.typeOf(bboxSplits) !== 'array') {
-      throw (
-        'bboxSplits must be specified as an array. Was: ' +
-        glift.util.typeOf(bboxSplits)
-      );
+  _splitBox(d, bboxSplits) {
+    var total = 0, i;
+    for (i = 0; i < bboxSplits.length; i++) {
+      total += bboxSplits[i];
     }
-    if (!(d === 'h' || d === 'v')) {
-      throw (
-        "What!? The only splits allowed are 'v' or 'h'.  " +
-        'You supplied: ' +
-        d
-      );
+    // Note: we use 0.9999 instead of 1.0 because of potential rounding errors.
+    if (total > 1 && total < 0.9999 ) {
+      throw new Error('Error splitting box: the box fractions must sum to 1');
     }
-    var totalSplitAmount = 0;
-    for (var i = 0; i < bboxSplits.length; i++) {
-      totalSplitAmount += bboxSplits[i];
+    if (typeof bboxSplits !== 'object') {
+      throw new Error('bboxSplits must be an array');
     }
-    if (totalSplitAmount >= 1) {
-      throw (
-        'The box splits must sum to less than 1, but instead summed to: ' +
-        totalSplitAmount
-      );
+    if (bboxSplits.length === 0) {
+      throw new Error('bboxSplits must be non-empty');
     }
 
-    // Note: this is really just used as marker.  We use the final
-    // this.botRight().x() / y() for the final marker to prevent rounding
-    // errors.
-    bboxSplits.push(1 - totalSplitAmount);
+    var remainingFrac = 1;
+    var fractions = [];
+    for (i = 0; i < bboxSplits.length; i++) {
+      var frac = bboxSplits[i];
+      remainingFrac -= frac;
+      fractions.push(frac);
+    }
+    if (remainingFrac > 0) {
+      fractions.push(remainingFrac);
+    }
 
-    var currentSplitPercentage = 0;
-    var outBboxes = [];
-    var currentTopLeft = this.topLeft().clone();
-    for (var i = 0; i < bboxSplits.length; i++) {
-      if (i === bboxSplits.length - 1) {
-        currentSplitPercentage = 1;
+    var newBoxes = [];
+    var currentFrac = 0;
+    var boxWidth = this.width();
+    var boxHeight = this.height();
+    var currentWidth = boxWidth;
+    var currentHeight = boxHeight;
+    var currentTopLeft = this.topLeft();
+    for (i = 0; i < fractions.length; i++) {
+      if (d === 'h') {
+        var height = boxHeight * fractions[i];
+        var newBox = exports.bbox.fromSides(
+            currentTopLeft,
+            boxWidth,
+            height);
+        newBoxes.push(newBox);
+        // Only change the y-value
+        var newtlx = currentTopLeft.x();
+        var newtly = currentTopLeft.y() + height;
+        currentTopLeft = util.point(newtlx, newtly);
+      } else if (d === 'v') {
+        var width = boxWidth * fractions[i];
+        newBox = exports.bbox.fromSides(
+            currentTopLeft,
+            width,
+            boxHeight);
+        newBoxes.push(newBox);
+        // Only change the x-value
+        newtlx = currentTopLeft.x() + width;
+        newtly = currentTopLeft.y();
+        currentTopLeft = util.point(newtlx, newtly);
       } else {
-        currentSplitPercentage += bboxSplits[i];
+        throw new Error('Unknown direction ' + d);
       }
-
-      // TODO(kashomon): All this switching makes me think there should be a
-      // separate method for a single split.
-      var nextBotRightX =
-        d === 'h'
-          ? this.botRight().x()
-          : this.topLeft().x() + this.width() * currentSplitPercentage;
-      var nextBotRightY =
-        d === 'h'
-          ? this.topLeft().y() + this.height() * currentSplitPercentage
-          : this.botRight().y();
-      var nextBotRight = glift.util.point(nextBotRightX, nextBotRightY);
-      outBboxes.push(
-        glift.orientation.bbox.fromPts(currentTopLeft, nextBotRight)
-      );
-      var nextTopLeftX =
-        d === 'h'
-          ? currentTopLeft.x()
-          : this.topLeft().x() + this.width() * currentSplitPercentage;
-      var nextTopLeftY =
-        d === 'h'
-          ? this.topLeft().y() + this.height() * currentSplitPercentage
-          : currentTopLeft.y();
-      currentTopLeft = glift.util.point(nextTopLeftX, nextTopLeftY);
     }
-    return outBboxes;
-  },
-};
+    return newBoxes;
+  }
+}
+
+// Экспорт для обратной совместимости
+var exports = { bbox, BoundingBox };

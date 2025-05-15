@@ -24,7 +24,17 @@ import * as controllers from './controllers/index.js';
 import * as themes from './themes/index.js';
 import * as api from './api/index.js';
 import * as dom from './dom/index.js';
+import * as parse from './parse/index.js';
+import * as svgModule from './svg/index.js';
+import * as orientation from './orientation/index.js';
 import { setupGlobalGlift } from './exports.js';
+
+// Пересобираем модуль svg без конфликтов
+const svg = {
+  ...svgModule,
+  // Используем только SvgIdGenerator из svg/index.js и не включаем IdGenerator из widgets/index.js
+  IdGenerator: svgModule.SvgIdGenerator 
+};
 
 // Версия библиотеки
 export const VERSION = '2.0.0-alpha';
@@ -59,7 +69,10 @@ export {
   controllers,
   themes,
   api,
-  dom
+  dom,
+  parse,
+  svg,
+  orientation
 };
 
 // Экспорт по умолчанию для совместимости с UMD
@@ -73,6 +86,9 @@ const gliftExport = {
   themes,
   api,
   dom,
+  parse,
+  svg,
+  orientation,
   global
 };
 
@@ -85,11 +101,72 @@ export { keyMappings } from './key_mappings.js';
 
 // Экспорт из подмодулей
 export * from './controllers/index.js';
-export * from './widgets/index.js';
+
+// Избегаем звездного экспорта для widgets и изменяем его на явный экспорт
+import { 
+  BaseWidget,
+  IdGenerator as WidgetIdGenerator,
+  idGenerator as widgetIdGenerator,
+  createId,
+  registerEventHandler,
+  WidgetManager
+} from './widgets/index.js';
+
+export {
+  BaseWidget,
+  WidgetIdGenerator,
+  widgetIdGenerator,
+  createId,
+  registerEventHandler,
+  WidgetManager
+};
+
 export * from './themes/index.js';
 export * from './displays/index.js';
 export * from './rules/index.js';
 export * from './sgf/index.js';
+export * from './parse/index.js';
+
+// Избегаем звездного экспорта для svg и изменяем его на явный экспорт
+import {
+  svg as svgFunc,
+  group,
+  circle,
+  rect,
+  path,
+  line,
+  image,
+  text,
+  svgPathUtils,
+  SvgIdGenerator,
+  ids,
+  svgObj,
+  pathutils,
+  SvgObj,
+  ViewBox,
+  createObj
+} from './svg/index.js';
+
+export {
+  svgFunc,
+  group,
+  circle,
+  rect,
+  path,
+  line,
+  image,
+  text,
+  svgPathUtils,
+  SvgIdGenerator,
+  ids,
+  svgObj,
+  pathutils,
+  SvgObj,
+  ViewBox,
+  createObj
+};
+
+export * from './orientation/index.js';
 
 // Избегаем конфликта с экспортом board из displays/index.js
 import * as flattenerModule from './flattener/index.js';

@@ -1,103 +1,116 @@
-goog.provide('glift.parse');
+/**
+ * Модуль для парсинга строк Го-формата.
+ * @module parse/parse
+ */
+
+import { enums } from '../../src/util/enums.js';
+import { movetree } from '../rules/movetree.js';
 
 /**
- * Glift parsing for strings.
+ * Типы парсинга
+ * @enum {string}
  */
-glift.parse = {
-  /**
-   * Parse types
-   * @enum {string}
-   */
-  parseType: {
-    /** FF1-FF4 Parse Type. */
-    SGF: 'SGF',
+export const parseType = {
+  /** FF1-FF4 Parse Type. */
+  SGF: 'SGF',
 
-    /** Tygem .gib files. */
-    TYGEM: 'TYGEM',
-
-    /**
-     * DEPRECATED.  This was created when I didn't understand the destinction
-     * between the various FF1-3 versions and FF4
-     *
-     * Prefer SGF, this is now equivalent.
-     */
-    PANDANET: 'PANDANET',
-  },
+  /** Tygem .gib files. */
+  TYGEM: 'TYGEM',
 
   /**
-   * List of known suffixes and the filetypes they match to.
-   * @type {!Object<string, glift.parse.parseType>}
-   */
-  suffixToType: {
-    '.sgf': 'SGF',
-    '.gib': 'TYGEM',
-  },
-
-  /**
-   * Determines whether a file is a known Go file.
+   * УСТАРЕВШИЙ. Создан, когда я не понимал различия
+   * между различными версиями FF1-3 и FF4
    *
-   * @param {string} filename The filename
-   * @return {boolean} whether or not the filename has a known type
+   * Предпочитайте SGF, теперь это эквивалентно.
    */
-  knownGoFile: function (filename) {
-    if (!filename || typeof filename !== 'string') {
-      return false;
-    }
-    for (var key in glift.parse.suffixToType) {
-      if (filename.indexOf(key) > -1) {
-        return true;
-      }
-    }
+  PANDANET: 'PANDANET',
+};
+
+/**
+ * Список известных суффиксов и типов файлов, которым они соответствуют.
+ * @type {!Object<string, string>}
+ */
+export const suffixToType = {
+  '.sgf': 'SGF',
+  '.gib': 'TYGEM',
+};
+
+/**
+ * Определяет, является ли файл известным файлом Го.
+ *
+ * @param {string} filename Имя файла
+ * @return {boolean} является ли имя файла известным типом
+ */
+export function knownGoFile(filename) {
+  if (!filename || typeof filename !== 'string') {
     return false;
-  },
-
-  /**
-   * Get the parse-type from a filename
-   *
-   * @param {string} filename Filename
-   * @return {glift.parse.parseType} The parse type
-   */
-  parseTypeFromFilename: function (filename) {
-    var ttype = glift.parse.parseType.SGF; // default type = SGF.
-    for (var key in glift.parse.suffixToType) {
-      if (filename.indexOf(key) > -1) {
-        ttype = glift.parse.suffixToType[key];
-      }
+  }
+  for (const key in suffixToType) {
+    if (filename.indexOf(key) > -1) {
+      return true;
     }
-    return ttype;
-  },
+  }
+  return false;
+}
 
-  /**
-   * Parse a Go-format format from a string.
-   *
-   * @param {string} str Raw contents that need to be parsed.
-   * @param {string} filename Name of the file from which the contents came.
-   * @return {!glift.rules.MoveTree}
-   */
-  fromFileName: function (str, filename) {
-    return glift.parse.fromString(
-      str,
-      glift.parse.parseTypeFromFilename(filename)
-    );
-  },
-
-  /**
-   * Transforms a stringified game-file into a movetree.
-   *
-   * @param {string} str Raw contents that need to be parsed.
-   * @param {glift.parse.parseType=} opt_ttype The parse type. Defaults to SGF
-   *    if unspecified.
-   * @return {!glift.rules.MoveTree} The generated movetree
-   */
-  fromString: function (str, opt_ttype) {
-    var ttype = opt_ttype || glift.parse.parseType.SGF;
-    if (ttype === glift.parse.parseType.PANDANET) {
-      // PANDANET type is now equivalent to SGF.
-      ttype = glift.parse.parseType.SGF;
+/**
+ * Получает тип парсинга из имени файла
+ *
+ * @param {string} filename Имя файла
+ * @return {string} Тип парсинга
+ */
+export function parseTypeFromFilename(filename) {
+  let ttype = parseType.SGF; // тип по умолчанию = SGF.
+  for (const key in suffixToType) {
+    if (filename.indexOf(key) > -1) {
+      ttype = suffixToType[key];
     }
-    var methodName = glift.enums.toCamelCase(ttype);
-    var func = glift.parse[methodName];
-    var movetree = func(str);
-    return glift.rules.movetree.initRootProperties(movetree);
-  },
+  }
+  return ttype;
+}
+
+/**
+ * Парсит формат Го из строки.
+ *
+ * @param {string} str Сырое содержимое, которое нужно проанализировать.
+ * @param {string} filename Имя файла, из которого пришло содержимое.
+ * @return {!Object} Дерево ходов
+ */
+export function fromFileName(str, filename) {
+  return fromString(
+    str,
+    parseTypeFromFilename(filename)
+  );
+}
+
+/**
+ * Преобразует строковый игровой файл в дерево ходов.
+ *
+ * @param {string} str Сырое содержимое, которое нужно проанализировать.
+ * @param {string=} opt_ttype Тип парсинга. По умолчанию SGF,
+ *    если не указан.
+ * @return {!Object} Сгенерированное дерево ходов
+ */
+export function fromString(str, opt_ttype) {
+  let ttype = opt_ttype || parseType.SGF;
+  if (ttype === parseType.PANDANET) {
+    // Тип PANDANET теперь эквивалентен SGF.
+    ttype = parseType.SGF;
+  }
+  const methodName = enums.toCamelCase(ttype);
+  const func = parse[methodName];
+  const moveTr = func(str);
+  return movetree.initRootProperties(moveTr);
+}
+
+/**
+ * Экспорт объекта для обратной совместимости
+ */
+export const parse = {
+  parseType,
+  suffixToType,
+  knownGoFile,
+  parseTypeFromFilename,
+  fromFileName,
+  fromString
 };

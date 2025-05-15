@@ -1,62 +1,72 @@
-goog.provide('glift.orientation.Cropbox');
+/**
+ * Модуль для определения области обрезки доски Го.
+ * @module orientation/cropbox
+ */
+
+import { util } from '../util/util.js';
+import { enums } from '../../../src/util/enums.js';
+import { bbox } from './bbox.js';
 
 /**
  * Definition of the cropbox
  *
  * @constructor @final @struct
  */
-glift.orientation.Cropbox = function (bbox, size) {
-  /**
-   * Points in the bounding box are 0 indexed.
-   * ex. 0,8, 0,12, 0,18
-   */
-  this.bbox = bbox;
+export class Cropbox {
+  constructor(bbox, size) {
+    /**
+     * Points in the bounding box are 0 indexed.
+     * ex. 0,8, 0,12, 0,18
+     */
+    this.bbox = bbox;
 
-  /** Size is 1 indexed (i.e., 19, 13, 9). */
-  this.size = size;
+    /** Size is 1 indexed (i.e., 19, 13, 9). */
+    this.size = size;
 
-  if (this.bbox.width() > this.size - 1) {
-    throw new Error(
-      'BBox width cannot be bigger than the size:' +
-        this.bbox.width() +
-        ' -- ' +
-        (this.size - 1)
-    );
+    if (this.bbox.width() > this.size - 1) {
+      throw new Error(
+        'BBox width cannot be bigger than the size:' +
+          this.bbox.width() +
+          ' -- ' +
+          (this.size - 1)
+      );
+    }
+
+    if (this.bbox.height() > this.size - 1) {
+      throw new Error(
+        'BBox height cannot be bigger than the size:' +
+          this.bbox.height() +
+          ' -- ' +
+          (this.size - 1)
+      );
+    }
   }
 
-  if (this.bbox.height() > this.size - 1) {
-    throw new Error(
-      'BBox height cannot be bigger than the size:' +
-        this.bbox.height() +
-        ' -- ' +
-        (this.size - 1)
-    );
-  }
-};
-
-glift.orientation.Cropbox.prototype = {
   /** Whether or not the top is ragged. */
-  hasRaggedTop: function () {
+  hasRaggedTop() {
     return this.bbox.topLeft().y() > 0;
-  },
+  }
+  
   /** Whether or not the left is ragged. */
-  hasRaggedLeft: function () {
+  hasRaggedLeft() {
     return this.bbox.topLeft().x() > 0;
-  },
+  }
+  
   /** Whether or not the bottom is ragged. */
-  hasRaggedBottom: function () {
+  hasRaggedBottom() {
     return this.bbox.botRight().y() < this.size - 1;
-  },
+  }
+  
   /** Whether or not the right is ragged. */
-  hasRaggedRight: function () {
+  hasRaggedRight() {
     return this.bbox.botRight().x() < this.size - 1;
-  },
-};
+  }
+}
 
 /**
  * Bounding boxes associated with the corpbox regions.
  */
-glift.orientation.cropbox = {
+export const cropbox = {
   /**
    * Return a bounding box that indicates the cropbox. The logic is somewhat
    * nuanced:
@@ -72,11 +82,11 @@ glift.orientation.cropbox = {
    *
    * @param {glift.enums.boardRegions} region
    * @param {number} intersects
-   * @return {!glift.orientation.Cropbox}
+   * @return {!Cropbox}
    */
   get: function (region, intersects) {
-    var point = glift.util.point,
-      boardRegions = glift.enums.boardRegions,
+    var point = util.point,
+      boardRegions = enums.boardRegions,
       min = 0,
       max = intersects - 1,
       halfInts = Math.ceil(max / 2),
@@ -88,8 +98,8 @@ glift.orientation.cropbox = {
     region = region || boardRegions.ALL;
 
     if (intersects < 19) {
-      return new glift.orientation.Cropbox(
-        glift.orientation.bbox.fromPts(point(min, min), point(max, max)),
+      return new Cropbox(
+        bbox.fromPts(point(min, min), point(max, max)),
         intersects
       );
     }
@@ -157,10 +167,9 @@ glift.orientation.cropbox = {
         // somehow.
         throw new Error('Unknown board region: ' + region);
     }
-    var bbox = glift.orientation.bbox.fromPts;
-    var pt = glift.util.point;
-    return new glift.orientation.Cropbox(
-      bbox(pt(left, top), pt(right, bot)),
+    
+    return new Cropbox(
+      bbox.fromPts(point(left, top), point(right, bot)),
       intersects
     );
   },
