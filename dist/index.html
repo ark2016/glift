@@ -1,4 +1,12 @@
-<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Glift: Модульная библиотека для игры Го</title><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50' x='50' dominant-baseline='middle' text-anchor='middle' font-size='80' fill='%23DCB35C' stroke='%23000000' stroke-width='2'>G</text><circle cx='50' cy='50' r='45' stroke='%23000' fill='none' stroke-width='5' /></svg>" type="image/svg+xml"><style>body {
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glift: Модульная библиотека для игры Го</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50' x='50' dominant-baseline='middle' text-anchor='middle' font-size='80' fill='%23DCB35C' stroke='%23000000' stroke-width='2'>G</text><circle cx='50' cy='50' r='45' stroke='%23000' fill='none' stroke-width='5' /></svg>" type="image/svg+xml">
+  <style>
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       margin: 0;
       padding: 20px;
@@ -40,56 +48,312 @@
     }
     button:hover {
       background-color: #45a049;
-    }</style><script src="glift.min.js"></script></head><body><h1>Glift: Модульная библиотека для игры Го</h1><p>Это демонстрационная страница обновленной библиотеки Glift с использованием ES-модулей и современных возможностей JavaScript.</p><div><button onclick="showCoordinates()">Показать/скрыть координаты</button> <button onclick="changeTheme()">Сменить тему</button></div><div id="glift-container"></div><script>var gliftWidget;
+    }
+  </style>
+  <!-- Скрипты будут добавлены webpack автоматически -->
+<script src="glift.js"></script></head>
+<body>
+  <h1>Glift: Модульная библиотека для игры Го</h1>
+  <p>Это демонстрационная страница обновленной библиотеки Glift с использованием ES-модулей и современных возможностей JavaScript.</p>
+  
+  <div>
+    <button onclick="showCoordinates()">Показать/скрыть координаты</button>
+    <button onclick="changeTheme()">Сменить тему</button>
+    <button onclick="createBasicBoard()">Создать базовую доску напрямую</button>
+  </div>
+  
+  <div style="margin-top: 10px;">
+    <button onclick="moveToStart()">⏮️ В начало</button>
+    <button onclick="movePrev()">⏪ Предыдущий ход</button>
+    <button onclick="moveNext()">⏩ Следующий ход</button>
+    <button onclick="moveToEnd()">⏭️ В конец</button>
+  </div>
+  
+  <div id="glift-container"></div>
+  <div id="debug-info" style="margin-top: 10px; padding: 10px; background-color: #f0f0f0; border: 1px solid #ccc;">
+    <strong>Отладочная информация:</strong>
+    <div id="debug-log"></div>
+  </div>
+  
+  <script>
+    // Тестовые данные SGF для инициализации
+    const testSgf = '(;GM[1]FF[4]CA[UTF-8]AP[Glift]ST[2]\n' +
+      'RU[Japanese]SZ[19]KM[0.00]\n' +
+      "C[Black to play. There aren't many options " +
+      'to choose from, but you might be surprised at the answer!]' +
+      'PW[White]PB[Black]AW[pa][qa][nb][ob][qb][oc][pc][md][pd][ne][oe]\n' +
+      'AB[na][ra][mb][rb][lc][qc][ld][od][qd][le][pe][qe][mf][nf][of][pg]\n' +
+      '(;B[mc]\n' +
+      ';W[nc]C[White lives.])\n' +
+      '(;B[ma]\n' +
+      '(;W[oa]\n' +
+      ';B[nc]\n' +
+      ';W[nd]\n' +
+      ';B[mc]C[White dies.]GB[1])\n' +
+      '(;W[mc]\n' +
+      '(;B[oa]\n' +
+      ';W[nd]\n' +
+      ';B[pb]C[White lives])\n' +
+      '(;B[nd]\n' +
+      ';W[nc]\n' +
+      ';B[oa]C[White dies.]GB[1]))\n' +
+      '(;W[nd]\n' +
+      ';B[mc]\n' +
+      ';W[oa]\n' +
+      ';B[nc]C[White dies.]GB[1]))\n' +
+      '(;B[nc]\n' +
+      ';W[mc]C[White lives])\n' +
+      '(;B[]C[A default consideration]\n' +
+      ';W[mc]C[White lives easily]))';
+
+    // Функция для добавления отладочных сообщений
+    function addDebugMessage(message) {
+      var debugLog = document.getElementById('debug-log');
+      var timestamp = new Date().toLocaleTimeString();
+      debugLog.innerHTML += '<div>' + timestamp + ': ' + message + '</div>';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      addDebugMessage('DOM загружен');
+      
+      // При загрузке делаем все кнопки неактивными
+      document.querySelectorAll('button').forEach(function(button) {
+        button.disabled = true;
+        button.title = 'Ожидание загрузки зависимостей...';
+      });
+      
+      // Проверяем зависимости
+      checkDependencies();
+    });
+
+    var gliftWidget;
     
     // Функция для проверки загрузки всех зависимостей перед инициализацией
     function checkDependencies() {
-      if (typeof glift !== 'undefined' && typeof testdata !== 'undefined' && typeof testdata.sgfs !== 'undefined') {
+      addDebugMessage('Проверка зависимостей...');
+      
+      // Проверяем наличие необходимых объектов
+      const gliftAvailable = typeof glift !== 'undefined';
+      
+      if (gliftAvailable) {
+        addDebugMessage('Зависимости загружены, инициализация Glift');
         initializeGlift();
       } else {
+        // Логируем отсутствующие зависимости для отладки
+        if (!gliftAvailable) addDebugMessage('Объект glift не определен');
+        
+        addDebugMessage('Зависимости не загружены, повторная попытка через 100мс');
         // Ждем 100 мс и пробуем снова
         setTimeout(checkDependencies, 100);
       }
     }
     
-    // Инициализируем Glift, когда все зависимости загружены
+    // Функция инициализации Glift
     function initializeGlift() {
+      addDebugMessage('Инициализация Glift');
       try {
-        // Создаем виджет Glift
         gliftWidget = glift.create({
-          divId: "glift-container",
-          sgf: testdata.sgfs.complexproblem,
-          theme: "DEFAULT",
+          divId: 'glift-container',
+          sgf: testSgf,
           display: {
-            drawBoardCoords: true
+            theme: 'EFESSCIENT'
           }
         });
+        
+        // Активируем кнопки после успешной инициализации
+        document.querySelectorAll('button').forEach(function(button) {
+          button.disabled = false;
+          button.title = '';
+        });
+        
+        addDebugMessage('Glift успешно инициализирован');
       } catch (e) {
-        document.getElementById('glift-container').innerHTML = 
-          '<div class="error">Ошибка загрузки библиотеки Glift: ' + e.message + '</div>';
+        addDebugMessage('ОШИБКА при инициализации Glift: ' + e.message);
         console.error(e);
       }
     }
     
-    // Начинаем проверку зависимостей после загрузки DOM
-    document.addEventListener('DOMContentLoaded', function() {
-      checkDependencies();
-    });
-    
+    // Функции для кнопок
     function showCoordinates() {
-      if (gliftWidget) {
-        var display = gliftWidget.display();
-        var drawCoords = !display.drawBoardCoords;
-        display.drawBoardCoords = drawCoords;
-        gliftWidget.redraw();
+      if (!gliftWidget) return;
+      try {
+        var currentCoords = gliftWidget.display.intersections().getCoordStyles();
+        var newCoords = currentCoords === glift.enums.coordStyles.NONE ? 
+                      glift.enums.coordStyles.SEIGO : glift.enums.coordStyles.NONE;
+        
+        gliftWidget.display.intersections().setCoordStyles(newCoords).draw();
+        addDebugMessage('Координаты ' + (newCoords === glift.enums.coordStyles.NONE ? 'скрыты' : 'показаны'));
+      } catch (e) {
+        addDebugMessage('ОШИБКА при изменении координат: ' + e.message);
       }
     }
     
     function changeTheme() {
-      if (gliftWidget) {
-        var currentTheme = gliftWidget.theme();
-        var newTheme = (currentTheme === "DEFAULT") ? "MOODY" : "DEFAULT";
-        gliftWidget.theme(newTheme);
-        gliftWidget.redraw();
+      if (!gliftWidget) return;
+      try {
+        var themes = ['DEPTH', 'MOODY', 'TRANSPARENT', 'TEXTBOOK', 'EFESSCIENT'];
+        var currentTheme = gliftWidget.display.theme().themeName;
+        var nextThemeIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
+        var nextTheme = themes[nextThemeIndex];
+        
+        gliftWidget.display.setTheme(nextTheme).draw();
+        addDebugMessage('Тема изменена на ' + nextTheme);
+      } catch (e) {
+        addDebugMessage('ОШИБКА при изменении темы: ' + e.message);
       }
-    }</script></body></html>
+    }
+    
+    function moveToStart() {
+      if (!gliftWidget) return;
+      try {
+        gliftWidget.applyBoardAction('first');
+        addDebugMessage('Переход в начало');
+      } catch (e) {
+        addDebugMessage('ОШИБКА при переходе в начало: ' + e.message);
+      }
+    }
+    
+    function movePrev() {
+      if (!gliftWidget) return;
+      try {
+        gliftWidget.applyBoardAction('previous');
+        addDebugMessage('Предыдущий ход');
+      } catch (e) {
+        addDebugMessage('ОШИБКА при переходе к предыдущему ходу: ' + e.message);
+      }
+    }
+    
+    function moveNext() {
+      if (!gliftWidget) return;
+      try {
+        gliftWidget.applyBoardAction('next');
+        addDebugMessage('Следующий ход');
+      } catch (e) {
+        addDebugMessage('ОШИБКА при переходе к следующему ходу: ' + e.message);
+      }
+    }
+    
+    function moveToEnd() {
+      if (!gliftWidget) return;
+      try {
+        gliftWidget.applyBoardAction('last');
+        addDebugMessage('Переход в конец');
+      } catch (e) {
+        addDebugMessage('ОШИБКА при переходе в конец: ' + e.message);
+      }
+    }
+    
+    // Простая функция для создания базовой доски без использования библиотеки
+    function createBasicBoard() {
+      addDebugMessage('Создание базовой доски напрямую');
+      var container = document.getElementById('glift-container');
+      if (!container) {
+        addDebugMessage('ОШИБКА: Контейнер не найден!');
+        return;
+      }
+      container.innerHTML = '';
+      container.style.backgroundColor = '#E8C064';
+      container.style.position = 'relative';
+      container.style.overflow = 'hidden';
+      
+      // Создаем SVG элемент
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', '100%');
+      svg.setAttribute('viewBox', '0 0 400 400');
+      svg.style.position = 'absolute';
+      svg.style.top = '0';
+      svg.style.left = '0';
+      
+      // Добавляем фон доски
+      var boardBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      boardBg.setAttribute('x', '0');
+      boardBg.setAttribute('y', '0');
+      boardBg.setAttribute('width', '400');
+      boardBg.setAttribute('height', '400');
+      boardBg.setAttribute('fill', '#E8C064');
+      boardBg.setAttribute('stroke', 'black');
+      boardBg.setAttribute('stroke-width', '2');
+      svg.appendChild(boardBg);
+      
+      // Создаем линии доски (19x19)
+      var spacing = 20; // Расстояние между линиями
+      var margin = 20; // Отступ от края
+      var size = 19;   // Размер доски
+      
+      // Добавляем горизонтальные линии
+      for (var i = 0; i < size; i++) {
+        var y = margin + i * spacing;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', margin);
+        line.setAttribute('y1', y);
+        line.setAttribute('x2', margin + (size - 1) * spacing);
+        line.setAttribute('y2', y);
+        line.setAttribute('stroke', 'black');
+        line.setAttribute('stroke-width', '1');
+        svg.appendChild(line);
+      }
+      
+      // Добавляем вертикальные линии
+      for (var i = 0; i < size; i++) {
+        var x = margin + i * spacing;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('y1', margin);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', margin + (size - 1) * spacing);
+        line.setAttribute('stroke', 'black');
+        line.setAttribute('stroke-width', '1');
+        svg.appendChild(line);
+      }
+      
+      // Добавляем звездные точки (hoshi)
+      var hoshiPoints = [
+        [3, 3], [3, 9], [3, 15], 
+        [9, 3], [9, 9], [9, 15],
+        [15, 3], [15, 9], [15, 15]
+      ];
+      
+      for (var j = 0; j < hoshiPoints.length; j++) {
+        var x = hoshiPoints[j][0];
+        var y = hoshiPoints[j][1];
+        var hoshi = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        hoshi.setAttribute('cx', margin + x * spacing);
+        hoshi.setAttribute('cy', margin + y * spacing);
+        hoshi.setAttribute('r', '4');
+        hoshi.setAttribute('fill', 'black');
+        svg.appendChild(hoshi);
+      }
+      
+      // Добавляем тестовые камни
+      var stones = [
+        [3, 3, 'black'], 
+        [3, 15, 'white'],
+        [15, 3, 'white'],
+        [15, 15, 'black'],
+        [9, 9, 'black']
+      ];
+      
+      for (var k = 0; k < stones.length; k++) {
+        var x = stones[k][0];
+        var y = stones[k][1];
+        var color = stones[k][2];
+        var stone = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        stone.setAttribute('cx', margin + x * spacing);
+        stone.setAttribute('cy', margin + y * spacing);
+        stone.setAttribute('r', '9');
+        stone.setAttribute('fill', color);
+        stone.setAttribute('stroke', color === 'black' ? '#333' : '#999');
+        stone.setAttribute('stroke-width', '1');
+        svg.appendChild(stone);
+      }
+      
+      container.appendChild(svg);
+      addDebugMessage('Базовая доска создана');
+      
+      // Деактивируем виджет Glift при создании базовой доски
+      gliftWidget = null;
+    }
+  </script>
+</body>
+</html> 

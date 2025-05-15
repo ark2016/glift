@@ -63,6 +63,7 @@ export const create = apiCreate;
 const api = apiModule;
 
 // Для обратной совместимости - создаем глобальный объект glift
+// Вызываем функцию сразу при загрузке модуля
 setupGlobalGlift();
 
 // Экспортируем публичное API

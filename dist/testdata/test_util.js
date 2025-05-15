@@ -1,1 +1,31 @@
-var testUtil={ptlistToMap:function(t){for(var n={},o=0;o<t.length;o++){var i=t[o];void 0!==i.value?n[i.point.toString()]=i:n[i.toString()]=i}return n},assertFullDiv:function(t){ok(glift.dom.elem(t).html().length>0,"Div should contain contents.  Was: "+glift.dom.elem(t).html())},assertEmptyDiv:function(t){var n=glift.dom.elem(t).html();ok(0===n.toString().length,"Div should not contain contents. Instead was ["+n+"]")}};
+// Util functions for running QUnit Tests
+var testUtil = {
+  ptlistToMap: function (list) {
+    var outMap = {};
+    for (var i = 0; i < list.length; i++) {
+      var item = list[i];
+      if (item.value !== undefined) {
+        outMap[item.point.toString()] = item; // LABEL
+      } else {
+        outMap[item.toString()] = item; // point
+      }
+    }
+    return outMap;
+  },
+
+  assertFullDiv: function (divId) {
+    // really this is just non-empty...
+    ok(
+      glift.dom.elem(divId).html().length > 0,
+      'Div should contain contents.' + '  Was: ' + glift.dom.elem(divId).html()
+    );
+  },
+
+  assertEmptyDiv: function (divId) {
+    var contents = glift.dom.elem(divId).html();
+    ok(
+      contents.toString().length === 0,
+      'Div should not contain contents. Instead was [' + contents + ']'
+    );
+  },
+};

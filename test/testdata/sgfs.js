@@ -1,7 +1,8 @@
-// This is not included in the compiled otre client file.
-if (testdata === undefined) var testdata = {};
+// Определяем объект testdata глобально, если он еще не определен
+window.testdata = window.testdata || {};
 
-testdata.sgfs = {
+// Добавляем данные SGF в объект testdata
+window.testdata.sgfs = {
   descriptionTest: '(;GM[1]C[Try these Problems out!])',
   base:
     '(;GM[1]FF[4]CA[UTF-8]AP[CGoban:3]ST[2]\n' +
@@ -187,7 +188,7 @@ testdata.sgfs = {
     'PW[Lee Sedol]PB[Gu Li]WR[9d]BR[7d]DT[2004-11-16]EV[9th Samsung Cup]RO[Semifinal]PC[Ulsan]SO[https://gogameguru.com/]RE[W+Resign]' +
     ';B[qd] ;W[dd] ;B[pq] ;W[oc] ;B[dp] ;W[po] ;B[pe] ;W[md] ;B[qm] ;W[qq] ;B[qp]' +
     ';W[pp] ;B[qo] ;W[qn] ;B[pn] ;W[rn] ;B[rq] ;W[qr] ;B[ro] ;W[rm] ;B[oq] ;W[np]' +
-    ';B[rr] ;W[ql] ;B[pm] ;W[pl] ;B[nm] ;W[op] ;B[ol] ;W[pj] ;B[qh] ;W[ok] ;B[nk]' +
+    ';B[rr] ;W[ql] ;B[pm] ;W[pl] ;B[ol] ;W[op] ;B[ol] ;W[pj] ;B[qh] ;W[ok] ;B[nk]' +
     ';W[nj] ;B[mk] ;W[so] ;B[rp] ;W[mm] ;B[nn] ;W[mn] ;B[mj] ;W[ni] ;B[mi] ;W[mh]' +
     ';B[lh] ;W[mg] ;B[lg] ;W[on] ;B[om] ;W[mf] ;B[jp] ;W[km] ;B[jj] ;W[im] ;B[lp]' +
     ';W[nq] ;B[pr] ;W[or] ;B[qs] ;W[no] ;B[nl] ;W[lo] ;B[gp] ;W[jh] ;B[ji] ;W[ih]' +
@@ -220,3 +221,6 @@ testdata.sgfs = {
     '' +
     '**228 moves: White won by resignation.**])',
 };
+
+// Экспортируем данные как ES модуль
+export default window.testdata.sgfs;

@@ -69,8 +69,17 @@ module.exports = (env, argv) => {
       }
     },
     devServer: {
-      static: {
-        directory: path.join(__dirname, 'dist'),
+      static: [
+        {
+          directory: path.join(__dirname, 'dist'),
+        },
+        {
+          directory: path.join(__dirname, 'test'),
+          publicPath: '/test'
+        }
+      ],
+      devMiddleware: {
+        writeToDisk: true
       },
       compress: true,
       port: 9000,
