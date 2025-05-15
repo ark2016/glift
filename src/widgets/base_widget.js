@@ -130,71 +130,46 @@ export class BaseWidget {
     
     // Получаем контейнер
     const container = selectId(this.innerDivId);
-    if (!container) return;
-    
-    // Создаем и добавляем контейнер для доски
-    const boardContainer = newElement('div', boardId);
-    boardContainer.style('width', '100%')
-      .style('height', '90%')
-      .style('position', 'relative');
-    
-    // Создаем и добавляем контейнер для статусбара
-    const statusbarContainer = newElement('div', statusbarId);
-    statusbarContainer.style('width', '100%')
-      .style('height', '10%')
-      .style('position', 'relative');
-    
-    // Добавляем контейнеры
-    container.append(boardContainer);
-    container.append(statusbarContainer);
-    
-    try {
-      console.log('Создание отображения...');
-      console.log('boardId:', boardId);
-      console.log('DISPLAY_TYPE:', displays.DISPLAY_TYPE);
-      
-      // Создаем отображение
-      this._display = displays.createByType(
-        displays.DISPLAY_TYPE.FULL, 
-        {
-          boardOptions: {
-            divId: boardId,
-            boardSize: this.displayOptions.boardSize || 19,
-            theme: this.displayOptions.theme || 'DEFAULT',
-            showCoordinates: this.displayOptions.drawBoardCoords || false
-          },
-          statusbarOptions: {
-            divId: statusbarId,
-            theme: this.displayOptions.theme || 'DEFAULT'
-          }
-        }
-      );
-      
-      console.log('Отображение создано:', this._display);
-      
-      // Отрисовываем доску и добавляем тестовые камни
-      if (this._display && this._display.board) {
-        console.log('Добавление камней на доску...');
-        // Рисуем несколько тестовых камней
-        this._display.board.addStone(3, 3, 'black');
-        this._display.board.addStone(3, 15, 'white');
-        this._display.board.addStone(15, 3, 'white');
-        this._display.board.addStone(15, 15, 'black');
-        this._display.board.addStone(9, 9, 'black');
-        
-        // Обновляем статусбар
-        if (this._display.statusbar) {
-          this._display.statusbar.setMove(5, 'black');
-          this._display.statusbar.setCaptures(1, 2);
-        }
-      } else {
-        console.error('Объект доски не создан!');
-      }
-    } catch (error) {
-      console.error('Ошибка при создании отображения:', error);
+    if (!container) {
+      console.error('Не найден контейнер:', this.innerDivId);
+      return;
     }
     
-    // В полноценной реализации здесь бы загружался SGF и создавался контроллер
+    // Создаем базовую структуру для тестирования
+    const html = `
+      <div id="${boardId}" style="width: 100%; height: 90%; background-color: #E8C064; position: relative; border: 2px solid black; box-sizing: border-box;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold;">
+          Доска Го
+        </div>
+        <div style="position: absolute; top: 20px; left: 20px; width: 20px; height: 20px; background-color: black; border-radius: 50%;">
+        </div>
+        <div style="position: absolute; top: 20px; right: 20px; width: 20px; height: 20px; background-color: white; border-radius: 50%; border: 1px solid black;">
+        </div>
+        <div style="position: absolute; bottom: 20px; left: 20px; width: 20px; height: 20px; background-color: white; border-radius: 50%; border: 1px solid black;">
+        </div>
+        <div style="position: absolute; bottom: 20px; right: 20px; width: 20px; height: 20px; background-color: black; border-radius: 50%;">
+        </div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; background-color: black; border-radius: 50%;">
+        </div>
+      </div>
+      <div id="${statusbarId}" style="width: 100%; height: 10%; background-color: #f5f5f5; border: 1px solid #ddd; box-sizing: border-box; display: flex; align-items: center; padding: 0 10px;">
+        <span style="font-weight: bold;">Ход: 5 (Черные)</span>
+      </div>
+    `;
+    
+    // Устанавливаем HTML напрямую
+    container.html(html);
+    
+    console.log('Создан простой HTML для отображения доски');
+    
+    // Проверяем, создались ли элементы
+    if (document.getElementById(boardId)) {
+      console.log('Контейнер доски найден в DOM');
+    } else {
+      console.error('Контейнер доски НЕ найден в DOM:', boardId);
+    }
+    
+    // Устанавливаем заглушку для контроллера
     this._controller = {
       initialize: () => {},
       getBoard: () => ({ stones: [] }),

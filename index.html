@@ -58,36 +58,204 @@
   <div>
     <button onclick="showCoordinates()">Показать/скрыть координаты</button>
     <button onclick="changeTheme()">Сменить тему</button>
+    <button onclick="createBasicBoard()">Создать базовую доску напрямую</button>
   </div>
   
   <div id="glift-container"></div>
+  <div id="debug-info" style="margin-top: 10px; padding: 10px; background-color: #f0f0f0; border: 1px solid #ccc;">
+    <strong>Отладочная информация:</strong>
+    <div id="debug-log"></div>
+  </div>
   
   <script>
+    // Функция для добавления отладочных сообщений
+    function addDebugMessage(message) {
+      var debugLog = document.getElementById('debug-log');
+      var timestamp = new Date().toLocaleTimeString();
+      debugLog.innerHTML += '<div>' + timestamp + ': ' + message + '</div>';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      addDebugMessage('DOM загружен');
+    });
+
     var gliftWidget;
     
     // Функция для проверки загрузки всех зависимостей перед инициализацией
     function checkDependencies() {
+      addDebugMessage('Проверка зависимостей...');
       if (typeof glift !== 'undefined' && typeof testdata !== 'undefined' && typeof testdata.sgfs !== 'undefined') {
+        addDebugMessage('Зависимости загружены, инициализация Glift');
         initializeGlift();
       } else {
+        addDebugMessage('Зависимости не загружены, повторная попытка через 100мс');
         // Ждем 100 мс и пробуем снова
         setTimeout(checkDependencies, 100);
       }
     }
     
+    // Простая функция для создания базовой доски без использования библиотеки
+    function createBasicBoard() {
+      addDebugMessage('Создание базовой доски напрямую');
+      var container = document.getElementById('glift-container');
+      if (!container) {
+        addDebugMessage('ОШИБКА: Контейнер не найден!');
+        return;
+      }
+      container.innerHTML = '';
+      container.style.backgroundColor = '#E8C064';
+      container.style.position = 'relative';
+      container.style.overflow = 'hidden';
+      
+      // Создаем SVG элемент
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', '100%');
+      svg.setAttribute('viewBox', '0 0 400 400');
+      svg.style.position = 'absolute';
+      svg.style.top = '0';
+      svg.style.left = '0';
+      
+      // Добавляем фон доски
+      var boardBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      boardBg.setAttribute('x', '0');
+      boardBg.setAttribute('y', '0');
+      boardBg.setAttribute('width', '400');
+      boardBg.setAttribute('height', '400');
+      boardBg.setAttribute('fill', '#E8C064');
+      boardBg.setAttribute('stroke', 'black');
+      boardBg.setAttribute('stroke-width', '2');
+      svg.appendChild(boardBg);
+      
+      // Создаем линии доски (19x19)
+      var spacing = 20; // Расстояние между линиями
+      var margin = 20; // Отступ от края
+      var size = 19;   // Размер доски
+      
+      // Добавляем горизонтальные линии
+      for (var i = 0; i < size; i++) {
+        var y = margin + i * spacing;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', margin);
+        line.setAttribute('y1', y);
+        line.setAttribute('x2', margin + (size - 1) * spacing);
+        line.setAttribute('y2', y);
+        line.setAttribute('stroke', 'black');
+        line.setAttribute('stroke-width', '1');
+        svg.appendChild(line);
+      }
+      
+      // Добавляем вертикальные линии
+      for (var i = 0; i < size; i++) {
+        var x = margin + i * spacing;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('y1', margin);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', margin + (size - 1) * spacing);
+        line.setAttribute('stroke', 'black');
+        line.setAttribute('stroke-width', '1');
+        svg.appendChild(line);
+      }
+      
+      // Добавляем звездные точки (hoshi)
+      var hoshiPoints = [
+        [3, 3], [3, 9], [3, 15], 
+        [9, 3], [9, 9], [9, 15],
+        [15, 3], [15, 9], [15, 15]
+      ];
+      
+      for (var j = 0; j < hoshiPoints.length; j++) {
+        var x = hoshiPoints[j][0];
+        var y = hoshiPoints[j][1];
+        var hoshi = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        hoshi.setAttribute('cx', margin + x * spacing);
+        hoshi.setAttribute('cy', margin + y * spacing);
+        hoshi.setAttribute('r', '4');
+        hoshi.setAttribute('fill', 'black');
+        svg.appendChild(hoshi);
+      }
+      
+      // Добавляем тестовые камни
+      var stones = [
+        [3, 3, 'black'], 
+        [3, 15, 'white'],
+        [15, 3, 'white'],
+        [15, 15, 'black'],
+        [9, 9, 'black']
+      ];
+      
+      for (var k = 0; k < stones.length; k++) {
+        var x = stones[k][0];
+        var y = stones[k][1];
+        var color = stones[k][2];
+        var stone = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        stone.setAttribute('cx', margin + x * spacing);
+        stone.setAttribute('cy', margin + y * spacing);
+        stone.setAttribute('r', spacing / 2 - 1);
+        stone.setAttribute('fill', color);
+        stone.setAttribute('stroke', color === 'black' ? '#333' : '#ddd');
+        stone.setAttribute('stroke-width', '1');
+        
+        if (color === 'white') {
+          // Для белых камней добавляем легкую тень
+          stone.setAttribute('fill', 'white');
+          stone.setAttribute('filter', 'drop-shadow(1px 1px 1px rgba(0,0,0,0.3))');
+        }
+        
+        svg.appendChild(stone);
+      }
+      
+      // Добавляем SVG на страницу
+      container.appendChild(svg);
+      
+      // Добавляем информацию о ходе
+      var infoBox = document.createElement('div');
+      infoBox.style.position = 'absolute';
+      infoBox.style.bottom = '10px';
+      infoBox.style.left = '0';
+      infoBox.style.width = '100%';
+      infoBox.style.textAlign = 'center';
+      infoBox.style.color = '#333';
+      infoBox.style.fontWeight = 'bold';
+      infoBox.style.backgroundColor = 'rgba(255,255,255,0.7)';
+      infoBox.style.padding = '5px';
+      infoBox.innerHTML = 'Ход: 5 (Черные)';
+      container.appendChild(infoBox);
+      
+      console.log('Базовая доска создана напрямую');
+    }
+    
     // Инициализируем Glift, когда все зависимости загружены
     function initializeGlift() {
       try {
-        // Создаем виджет Glift
-        gliftWidget = glift.create({
-          divId: "glift-container",
-          sgf: testdata.sgfs.complexproblem,
-          theme: "DEFAULT",
-          display: {
-            drawBoardCoords: true
+        addDebugMessage('Начало инициализации Glift');
+        
+        // Сначала попробуем создать базовую доску напрямую
+        addDebugMessage('Создание базовой доски напрямую');
+        createBasicBoard();
+        
+        // Затем попробуем создать виджет Glift (если не работает, у нас хотя бы будет базовая доска)
+        addDebugMessage('Запланирована инициализация виджета Glift через 1 секунду');
+        setTimeout(function() {
+          try {
+            addDebugMessage('Попытка создания виджета Glift');
+            gliftWidget = glift.create({
+              divId: "glift-container",
+              sgf: testdata.sgfs.complexproblem,
+              theme: "DEFAULT",
+              display: {
+                drawBoardCoords: true
+              }
+            });
+            addDebugMessage('Виджет Glift успешно создан');
+          } catch (e) {
+            addDebugMessage('ОШИБКА: при создании Glift виджета: ' + e.message);
+            console.error('Ошибка при создании Glift виджета:', e);
           }
-        });
+        }, 1000);
       } catch (e) {
+        addDebugMessage('ОШИБКА: при инициализации Glift: ' + e.message);
         document.getElementById('glift-container').innerHTML = 
           '<div class="error">Ошибка загрузки библиотеки Glift: ' + e.message + '</div>';
         console.error(e);
@@ -96,6 +264,11 @@
     
     // Начинаем проверку зависимостей после загрузки DOM
     document.addEventListener('DOMContentLoaded', function() {
+      addDebugMessage('DOM загружен, создаю базовую доску');
+      // Попробуем сразу создать базовую доску, даже если Glift не загрузится
+      createBasicBoard();
+      addDebugMessage('Базовая доска создана, проверяю зависимости Glift');
+      // Затем проверим зависимости Glift
       checkDependencies();
     });
     

@@ -117,6 +117,7 @@ export const showError = (message, container) => {
  * glift.dom.attachToParent(mySvgObject, 'board-container');
  */
 export const attachToParent = (svgObj, parentId) => {
+  console.log('Attaching SVG to parent:', parentId);
   const container = selectId(parentId);
   if (!container) {
     console.error('Не удалось найти родительский контейнер:', parentId);
@@ -126,13 +127,19 @@ export const attachToParent = (svgObj, parentId) => {
   // Очищаем контейнер перед добавлением SVG
   container.empty();
   
-  // Проверяем, что есть правильный SVG объект
+  // Проверяем тип SVG объекта и добавляем соответствующим образом
   if (svgObj && svgObj.el) {
+    console.log('Appending SVG with el property');
     container.append(svgObj);
   } else if (svgObj && svgObj.element) {
-    // Поддержка для старого формата SVG объектов
+    console.log('Appending SVG with element property');
     container.append(svgObj.element);
+  } else if (svgObj && typeof svgObj.render === 'function') {
+    // Это объект SvgObj, нужно использовать его метод render()
+    console.log('Appending rendered SVG');
+    const svgContent = svgObj.render();
+    container.html(svgContent);
   } else {
-    console.error('Передан некорректный SVG объект');
+    console.error('Передан некорректный SVG объект', svgObj);
   }
 }; 

@@ -8,6 +8,8 @@ import * as svg from '../../svg/index.js';
 import * as dom from '../../dom/index.js';
 import { enums } from '../../util/index.js';
 import { Intersections } from './intersections.js';
+import { Board } from '../../flattener/board.js';
+import { Flattened } from '../../flattener/flattened.js';
 
 // Функции для создания элементов доски - импортируем из соответствующих модулей
 import { boardBase } from './board_base.js';
@@ -19,13 +21,14 @@ import { shadows } from './stones.js';
 import { stones } from './stones.js';
 import { markContainer, addMark } from './marks.js';
 import { buttons } from './buttons.js';
+import { Point } from '../../util/point.js';
+import { symbols } from '../../flattener/symbols.js';
+import { states } from '../../util/enums.js';
 
 // Создаем заглушки для flattener, пока не имплементируем этот модуль полностью
 const flattener = {
   emptyFlattened: (size) => ({ 
-    board: () => ({ 
-      differ: () => [] 
-    }) 
+    board: () => [] 
   }),
   symbolStoneToState: {},
   symbolMarkToMark: {},
@@ -87,7 +90,8 @@ export class Display {
      *
      * @private {Object}
      */
-    this.flattened_ = flattener.emptyFlattened(this.numIntersections());
+    const boardData = new Board(this.numIntersections());
+    this.flattened_ = new Flattened(boardData);
   }
 
   /**
@@ -144,16 +148,49 @@ export class Display {
    * @return {Display}
    */
   init() {
+    console.log('Initializing board with ID:', this.divId());
+    const containerElem = dom.selectId(this.divId());
+    
+    if (containerElem) {
+      // Проверим размеры контейнера
+      const rect = containerElem.boundingClientRect();
+      console.log('Container size:', rect.width, 'x', rect.height);
+      
+      // Убедимся, что контейнер имеет высоту
+      if (rect.height === 0) {
+        console.log('Container has zero height, setting explicit height');
+        containerElem.style('height', '400px'); // Установим явную высоту
+      }
+      if (rect.width === 0) {
+        console.log('Container has zero width, setting explicit width');
+        containerElem.style('width', '400px'); // Установим явную ширину
+      }
+      
+      // Установим стили для контейнера
+      containerElem.style('position', 'relative');
+      containerElem.style('display', 'block');
+      containerElem.style('overflow', 'hidden');
+      containerElem.style('background-color', '#F7D26E');
+    } else {
+      console.error('Container not found for ID:', this.divId());
+    }
+    
     if (!this.svg_) {
       this.destroy(); // make sure everything is cleared out of the div.
       this.svg_ = svg.svg({
         height: '100%',
         width: '100%',
-        position: 'float',
+        position: 'absolute',
         top: 0,
+        left: 0,
         id: this.divId() + '_svgboard',
       });
+      
+      console.log('Created SVG element with ID:', this.divId() + '_svgboard');
+    } else {
+      console.log('SVG already initialized');
     }
+    
     this.environment_.init();
     return this;
   }
@@ -183,6 +220,22 @@ export class Display {
       throw new Error('boardPoints null: Gui Environment obj not initialized.');
     }
 
+    console.log('Drawing board with dimensions:', goBox.width(), 'x', goBox.height());
+    console.log('Board points:', boardPoints.data().length);
+    console.log('Theme:', theme);
+
+    // Добавим видимый фон для всей доски, чтобы проверить, рендерится ли SVG
+    svgObj.append(
+      svg.rect()
+        .setAttr('x', 0)
+        .setAttr('y', 0)
+        .setAttr('width', '100%')
+        .setAttr('height', '100%')
+        .setAttr('fill', '#F7D26E') // Светло-коричневый фон для доски го
+        .setAttr('stroke', 'black')
+        .setAttr('stroke-width', 2)
+    );
+
     boardBase(svgObj, idGen, goBox, theme);
     initBlurFilter(divId, svgObj); // в boardBase. Должно быть перенесено.
 
@@ -207,7 +260,12 @@ export class Display {
       this.rotation()
     );
 
+    // Добавляем тестовый камень прямо здесь для проверки
+    const testPoint = new Point(9, 9);
+    this.addStone(9, 9, 'BLACK');
+
     this.flush();
+    console.log('Board drawing complete. SVG:', this.svg_);
     return this; // required
   }
 
@@ -227,7 +285,32 @@ export class Display {
   /** @return {Display} this */
   flush() {
     if (this.svg_) {
-      dom.attachToParent(this.svg_, this.divId());
+      console.log('Flushing SVG to DOM element with ID:', this.divId());
+      const container = dom.selectId(this.divId());
+      if (container) {
+        console.log('Container found:', container);
+        // Явно установим размеры и видимость контейнера
+        container.style('width', '100%');
+        container.style('height', '100%');
+        container.style('display', 'block');
+        container.style('background-color', '#F7D26E');
+        container.empty(); // Очищаем контейнер перед добавлением
+        
+        console.log('SVG object to flush:', this.svg_);
+        
+        // Добавляем SVG вручную в контейнер
+        if (this.svg_.element) {
+          console.log('Appending SVG element directly to container');
+          container.append(this.svg_.element);
+        } else {
+          console.log('Using attachToParent for SVG object');
+          dom.attachToParent(this.svg_, this.divId());
+        }
+      } else {
+        console.error('Container not found for ID:', this.divId());
+      }
+    } else {
+      console.error('SVG not initialized in flush()');
     }
     return this;
   }
@@ -247,5 +330,48 @@ export class Display {
     this.flattened_ = flattener.emptyFlattened(this.numIntersections());
     this.intersections_ = null;
     return this;
+  }
+
+  /**
+   * Добавляет камень на доску.
+   * @param {number} x Координата X
+   * @param {number} y Координата Y
+   * @param {string} color Цвет камня ('black' или 'white' в нижнем регистре)
+   */
+  addStone(x, y, color) {
+    console.log(`Добавление камня цвета ${color} в точке (${x},${y})`);
+    
+    // Нормализуем цвет для внутреннего использования
+    const normalizedColor = color.toUpperCase();
+    const stoneState = normalizedColor === 'BLACK' ? states.BLACK : 
+                      normalizedColor === 'WHITE' ? states.WHITE : states.EMPTY;
+    
+    const point = new Point(x, y);
+    const stoneSymbol = stoneState === states.BLACK ? symbols.BSTONE :
+                       stoneState === states.WHITE ? symbols.WSTONE : symbols.EMPTY;
+
+    console.log(`Нормализованный цвет: ${normalizedColor}, symbol: ${stoneSymbol}`);
+
+    // Обновляем flattened состояние
+    const intersection = this.flattened_.getIntBoardPt(point);
+    if (intersection) {
+      console.log(`Intersection найден для точки (${x},${y})`);
+      intersection.setStone(stoneSymbol);
+    } else {
+      console.warn(`Intersection not found for point: (${x},${y})`);
+      return;
+    }
+
+    // Обновляем SVG отображение
+    if (this.intersections_) {
+      console.log(`Вызываем setStoneColor для точки (${x},${y}) с цветом ${normalizedColor}`);
+      // Передаем нормализованный цвет
+      this.intersections_.setStoneColor(point, normalizedColor);
+    } else {
+      console.warn('Intersections object not initialized in Display.addStone');
+    }
+
+    // Обновляем SVG
+    this.flush();
   }
 }
