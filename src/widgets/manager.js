@@ -409,15 +409,19 @@ export class WidgetManager {
    * @export
    */
   createWidget(sgfObj) {
-    return new BaseWidget(
-      this.getDivId(),
-      sgfObj,
-      this.displayOptions,
-      this.iconActions,
-      this.stoneActions,
-      this,
-      this.hooks
-    );
+    // Создаем объект опций для BaseWidget
+    const options = {
+      divId: this.getDivId(),
+      sgf: sgfObj.sgfString,
+      sgfDefaults: sgfObj,
+      display: this.displayOptions,
+      stoneActions: this.stoneActions,
+      iconActions: this.iconActions,
+      hooks: this.hooks,
+      widgetType: sgfObj.widgetType
+    };
+    
+    return new BaseWidget(options);
   }
 
   /**

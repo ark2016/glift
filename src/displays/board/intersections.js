@@ -66,37 +66,60 @@ export class Intersections {
   setStoneColor(pt, color) {
     console.log(`Установка цвета камня ${color} в точке ${pt.x()},${pt.y()}`);
     
+    if (!pt || typeof pt.x !== 'function' || typeof pt.y !== 'function') {
+      console.error('Некорректная точка:', pt);
+      return;
+    }
+    
     const idGen = svg.ids.gen(this.divId_);
     const stoneId = idGen.stone(pt);
     
     console.log('Looking for stone with ID:', stoneId);
     
+    // Нормализуем цвет
+    const normalizedColor = (color || 'EMPTY').toUpperCase();
+    
     // Поиск элемента камня по ID в DOM
-    const stoneElement = document.getElementById(stoneId);
-    if (stoneElement) {
-      console.log('Stone DOM element found:', stoneElement);
+    let stoneElement = document.getElementById(stoneId);
+    
+    // Если камень не найден, создаем его
+    if (!stoneElement) {
+      console.log('Stone element not found, creating new one');
+      this._createStone(pt, normalizedColor);
+      stoneElement = document.getElementById(stoneId);
       
-      const stoneTheme = this.theme_.stones[color.toUpperCase()];
-      if (color === enums.states.EMPTY) {
+      // Если создание не удалось, выходим
+      if (!stoneElement) {
+        console.error('Failed to create stone element');
+        return;
+      }
+    }
+    
+    console.log('Stone DOM element found/created:', stoneElement);
+    
+    // Применяем стиль на основе цвета
+    try {
+      if (normalizedColor === 'EMPTY') {
         stoneElement.setAttribute('opacity', '0');
         stoneElement.setAttribute('stone_color', 'EMPTY');
-      } else if (stoneTheme) {
-        console.log('Using theme for stone:', stoneTheme);
-        stoneElement.setAttribute('opacity', stoneTheme.opacity || '1');
-        stoneElement.setAttribute('fill', stoneTheme.fill);
-        stoneElement.setAttribute('stroke', stoneTheme.stroke);
-        stoneElement.setAttribute('stone_color', color.toUpperCase());
       } else {
-        console.warn(`Theme not found for stone color: ${color}`);
-        // Устанавливаем значения по умолчанию
-        stoneElement.setAttribute('opacity', '1');
-        stoneElement.setAttribute('fill', color.toLowerCase());
-        stoneElement.setAttribute('stone_color', color.toUpperCase());
+        const stoneTheme = this.theme_.stones[normalizedColor];
+        if (stoneTheme) {
+          console.log('Using theme for stone:', stoneTheme);
+          stoneElement.setAttribute('opacity', stoneTheme.opacity || '1');
+          stoneElement.setAttribute('fill', stoneTheme.fill);
+          stoneElement.setAttribute('stroke', stoneTheme.stroke);
+          stoneElement.setAttribute('stone_color', normalizedColor);
+        } else {
+          console.warn(`Theme not found for stone color: ${normalizedColor}`);
+          // Устанавливаем значения по умолчанию
+          stoneElement.setAttribute('opacity', '1');
+          stoneElement.setAttribute('fill', normalizedColor.toLowerCase());
+          stoneElement.setAttribute('stone_color', normalizedColor);
+        }
       }
-    } else {
-      console.warn(`Stone element not found with ID: ${stoneId}`);
-      // Попробуем создать камень
-      this._createStone(pt, color);
+    } catch (error) {
+      console.error('Error setting stone color:', error);
     }
   }
   
@@ -112,6 +135,12 @@ export class Intersections {
       
       const idGen = svg.ids.gen(this.divId_);
       const stoneId = idGen.stone(pt);
+      
+      // Проверяем, существует ли уже камень с таким ID
+      if (document.getElementById(stoneId)) {
+        console.log(`Камень с ID ${stoneId} уже существует`);
+        return;
+      }
       
       // Найдем координаты для точки на доске
       const boardPoints = this.boardPoints_;
@@ -138,25 +167,48 @@ export class Intersections {
         .setAttr('r', boardPoints.radius - 0.4)
         .setId(stoneId);
       
-      const stoneTheme = this.theme_.stones[color.toUpperCase()];
-      if (stoneTheme) {
+      // Получаем тему для камня
+      const normalizedColor = color.toUpperCase();
+      const stoneTheme = this.theme_.stones[normalizedColor];
+      
+      // Применяем тему или устанавливаем значения по умолчанию
+      if (normalizedColor === 'EMPTY') {
+        stone.setAttr('opacity', '0');
+      } else if (stoneTheme) {
         stone.setAttr('opacity', stoneTheme.opacity || '1');
         stone.setAttr('fill', stoneTheme.fill);
         stone.setAttr('stroke', stoneTheme.stroke);
       } else {
         stone.setAttr('opacity', '1');
-        stone.setAttr('fill', color.toLowerCase());
+        stone.setAttr('fill', normalizedColor.toLowerCase());
+        stone.setAttr('stroke', normalizedColor === 'BLACK' ? '#000' : '#555');
       }
-      stone.setAttr('stone_color', color.toUpperCase());
+      
+      stone.setAttr('stone_color', normalizedColor);
       stone.setAttr('class', 'stone');
       
-      // Находим группу камней и добавляем в нее новый камень
-      const stoneGroup = document.getElementById(idGen.stoneGroup());
-      if (stoneGroup) {
-        stoneGroup.appendChild(stone.element);
-      } else {
-        console.error('Stone group not found');
+      // Находим группу камней
+      const stoneGroupId = idGen.stoneGroup();
+      let stoneGroup = document.getElementById(stoneGroupId);
+      
+      // Если группа не найдена, создаем её
+      if (!stoneGroup) {
+        console.log(`Создаем группу камней с ID ${stoneGroupId}`);
+        const svgElement = document.querySelector('svg');
+        if (!svgElement) {
+          console.error('SVG element not found');
+          return;
+        }
+        
+        stoneGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        stoneGroup.setAttribute('id', stoneGroupId);
+        svgElement.appendChild(stoneGroup);
       }
+      
+      // Добавляем камень в группу
+      stoneGroup.appendChild(stone.element);
+      console.log(`Камень успешно создан с ID ${stoneId}`);
+      
     } catch (error) {
       console.error('Error creating stone:', error);
     }

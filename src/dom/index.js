@@ -128,18 +128,39 @@ export const attachToParent = (svgObj, parentId) => {
   container.empty();
   
   // Проверяем тип SVG объекта и добавляем соответствующим образом
-  if (svgObj && svgObj.el) {
-    console.log('Appending SVG with el property');
-    container.append(svgObj);
-  } else if (svgObj && svgObj.element) {
-    console.log('Appending SVG with element property');
-    container.append(svgObj.element);
-  } else if (svgObj && typeof svgObj.render === 'function') {
-    // Это объект SvgObj, нужно использовать его метод render()
-    console.log('Appending rendered SVG');
-    const svgContent = svgObj.render();
-    container.html(svgContent);
-  } else {
-    console.error('Передан некорректный SVG объект', svgObj);
+  if (!svgObj) {
+    console.error('Передан пустой SVG объект');
+    return;
+  }
+  
+  try {
+    if (svgObj.el) {
+      console.log('Appending SVG with el property');
+      container.append(svgObj);
+    } else if (svgObj.element) {
+      console.log('Appending SVG with element property');
+      container.append(svgObj.element);
+    } else if (svgObj instanceof SVGElement || svgObj instanceof Element) {
+      console.log('Appending native SVG or DOM Element');
+      container.append(svgObj);
+    } else if (typeof svgObj.render === 'function') {
+      // Это объект SvgObj, нужно использовать его метод render()
+      console.log('Appending rendered SVG');
+      const svgContent = svgObj.render();
+      container.html(svgContent);
+    } else if (typeof svgObj === 'string') {
+      // Это строка с SVG-разметкой
+      console.log('Appending SVG string');
+      container.html(svgObj);
+    } else if (svgObj.outerHTML) {
+      // Это узел DOM
+      console.log('Appending DOM node with outerHTML');
+      container.html(svgObj.outerHTML);
+    } else {
+      console.error('Неизвестный тип SVG объекта:', svgObj);
+      console.debug('SVG object properties:', Object.keys(svgObj));
+    }
+  } catch (error) {
+    console.error('Ошибка при добавлении SVG:', error);
   }
 }; 

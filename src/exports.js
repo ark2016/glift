@@ -5,6 +5,7 @@
  */
 
 import * as api from './api/index.js';
+import { create } from './api/api.js';
 import { VERSION } from './index.js';
 import * as util from './util/index.js';
 import * as widgets from './widgets/index.js';
@@ -24,7 +25,7 @@ export const setupGlobalGlift = () => {
     VERSION,
     
     // Основная функция создания виджета
-    create: api.create,
+    create: create,
     
     // Публичные модули
     util,

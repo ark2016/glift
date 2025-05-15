@@ -10,6 +10,7 @@ import { DisplayOptions, themes } from './display_options.js';
 import { StoneActions, StoneFn } from './stone_actions.js';
 import { IconActions, IconDef, IconFn } from './icon_actions.js';
 import { SgfOptions } from './sgf_options.js';
+import { BaseWidget } from '../widgets/base_widget.js';
 
 /**
  * Класс опций для типов виджетов.

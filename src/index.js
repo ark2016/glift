@@ -22,7 +22,8 @@ import * as widgets from './widgets/index.js';
 import * as displays from './displays/index.js';
 import * as controllers from './controllers/index.js';
 import * as themes from './themes/index.js';
-import * as api from './api/index.js';
+import * as apiModule from './api/index.js';
+import { create as apiCreate } from './api/api.js';
 import * as dom from './dom/index.js';
 import * as parse from './parse/index.js';
 import * as svgModule from './svg/index.js';
@@ -56,7 +57,10 @@ export const init = (disableZoomForMobile, divId) => {
 };
 
 // Создаем функцию для создания экземпляра Glift
-export const create = api.create;
+export const create = apiCreate;
+
+// Переименовываем импорт для корректности
+const api = apiModule;
 
 // Для обратной совместимости - создаем глобальный объект glift
 setupGlobalGlift();
