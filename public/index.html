@@ -2,135 +2,61 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Glift - Go Board Viewer</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      color: #333;
-      text-align: center;
-    }
-    #glift-container {
-      width: 100%;
-      height: 500px;
-      margin: 20px auto;
-    }
-    .controls {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    .controls button {
-      margin: 0 5px;
-      padding: 8px 15px;
-      background-color: #4a4a4a;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .controls button:hover {
-      background-color: #333;
-    }
-    .sgf-selector {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    select {
-      padding: 8px;
-      width: 300px;
-      border-radius: 3px;
-      border: 1px solid #ddd;
-    }
-  </style>
+  <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
+  <h1>Glift - Демонстрация Go-доски</h1>
+  
+  <div class="sgf-selector">
+    <select id="sgf-select">
+      <option value="simple.sgf">Простая игра</option>
+      <option value="complex.sgf">Игра с комментариями</option>
+      <option value="joseki.sgf">Дзёсэки угла</option>
+      <option value="fuseki.sgf">Фусэки (начало игры)</option>
+      <option value="life_and_death.sgf">Задача жизни и смерти</option>
+      <option value="handicap.sgf">Игра с форой</option>
+      <option value="territory.sgf">Пример территории</option>
+    </select>
+  </div>
+  
   <div class="container">
-    <h1>Glift - Демонстрация Go-доски</h1>
-    
-    <div class="sgf-selector">
-      <select id="sgf-select">
-        <option value="simple.sgf">Простая игра</option>
-        <option value="complex.sgf">Игра с комментариями</option>
-        <option value="joseki.sgf">Дзёсэки угла</option>
-        <option value="fuseki.sgf">Фусэки (начало игры)</option>
-        <option value="life_and_death.sgf">Задача жизни и смерти</option>
-        <option value="handicap.sgf">Игра с форой</option>
-        <option value="territory.sgf">Пример территории</option>
-      </select>
+    <!-- Левая панель для дерева ходов -->
+    <div id="move-tree-panel">
+      <h3>Дерево ходов</h3>
+      <div class="tree-container">
+        <!-- Здесь будет дерево ходов в будущем -->
+        <p>Дерево ходов будет добавлено позже</p>
+      </div>
     </div>
     
+    <!-- Центральная панель с доской Go -->
     <div id="glift-container"></div>
     
-    <div class="controls">
-      <button id="prev-button">← Назад</button>
-      <button id="next-button">Вперёд →</button>
+    <!-- Правая панель с информацией -->
+    <div id="game-info-panel">
+      <div class="info-section">
+        <strong>Игроки:</strong>
+        <div id="player-black">Черные: -</div>
+        <div id="player-white">Белые: -</div>
+      </div>
+      <div class="info-section">
+        <strong>Время:</strong>
+        <div id="time-black">Черные: -</div>
+        <div id="time-white">Белые: -</div>
+      </div>
     </div>
   </div>
+  
+  <div class="controls">
+    <button id="prev-button">← Назад</button>
+    <button id="next-button">Вперёд →</button>
+  </div>
 
+  <!-- Подключение скриптов -->
   <script src="../compiled/glift.js"></script>
   <script src="sgf-examples.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      let currentGliftInstance = null;
-      
-      // Функция для инициализации Glift с выбранным SGF
-      function initGlift(sgfContent) {
-        if (currentGliftInstance) {
-          // Если экземпляр Glift уже существует, удаляем его
-          currentGliftInstance.destroy();
-        }
-        
-        // Создаем новый экземпляр Glift
-        currentGliftInstance = glift.create({
-          divId: "glift-container",
-          sgf: sgfContent,
-          display: {
-            theme: "COLORFUL",
-            goBoardBackground: "#f2b06d"
-          },
-          allowWrapAround: true,
-          useMarkdown: true
-        });
-      }
-      
-      // Обработчик изменения выбора SGF
-      document.getElementById('sgf-select').addEventListener('change', function(e) {
-        const selectedSgf = e.target.value;
-        
-        if (SGF_EXAMPLES[selectedSgf]) {
-          initGlift(SGF_EXAMPLES[selectedSgf]);
-        }
-      });
-      
-      // Кнопки навигации
-      document.getElementById('prev-button').addEventListener('click', function() {
-        if (currentGliftInstance) {
-          currentGliftInstance.applyBoardAction('back');
-        }
-      });
-      
-      document.getElementById('next-button').addEventListener('click', function() {
-        if (currentGliftInstance) {
-          currentGliftInstance.applyBoardAction('forward');
-        }
-      });
-      
-      // Инициализируем с первым SGF
-      initGlift(SGF_EXAMPLES["simple.sgf"]);
-    });
-  </script>
+  <script src="scripts/app.js"></script>
 </body>
 </html> 

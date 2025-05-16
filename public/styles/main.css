@@ -1,0 +1,167 @@
+/* Основные стили */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  background-color: white;
+}
+
+h1 {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #333;
+  z-index: 10;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* Дерево ходов (левая панель) */
+#move-tree-panel {
+  flex: 0 0 20%;
+  height: 100%;
+  background-color: #f0f0f0;
+  border-right: 1px solid #ddd;
+  box-sizing: border-box;
+  padding: 50px 10px 10px 10px; /* Отступ сверху для заголовка */
+}
+
+/* Доска Go (центральная часть) */
+#glift-container {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 40px; /* Для заголовка */
+}
+
+/* Информация об игре (правая панель) */
+#game-info-panel {
+  flex: 0 0 20%;
+  height: 100%;
+  background-color: #e0e7ff;
+  border-left: 1px solid #ddd;
+  box-sizing: border-box;
+  padding: 50px 15px 15px 15px; /* Отступ сверху для заголовка */
+  overflow-y: auto;
+  color: #333;
+}
+
+.info-section {
+  margin-bottom: 15px;
+}
+
+.info-section strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 3px;
+}
+
+.info-section div {
+  padding: 5px 0 5px 10px;
+  color: #555;
+}
+
+/* Элементы управления */
+.controls {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.controls button {
+  margin: 0 5px;
+  padding: 8px 15px;
+  background-color: #4a4a4a;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background-color: #333;
+}
+
+/* Селектор SGF */
+.sgf-selector {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 10;
+}
+
+select {
+  padding: 8px;
+  width: 300px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+  /* Для вертикальных экранов (мобильные) */
+  .container {
+    flex-direction: column;
+  }
+  
+  #move-tree-panel {
+    flex: 0 0 15%;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+  }
+  
+  #glift-container {
+    flex: 0 0 50%;
+    width: 100%;
+    padding-top: 0;
+  }
+  
+  #game-info-panel {
+    flex: 0 0 25%;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+  }
+  
+  h1 {
+    position: relative;
+    padding: 10px 0;
+  }
+  
+  .sgf-selector {
+    position: relative;
+    top: 0;
+    padding: 10px 0;
+  }
+  
+  .controls {
+    position: relative;
+    padding: 10px 0;
+  }
+} 
